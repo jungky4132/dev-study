@@ -34,7 +34,7 @@ svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
 footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 </style></head><body><main>
 <h1>CPU 레지스터 한 장 그림</h1>
-<p class="sub">if 한 줄(CMP R1, R2 → JE 2000)과 인터럽트가 CPU 안에서 처리되는 순서 · STAGE 1 컴퓨터 시스템</p>
+<p class="sub">if 한 줄(CMP R1, R2 → JE 2000)과 인터럽트(벡터 · 서비스 루틴)가 CPU 안에서 처리되는 순서 · STAGE 1 컴퓨터 시스템</p>
 <div class="panel"><div class="ctrl"><button id="prev">이전</button><button id="next">다음</button><div class="dots" id="dots"></div></div>
 <div id="stitle"></div><div id="sdesc"></div></div>
 <div class="panel"><svg id="fig" width="100%" role="img" aria-label="CPU 레지스터, 메모리, 인터럽트 요청까지 포함한 전체 구조도" viewBox="0 0 830 820" xmlns="http://www.w3.org/2000/svg">
@@ -48,6 +48,10 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <g class="el c-gray" id="m1000"><rect x="475" y="84" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="100" text-anchor="middle" dominant-baseline="central">1000 · CMP R1, R2</text></g>
 <g class="el c-gray" id="m1004"><rect x="475" y="116" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="132" text-anchor="middle" dominant-baseline="central">1004 · JE 2000</text></g>
 <g class="el c-gray" id="m2000"><rect x="475" y="148" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="164" text-anchor="middle" dominant-baseline="central">2000 · 같을 때 할 일</text></g>
+<text class="ts" x="475" y="212" dominant-baseline="central">커널 영역 (운영체제)</text>
+<g class="el c-gray" id="mvec"><rect x="475" y="226" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="242" text-anchor="middle" dominant-baseline="central">벡터 테이블 · 키보드 → 8000</text></g>
+<g class="el c-gray" id="misr"><rect x="475" y="258" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="274" text-anchor="middle" dominant-baseline="central">8000 · 키보드 ISR</text></g>
+<g class="el c-gray" id="miret"><rect x="475" y="290" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="306" text-anchor="middle" dominant-baseline="central">ISR 끝 · IRET (복귀)</text></g>
 <text class="ts" x="475" y="488" dominant-baseline="central">스택 영역</text>
 <g class="el c-gray" id="m3000"><rect x="475" y="500" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="516" text-anchor="middle" dominant-baseline="central">3000 · 지역 변수 b</text></g>
 <g class="el c-gray" id="m3004"><rect x="475" y="532" width="160" height="32" rx="4" stroke-width="0.5"/><text class="ts" x="555" y="548" text-anchor="middle" dominant-baseline="central">3004 · 지역 변수 a</text></g>
@@ -90,9 +94,13 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <line x1="320" y1="797" x2="350" y2="797" stroke="#7F77DD" stroke-width="1.5" stroke-dasharray="5 4"/><text class="ts" x="358" y="797" dominant-baseline="central">지휘 신호</text>
 <line x1="430" y1="797" x2="460" y2="797" stroke="#D85A30" stroke-width="1.5"/><text class="ts" x="468" y="797" dominant-baseline="central">PC 바꾸기</text>
 <line x1="540" y1="797" x2="570" y2="797" stroke="#73726c" stroke-width="1.5" stroke-dasharray="2 3"/><text class="ts" x="578" y="797" dominant-baseline="central">가리킴</text>
+<g class="el" id="a2v"><line x1="400" y1="94" x2="471" y2="238" class="arr" marker-end="url(#arrow)"/></g>
+<g class="el" id="a3v"><line x1="475" y1="246" x2="404" y2="186" class="arr" marker-end="url(#arrow)"/></g>
+<g class="el" id="a2i"><line x1="400" y1="98" x2="471" y2="270" class="arr" marker-end="url(#arrow)"/></g>
+<g class="el" id="a3i"><line x1="475" y1="278" x2="404" y2="190" class="arr" marker-end="url(#arrow)"/></g>
 </g>
 <g class="el c-gray" id="dev"><rect x="10" y="258" width="130" height="52" rx="8" stroke-width="0.5"/><text class="th" x="75" y="276" text-anchor="middle" dominant-baseline="central">장치</text><text class="ts" x="75" y="294" text-anchor="middle" dominant-baseline="central">키보드 · 네트워크</text></g>
-<g class="el" id="aint"><line x1="140" y1="284" x2="381" y2="284" stroke="#BA7517" stroke-width="2" marker-end="url(#arrow)"/><text class="ts" x="205" y="302" dominant-baseline="central">인터럽트 요청 신호 (제어 버스)</text></g>
+<g class="el" id="aint"><line x1="140" y1="284" x2="381" y2="284" stroke="#BA7517" stroke-width="2" marker-end="url(#arrow)"/><text class="ts" x="205" y="302" dominant-baseline="central">인터럽트 요청 + 벡터 (버스)</text></g>
 </svg></div>
 <footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 4–5 학습 정리 (인터럽트 포함)</footer>
 </main>
@@ -109,11 +117,13 @@ const S=[
 {t:'8. 무조건 점프 · 함수 호출',d:'JMP나 CALL은 플래그를 보지 않고 IR에 적힌 주소로 PC를 바로 바꿉니다. CALL은 그 전에 "돌아갈 주소"를 스택에 push합니다.',on:['ir','a12','pc','m3008'],v:{irv:'CALL add',pcv:'add 시작 주소'}},
 {t:'9. 스택 push · pop (SP)',d:'제어장치가 주소 계산 회로에 지시하면 SP에서 4를 빼(push) 새 SP를 만들고 그 칸에 값을 씁니다. pop은 값을 읽고 4를 더합니다. SP는 항상 스택 꼭대기를 가리킵니다.',on:['cu','a8','agu','a13','sp','a14','m3000'],v:{spv:'3000 → 2996 (push)',irv:'PUSH'}},
 {t:'10. 베이스 레지스터 + 오프셋',d:'LOAD R1, [BR + 8]이 오면 주소 계산이 베이스 레지스터의 5000에 오프셋 8을 더해 5008을 만들고 배열[2]를 읽습니다. 베이스 레지스터 값은 바뀌지 않습니다.',on:['cu','a8','br','a15','agu','a17','m5008','a16','m5000'],v:{irv:'LOAD R1, [BR+8]',spv:'3000 (꼭대기)'}},
-{t:'11. 인터럽트 요청 도착',d:'키보드 입력이나 네트워크 수신처럼 장치가 처리를 요청하면, 인터럽트 요청 신호가 제어 버스를 타고 제어장치로 들어옵니다(초인종). 제어장치는 명령어 하나를 끝낼 때마다 이 신호가 왔는지 확인합니다.',on:['dev','aint','cu'],v:{pcv:'다음 명령어 주소',irv:'실행 중이던 명령어',marv:'—',mbrv:'—',spv:'3000 (꼭대기)'}},
-{t:'12. 받아들일지 확인 (인터럽트 플래그)',d:'요청이 왔으면 제어장치가 플래그 레지스터의 인터럽트 플래그를 봅니다(방해 금지 팻말). 1이면 받아들이고, 0이면 무시하고 하던 일을 계속합니다. 요청이 플래그에 표시되는 것이 아니라, 플래그는 허용 스위치입니다.',on:['dev','aint','cu','flag'],v:{flagv:'인터럽트 허용 1 → 받아들임'}},
-{t:'13. 하던 일 백업 (스택에 push)',d:'제어장치의 지시로 지금의 PC와 플래그를 스택에 push합니다. 주소 계산 회로가 SP에서 4씩 빼 새 꼭대기를 만들고, 그 칸에 값을 씁니다. 돌아올 때 그대로 되돌리기 위해서입니다.',on:['cu','pc','flag','a8','agu','a13','sp','a14','m3000'],v:{spv:'2996 (PC·플래그 저장)'}},
-{t:'14. 처리 코드로 점프 → 끝나면 복귀',d:'PC를 인터럽트 처리 코드(운영체제가 준비해 둔 코드)의 주소로 바꿔 실행합니다. 처리가 끝나면 스택에서 PC와 플래그를 pop해 되돌리고, 하던 명령어 다음부터 이어서 실행합니다. 정전처럼 급한 인터럽트(NMI)는 인터럽트 플래그가 0이어도 막을 수 없습니다.',on:['pc','sp','a14','m3000','cu'],v:{pcv:'처리 코드 → 복귀',spv:'3000 (꼭대기)'}},
-{t:'15. 반복',d:'명령어 하나가 끝나면 PC가 가리키는 주소로 2단계(인출)부터 다시 시작합니다. 제어장치는 클럭, IR의 명령어, 플래그, 제어 버스 신호(인터럽트 포함) 네 가지를 받아 매번 무엇을 할지 정합니다. 이 사이클이 1초에 수십억 번 반복됩니다.',on:null,v:{pcv:'다음 주소',marv:'—',mbrv:'—',irv:'—',spv:'3000 (꼭대기)',flagv:'Z = 1 · 인터럽트 허용 1'}}];
+{t:'11. 인터럽트 요청 (+ 벡터)',d:'키보드 같은 장치가 제어 버스로 인터럽트 요청 신호를 보냅니다(초인종). 이때 "누가 불렀는지"를 알려 주는 번호인 인터럽트 벡터도 함께 전달합니다. 제어장치는 명령어 하나를 끝낼 때마다 요청이 왔는지 확인합니다.',on:['dev','aint','cu'],v:{pcv:'다음 명령어 주소',irv:'실행 중이던 명령어',marv:'—',mbrv:'—',spv:'3000 (꼭대기)'}},
+{t:'12. 받아들일지 확인 (인터럽트 플래그)',d:'제어장치가 플래그 레지스터의 인터럽트 플래그를 봅니다(방해 금지 팻말). 1이면 받아들이고, 0이면 무시하고 하던 일을 계속합니다. 요청이 플래그에 표시되는 것이 아니라, 플래그는 허용 스위치입니다.',on:['dev','aint','cu','flag'],v:{flagv:'인터럽트 허용 1 → 받아들임'}},
+{t:'13. 하던 일 백업 (스택에 push)',d:'지금의 PC와 플래그를 스택에 push합니다. 주소 계산 회로가 SP에서 4씩 빼 새 꼭대기를 만들고 그 칸에 씁니다. 나중에 그대로 되돌리기 위해서입니다.',on:['cu','pc','flag','a8','agu','a13','sp','a14','m3000'],v:{spv:'2996 (PC·플래그 저장)'}},
+{t:'14. 인터럽트 벡터로 ISR 주소 찾기',d:'인터럽트 벡터는 "어떤 처리 코드를 실행할지" 찾기 위한 번호입니다. CPU는 메모리의 인터럽트 벡터 테이블에서 그 번호 칸을 읽어 키보드 ISR의 시작 주소(8000)를 알아내고, PC에 넣습니다. 읽는 길은 평소와 같은 MAR → 메모리 → MBR입니다.',on:['cu','mar','a2v','mvec','a3v','mbr','pc'],v:{marv:'벡터 테이블 칸',mbrv:'8000',pcv:'8000 (키보드 ISR)'}},
+{t:'15. 인터럽트 서비스 루틴(ISR) 실행',d:'ISR(인터럽트 서비스 루틴, 인터럽트 핸들러)은 인터럽트를 처리하는 프로그램으로, 운영체제가 메모리에 미리 올려 둡니다. 특별한 것이 아니라 평소처럼 PC → MAR → 메모리 → MBR → IR로 명령어를 하나씩 인출해 실행합니다. 예: 눌린 키 값을 읽어 버퍼에 저장. 범용 레지스터를 써야 하면 ISR이 먼저 스택에 백업합니다.',on:['pc','a1','mar','a2i','misr','a3i','mbr','a4','ir','a5','cu'],v:{marv:'8000',mbrv:'ISR 명령어',irv:'ISR 명령어',pcv:'8004 (+1)'}},
+{t:'16. 복귀 (IRET → 스택에서 pop)',d:'ISR의 마지막 명령어 IRET이 실행되면, 13단계에서 백업한 PC와 플래그를 스택에서 pop해 되돌립니다. SP도 원래 자리로 돌아옵니다. CPU는 인터럽트가 오기 전 하던 명령어의 다음부터 아무 일 없었다는 듯 이어서 실행합니다.',on:['miret','cu','a8','agu','a13','sp','a14','m3000','pc','flag'],v:{irv:'IRET',pcv:'하던 다음 주소 (복구)',spv:'3000 (꼭대기, 복구)',flagv:'Z = 1 · 인터럽트 허용 1'}},
+{t:'17. 반복',d:'명령어 하나가 끝나면 PC가 가리키는 주소로 2단계(인출)부터 다시 시작합니다. 제어장치는 클럭, IR의 명령어, 플래그, 제어 버스 신호(인터럽트 포함) 네 가지를 받아 매번 무엇을 할지 정합니다. 이 사이클이 1초에 수십억 번 반복됩니다.',on:null,v:{pcv:'다음 주소',marv:'—',mbrv:'—',irv:'—',spv:'3000 (꼭대기)',flagv:'Z = 1 · 인터럽트 허용 1'}}];
 let i=0;const cur={};const fig=document.getElementById('fig');const dots=document.getElementById('dots');
 S.forEach((s,k)=>{const d=document.createElement('button');d.className='dot';d.setAttribute('aria-label',s.t);d.onclick=()=>{i=k;rebuild();};dots.append(d);});
 function rebuild(){Object.keys(cur).forEach(k=>delete cur[k]);for(let k=0;k<=i;k++)Object.assign(cur,S[k].v);draw();}
