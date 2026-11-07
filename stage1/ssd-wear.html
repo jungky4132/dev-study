@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SSD 셀 · 페이지 · 블록과 수명</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:52px}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts,.c-amber>.tm{fill:var(--am-s)}
+.tm{font-size:11px;font-weight:500}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+.cv>rect{fill:var(--te-f);stroke:var(--te-s)}.cv>text{fill:var(--te-t)}
+.cx>rect{fill:var(--gr-f);stroke:var(--gr-s)}.cx>text{fill:var(--gr-s)}
+.cf>rect{fill:none;stroke:var(--b);stroke-dasharray:3 3}.cf>text{fill:var(--muted)}
+.cell text{font-size:12px}
+.hl{opacity:0}.dim .el.hl{opacity:0}.dim .el.hl.on{opacity:1}
+</style></head><body><main>
+<h1>SSD 셀 · 페이지 · 블록과 수명</h1>
+<p class="sub">왜 덮어쓰지 못하고 블록 단위로만 지우는지, 그리고 지울 때마다 수명이 줄어드는 과정 · STAGE 1 컴퓨터 시스템 (보조기억장치)</p>
+<div class="panel"><div class="ctrl"><button id="prev">이전</button><button id="next">다음</button><div class="dots" id="dots"></div></div>
+<div id="stitle"></div><div id="sdesc"></div></div>
+<div class="panel"><svg id="fig" width="100%" viewBox="0 44 760 600" role="img" aria-label="블록 A와 블록 B의 셀 격자, 셀 확대 단면, 전압 분포, 블록 수명 게이지, 호스트와 FTL로 구성된 SSD 구조도" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="el" id="blkA"><rect x="20" y="60" width="280" height="250" rx="12" fill="none" stroke="var(--b)" stroke-width="0.8" stroke-dasharray="4 4"/><text class="th" x="34" y="80" dominant-baseline="central">블록 A</text><text class="ts" x="286" y="80" text-anchor="end" dominant-baseline="central" id="peA">P/E 0회</text></g>
+<g class="el" id="blkB"><rect x="320" y="60" width="280" height="250" rx="12" fill="none" stroke="var(--b)" stroke-width="0.8" stroke-dasharray="4 4"/><text class="th" x="334" y="80" dominant-baseline="central">블록 B</text><text class="ts" x="586" y="80" text-anchor="end" dominant-baseline="central" id="peB">P/E 0회</text></g>
+<g id="gridA"></g><g id="gridB"></g>
+<g class="el c-amber" id="wellA"><rect x="34" y="252" width="252" height="44" rx="6" stroke-width="0.5"/><text class="th" x="160" y="266" text-anchor="middle" dominant-baseline="central">공유 기판 (p-웰)</text><text class="ts" x="160" y="284" text-anchor="middle" dominant-baseline="central">블록 A 전체가 함께 씀</text></g>
+<g class="el c-amber" id="wellB"><rect x="334" y="252" width="252" height="44" rx="6" stroke-width="0.5"/><text class="th" x="460" y="266" text-anchor="middle" dominant-baseline="central">공유 기판 (p-웰)</text><text class="ts" x="460" y="284" text-anchor="middle" dominant-baseline="central">블록 B 전체가 함께 씀</text></g>
+<rect class="el hl" id="hlCell" x="60" y="94" width="54" height="38" rx="5" fill="none" stroke="#D85A30" stroke-width="2"/>
+<rect class="el hl" id="hlCell2" x="114" y="94" width="54" height="38" rx="5" fill="none" stroke="#D85A30" stroke-width="2"/>
+<rect class="el hl" id="hlPage" x="56" y="92" width="222" height="42" rx="6" fill="none" stroke="#D85A30" stroke-width="2"/>
+<rect class="el hl" id="hlBlock" x="16" y="56" width="288" height="258" rx="14" fill="none" stroke="#D85A30" stroke-width="2"/>
+<g class="el" id="zoom">
+<rect x="612" y="60" width="136" height="250" rx="12" fill="none" stroke="var(--b)" stroke-width="0.8" stroke-dasharray="4 4"/>
+<text class="th" x="680" y="80" text-anchor="middle" dominant-baseline="central">셀 확대</text>
+<g class="c-gray"><rect x="640" y="96" width="80" height="28" rx="3" stroke-width="0.5"/><text class="th" x="680" y="110" text-anchor="middle" dominant-baseline="central" id="cgv">0V</text></g>
+<rect class="c-amber" x="640" y="124" width="80" height="8" stroke-width="0.5"/>
+<rect class="c-purple" x="640" y="132" width="80" height="34" stroke-width="0.5"/>
+<rect class="c-amber" x="640" y="166" width="80" height="8" stroke-width="0.5"/>
+<g class="c-gray"><rect x="626" y="174" width="108" height="40" rx="3" stroke-width="0.5"/><text class="th" x="680" y="200" text-anchor="middle" dominant-baseline="central" id="wellv">0V</text></g>
+<circle id="e1" cx="652" cy="149" r="4" fill="#378ADD"/><circle id="e2" cx="672" cy="149" r="4" fill="#378ADD"/><circle id="e3" cx="688" cy="149" r="4" fill="#378ADD"/><circle id="e4" cx="708" cy="149" r="4" fill="#378ADD"/>
+<circle id="t1" cx="652" cy="170" r="2.5" fill="#E24B4A"/><circle id="t2" cx="680" cy="170" r="2.5" fill="#E24B4A"/><circle id="t3" cx="708" cy="170" r="2.5" fill="#E24B4A"/>
+<text class="ts" x="680" y="236" text-anchor="middle" dominant-baseline="central" id="cz1">전자 없음</text>
+<text class="ts" x="680" y="256" text-anchor="middle" dominant-baseline="central" id="cz2">= 1 (지운 상태)</text>
+<text class="ts" x="680" y="286" text-anchor="middle" dominant-baseline="central">보라 = 전하 저장층</text>
+</g>
+<g class="el hl" id="aprog"><line x1="662" y1="186" x2="662" y2="140" stroke="#378ADD" stroke-width="1.8" marker-end="url(#arrow)"/></g>
+<g class="el hl" id="aera"><line x1="698" y1="140" x2="698" y2="188" stroke="#378ADD" stroke-width="1.8" marker-end="url(#arrow)"/></g>
+<rect x="20" y="330" width="440" height="170" rx="12" fill="none" stroke="var(--b)" stroke-width="0.8" stroke-dasharray="4 4"/>
+<text class="th" x="34" y="350" dominant-baseline="central">셀 전압 분포 (MLC 4상태 예)</text>
+<g class="el" id="distNew"><line x1="34" y1="450" x2="234" y2="450" stroke="var(--line)" stroke-width="0.5"/>
+<path d="M38 450 C51 450 51 385 58 385 C65 385 65 450 78 450" fill="none" stroke="#1D9E75" stroke-width="1.6"/>
+<path d="M86 450 C99 450 99 385 106 385 C113 385 113 450 126 450" fill="none" stroke="#1D9E75" stroke-width="1.6"/>
+<path d="M134 450 C147 450 147 385 154 385 C161 385 161 450 174 450" fill="none" stroke="#1D9E75" stroke-width="1.6"/>
+<path d="M182 450 C195 450 195 385 202 385 C209 385 209 450 222 450" fill="none" stroke="#1D9E75" stroke-width="1.6"/>
+<text class="ts" x="134" y="474" text-anchor="middle" dominant-baseline="central">새 셀 · 상태 사이 여유 충분</text></g>
+<g class="el" id="distWorn"><line x1="248" y1="450" x2="452" y2="450" stroke="var(--line)" stroke-width="0.5"/>
+<path d="M248 450 C266 450 266 392 278 392 C290 392 290 450 308 450" fill="none" stroke="#D85A30" stroke-width="1.6"/>
+<path d="M294 450 C312 450 312 392 324 392 C336 392 336 450 354 450" fill="none" stroke="#D85A30" stroke-width="1.6" stroke-dasharray="5 3"/>
+<path d="M340 450 C358 450 358 392 370 392 C382 392 382 450 400 450" fill="none" stroke="#D85A30" stroke-width="1.6"/>
+<path d="M386 450 C404 450 404 392 416 392 C428 392 428 450 446 450" fill="none" stroke="#D85A30" stroke-width="1.6" stroke-dasharray="5 3"/>
+<text class="ts" x="350" y="474" text-anchor="middle" dominant-baseline="central">닳은 셀 · 겹침 → 읽기 오류</text></g>
+<g class="el" id="gaugeP"><rect x="480" y="330" width="268" height="170" rx="12" fill="none" stroke="var(--b)" stroke-width="0.8" stroke-dasharray="4 4"/>
+<text class="th" x="494" y="350" dominant-baseline="central">블록 A 수명 (TLC 예)</text>
+<rect x="494" y="368" width="240" height="18" rx="4" fill="none" stroke="var(--line)" stroke-width="0.8"/>
+<rect id="gfill" x="494" y="368" width="0" height="18" rx="4" fill="#D85A30"/>
+<text class="ts" x="494" y="402" dominant-baseline="central" id="gaugev">0 / 3,000회</text></g>
+<g class="el" id="eol"><text class="ts" x="494" y="428" dominant-baseline="central">한계 도달 → 배드 블록 등록</text><text class="ts" x="494" y="448" dominant-baseline="central">→ 예비 블록으로 교체</text><text class="ts" x="494" y="468" dominant-baseline="central">→ 예비 소진 시 읽기 전용</text></g>
+<g class="el c-gray" id="host"><rect x="20" y="520" width="200" height="56" rx="8" stroke-width="0.5"/><text class="th" x="120" y="538" text-anchor="middle" dominant-baseline="central">호스트 (OS)</text><text class="ts" x="120" y="558" text-anchor="middle" dominant-baseline="central" id="hostv">—</text></g>
+<g class="el" id="ah"><line x1="220" y1="548" x2="276" y2="548" class="arr" marker-end="url(#arrow)"/></g>
+<g class="el c-purple" id="ftl"><rect x="280" y="520" width="300" height="56" rx="8" stroke-width="0.5"/><text class="th" x="430" y="538" text-anchor="middle" dominant-baseline="central">FTL (SSD 컨트롤러 주소표)</text><text class="ts" x="430" y="558" text-anchor="middle" dominant-baseline="central" id="ftlv">비어 있음</text></g>
+<g class="el c-teal" id="tips"><rect x="600" y="520" width="148" height="56" rx="8" stroke-width="0.5"/><text class="th" x="674" y="538" text-anchor="middle" dominant-baseline="central">수명 늘리기</text><text class="ts" x="674" y="558" text-anchor="middle" dominant-baseline="central">TRIM · OP · 웨어 레벨링</text></g>
+<g class="cell cv"><rect x="20" y="608" width="16" height="14" rx="3" stroke-width="0.5"/></g><text class="ts" x="42" y="615" dominant-baseline="central">유효</text>
+<g class="cell cx"><rect x="86" y="608" width="16" height="14" rx="3" stroke-width="0.5"/></g><text class="ts" x="108" y="615" dominant-baseline="central">무효 (옛 데이터)</text>
+<g class="cell cf"><rect x="210" y="608" width="16" height="14" rx="3" stroke-width="0.5"/></g><text class="ts" x="232" y="615" dominant-baseline="central">빈칸</text>
+<circle cx="288" cy="615" r="4" fill="#378ADD"/><text class="ts" x="298" y="615" dominant-baseline="central">전자</text>
+<circle cx="348" cy="615" r="3" fill="#E24B4A"/><text class="ts" x="358" y="615" dominant-baseline="central">산화막에 갇힌 전자</text>
+<text class="ts" x="490" y="615" dominant-baseline="central">P = 페이지(가로 줄) · 세로 선 = 스트링</text>
+</svg></div>
+<footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 8 "다양한 보조기억장치" 학습 정리</footer>
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+function mk(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent.append(e);return e;}
+function block(p,x0){const g=document.getElementById('grid'+p);
+const bl=mk('g',{class:'el',id:'bl'+p},g);
+for(let c=0;c<4;c++){const cx=x0+44+c*54+23;mk('line',{x1:cx,y1:92,x2:cx,y2:248,stroke:'var(--b)','stroke-width':1},bl);}
+for(let r=0;r<4;r++){const t=mk('text',{class:'ts',x:x0+12,y:98+r*38+15,'dominant-baseline':'central'},bl);t.textContent='P'+r;
+for(let c=0;c<4;c++){const cell=mk('g',{class:'el cell cf',id:p+r+c},g);
+mk('rect',{x:x0+44+c*54,y:98+r*38,width:46,height:30,rx:4,'stroke-width':0.8},cell);
+mk('text',{x:x0+44+c*54+23,y:98+r*38+15,'text-anchor':'middle','dominant-baseline':'central'},cell);}}}
+block('A',20);block('B',320);
+const ALL={};['A','B'].forEach(p=>{for(let r=0;r<4;r++)for(let c=0;c<4;c++)ALL[p+r+c]=['f',''];});
+const AF={};for(let r=0;r<4;r++)for(let c=0;c<4;c++)AF['A'+r+c]=['f',''];
+const S=[
+{t:'0. 전체 그림',d:'SSD의 플래시는 셀 → 페이지 → 블록 순서로 묶여 있습니다. 위는 블록 A · 블록 B와 셀 하나를 확대한 단면, 아래는 셀의 전압 분포 · 블록 수명 · 주소를 관리하는 FTL입니다.',on:null,c:ALL,v:{peA:'P/E 0회',peB:'P/E 0회',ftlv:'비어 있음',hostv:'—',gaugev:'0 / 3,000회',cgv:'0V',wellv:'0V',cz1:'전자 없음',cz2:'= 1 (지운 상태)'},e:0,tr:0,g:0},
+{t:'1. 셀 · 가장 작은 저장 단위',d:'셀은 전하 저장층(보라)을 가진 트랜지스터 하나입니다. 저장층에 전자가 얼마나 있느냐로 값을 구분합니다. 전자가 없으면 1(지운 상태), 차 있으면 0입니다. SLC는 전자량을 2단계로, TLC는 8단계로 나눠 읽습니다. 오른쪽 그림은 블록 A 왼쪽 위 셀 하나의 단면입니다.',on:['hlCell','A00','zoom'],v:{}},
+{t:'2. 페이지 · 읽기와 쓰기 단위',d:'가로 한 줄, 즉 같은 워드라인에 연결된 셀들이 페이지(P0~P3)입니다. 읽기와 쓰기는 페이지 단위로 합니다. 실제 페이지는 4~16KB로, 한 줄에 셀이 수만 개 붙어 있습니다.',on:['hlPage','A00','A01','A02','A03'],v:{}},
+{t:'3. 블록 · 지우기 단위',d:'세로 선은 셀이 직렬로 이어진 스트링이고, 스트링들이 기판(p-웰) 하나를 함께 씁니다. 이 기판을 공유하는 묶음이 블록이며, 지우기는 블록 단위로만 할 수 있습니다. 실제 블록은 수백 페이지(수 MB)입니다. 셀마다 기판을 따로 만들면 경계와 배선이 늘어 칩이 커지므로, 집적도(용량)를 위해 기판을 공유하도록 설계했습니다.',on:['hlBlock','A*','blA','wellA'],v:{}},
+{t:'4. 쓰기(프로그램) = 전자 넣기',d:'파일 a, b, c, d를 빈 페이지 P0에 씁니다. 고른 셀의 제어 게이트에 약 20V를 걸면 전자가 얇은 터널 산화막을 뚫고 저장층으로 들어갑니다. 전압을 고른 줄에만 걸 수 있어서 쓰기는 페이지 단위로 가능합니다.',on:['host','ah','ftl','A00','A01','A02','A03','zoom','aprog'],c:{A00:['v','a'],A01:['v','b'],A02:['v','c'],A03:['v','d']},v:{hostv:'파일 a, b, c, d 쓰기',ftlv:'a · b · c · d → 블록 A · P0',cgv:'+20V',cz1:'전자가 들어감',cz2:'= 0 (쓴 상태)'},e:3},
+{t:'5. 덮어쓰기가 안 되는 이유',d:'쓰기는 전자를 "넣는" 방향으로만 할 수 있습니다. b를 새 값으로 바꾸려면 일부 셀에서 전자를 빼야 하는데, 전자를 빼는 방법은 기판에 고전압을 거는 지우기뿐입니다. 기판은 블록 전체가 공유하므로 b 한 칸만 지울 수 없고, 지우면 같은 블록의 a, c, d까지 모두 사라집니다. 그래서 같은 자리에 덮어쓰기가 불가능합니다.',on:['hlCell2','A00','A01','A02','A03','wellA','zoom'],v:{cgv:'0V',cz1:'전자 넣기만 가능',cz2:'빼기 = 블록 지우기'}},
+{t:'6. 수정 = 새 칸에 쓰고 옛 칸은 무효',d:'그래서 b를 고치면 새 값 b′를 빈 페이지 P1에 쓰고, 옛 b는 무효(×)로 표시만 합니다. FTL이 주소표를 "b → P1"로 바꾸기 때문에 OS는 같은 자리에 쓴 것처럼 느낍니다. CPU의 MMU처럼 논리 주소와 실제 위치를 분리하는 원리입니다.',on:['host','ah','ftl','A01','A10'],c:{A01:['x','×b'],A10:['v','b′']},v:{hostv:'파일 b 수정',ftlv:'b → 블록 A · P1 (옛 칸 무효)'}},
+{t:'7. 수정이 반복되면 무효 칸이 쌓인다',d:'수정과 새 파일 쓰기가 이어지면 블록 A가 가득 찹니다. 유효한 칸은 8개뿐이고 나머지 8개는 쓸모없는 옛 데이터지만, 블록을 지우기 전에는 그 자리에 다시 쓸 수 없습니다.',on:['host','ah','ftl','A*'],c:{A00:['x','×a'],A02:['x','×c'],A03:['x','×d'],A10:['x','×b′'],A11:['x','×c′'],A12:['x','×a′'],A13:['v','b″'],A20:['x','×e'],A21:['v','f'],A22:['v','c″'],A23:['v','d′'],A30:['v','g'],A31:['v','h'],A32:['v','a″'],A33:['v','e′']},v:{hostv:'수정 · 새 파일 반복',ftlv:'블록 A: 유효 8칸 · 무효 8칸 · 빈칸 0'}},
+{t:'8. 가비지 컬렉션 ① 유효 칸만 옮기기',d:'빈 블록을 만들려고 컨트롤러가 유효 칸 8개를 블록 B로 복사합니다. 호스트는 아무것도 쓰지 않았는데 플래시에는 8칸이 더 쓰였습니다. 이것이 쓰기 증폭(WAF)이고, 그만큼 수명을 더 소모합니다.',on:['ftl','A*','B*'],c:{B00:['v','b″'],B01:['v','f'],B02:['v','c″'],B03:['v','d′'],B10:['v','g'],B11:['v','h'],B12:['v','a″'],B13:['v','e′']},v:{hostv:'(요청 없음)',ftlv:'유효 8칸 → 블록 B로 복사 (쓰기 증폭)'}},
+{t:'9. 가비지 컬렉션 ② 블록 A 통째로 지우기',d:'블록 A의 기판(p-웰)에 약 20V를 걸어 모든 셀의 전자를 한꺼번에 끌어냅니다. 블록 전체가 빈칸이 되고 P/E 횟수가 1 늘어납니다. 이때 전자가 터널 산화막을 지나가면서 일부가 산화막에 갇힙니다(빨간 점).',on:['hlBlock','A*','wellA','zoom','aera','gaugeP'],c:AF,v:{peA:'P/E 1회',gaugev:'1 / 3,000회',ftlv:'블록 A → 빈 블록으로 반환',cgv:'0V',wellv:'+20V',cz1:'전자를 기판으로',cz2:'블록 전체 동시에'},e:0,tr:1,g:0.004},
+{t:'10. 반복할수록 산화막이 닳는다',d:'쓰고 지울 때마다 고전압 속에서 전자가 산화막을 지나갑니다. 산화막에 갇히는 전자가 늘고 막이 약해져, 저장층의 전자가 조금씩 새어 나갑니다. 같은 값을 써도 셀마다 전압이 들쭉날쭉해지고, 전원 없이 데이터를 보관하는 기간(리텐션)도 짧아집니다.',on:['zoom','gaugeP','blkA'],v:{peA:'P/E 2,000회',gaugev:'2,000 / 3,000회',wellv:'0V',cgv:'0V',cz1:'산화막에 전자 갇힘',cz2:'누설 · 오차 증가'},e:2,tr:3,g:0.67},
+{t:'11. 상태 구분이 흐려진다',d:'새 셀은 상태별 전압 분포가 좁아 사이 여유가 충분합니다. 닳은 셀은 분포가 넓게 퍼져 이웃 상태와 겹치고, 읽을 때 다른 값으로 착각합니다. 처음엔 ECC(LDPC)가 오류를 고쳐 주지만 고칠 수 있는 한계를 넘으면 그 블록은 쓸 수 없습니다. 상태가 많은 QLC는 처음부터 여유가 좁아 더 빨리 이 지점에 닿습니다.',on:['distNew','distWorn','zoom'],v:{}},
+{t:'12. 수명 끝 · 배드 블록',d:'P/E 한계(TLC 약 3,000회)에 가까워져 오류를 고칠 수 없게 되면 컨트롤러가 그 블록을 배드 블록으로 등록하고 예비 블록으로 바꿉니다. 예비 블록까지 다 쓰면 많은 SSD가 남은 데이터를 지키려고 읽기 전용 모드로 바뀝니다.',on:['gaugeP','eol','blkA'],v:{peA:'P/E 3,000회 · 배드',gaugev:'3,000 / 3,000회 · 한계'},g:1},
+{t:'13. 수명을 늘리는 방법',d:'TRIM: OS가 지운 파일을 알려 주면 그 칸을 바로 무효로 표시해 GC 때 쓸데없이 복사하지 않습니다. OP(여유 공간): 빈 블록이 넉넉해 GC 복사가 줄어듭니다. 웨어 레벨링: 쓰기를 모든 블록에 고르게 나눠 한 블록만 먼저 닳지 않게 합니다. 리눅스에서는 fstrim.timer로 TRIM을 주기적으로 돌리고 smartctl -a로 수명(Percentage Used)을 확인합니다.',on:['host','ah','ftl','tips'],v:{hostv:'TRIM: 지운 파일 알림',ftlv:'해당 칸 즉시 무효 → GC 복사 감소'}}];
+let i=0;const fig=document.getElementById('fig');const dots=document.getElementById('dots');
+S.forEach((s,k)=>{const d=document.createElement('button');d.className='dot';d.setAttribute('aria-label',s.t);d.onclick=()=>{i=k;draw();};dots.append(d);});
+function ex(list){const out=[];list.forEach(x=>{if(x.endsWith('*')){const p=x[0];for(let r=0;r<4;r++)for(let c=0;c<4;c++)out.push(p+r+c);}else out.push(x);});return out;}
+function draw(){const s=S[i];const v={},c={};let e=0,tr=0,g=0;
+for(let k=0;k<=i;k++){Object.assign(v,S[k].v);if(S[k].c)Object.assign(c,S[k].c);if('e'in S[k])e=S[k].e;if('tr'in S[k])tr=S[k].tr;if('g'in S[k])g=S[k].g;}
+Object.keys(v).forEach(k=>{const el=document.getElementById(k);if(el)el.textContent=v[k];});
+Object.keys(c).forEach(k=>{const el=document.getElementById(k);if(!el)return;el.setAttribute('class','el cell c'+c[k][0]);el.querySelector('text').textContent=c[k][1];});
+[1,2,3,4].forEach(n=>document.getElementById('e'+n).setAttribute('opacity',n<=e?1:0));
+[1,2,3].forEach(n=>document.getElementById('t'+n).setAttribute('opacity',n<=tr?1:0));
+document.getElementById('gfill').setAttribute('width',Math.max(0,240*g));
+if(s.on){const on=ex(s.on);fig.classList.add('dim');fig.querySelectorAll('.el').forEach(el=>el.classList.toggle('on',on.includes(el.id)));}else{fig.classList.remove('dim');fig.querySelectorAll('.el').forEach(el=>el.classList.remove('on'));}
+document.getElementById('stitle').textContent=s.t;document.getElementById('sdesc').textContent=s.d;
+document.getElementById('prev').disabled=i===0;document.getElementById('next').textContent=i===S.length-1?'처음으로':'다음';
+[...dots.children].forEach((d,k)=>d.className='dot'+(k===i?' on':''));}
+document.getElementById('next').onclick=()=>{i=i===S.length-1?0:i+1;draw();};
+document.getElementById('prev').onclick=()=>{if(i>0){i--;draw();}};
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')document.getElementById('next').click();if(e.key==='ArrowLeft')document.getElementById('prev').click();});
+draw();
+</script></body></html>
