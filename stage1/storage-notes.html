@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>보조기억장치 정리</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:52px}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts,.c-amber>.tm{fill:var(--am-s)}
+.tm{font-size:11px;font-weight:500}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+.cv>rect{fill:var(--te-f);stroke:var(--te-s)}.cv>text{fill:var(--te-t)}
+.cx>rect{fill:var(--gr-f);stroke:var(--gr-s)}.cx>text{fill:var(--gr-s)}
+.cf>rect{fill:none;stroke:var(--b);stroke-dasharray:3 3}.cf>text{fill:var(--muted)}
+.cell text{font-size:12px}
+.hl{opacity:0}.dim .el.hl{opacity:0}.dim .el.hl.on{opacity:1}
+.box{fill:var(--card);stroke:var(--b)}.leader{stroke:var(--line);stroke-width:.5;stroke-dasharray:3 3}
+:root{--t:var(--line)}
+h2{font-size:18px;font-weight:500;margin:28px 0 8px}
+p{margin:0 0 12px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0 16px}
+th,td{border-bottom:1px solid var(--border);padding:7px 8px;text-align:left;vertical-align:top}
+th{font-weight:500;background:var(--bg)}
+td:first-child{white-space:nowrap;font-weight:500}
+.wrap{overflow-x:auto}
+code{font-size:13px;background:var(--bg);padding:1px 5px;border-radius:4px}
+</style></head><body><main>
+<h1>보조기억장치 정리</h1>
+<p class="sub">SLC · MLC · TLC · QLC 비교, SLC 캐시, 하드디스크 역사, 용어 · STAGE 1 컴퓨터 시스템 (혼공컴운 섹션 8)</p>
+<div class="panel" style="font-size:15px">지우기 때문에 수명이 줄어드는 과정(셀 · 페이지 · 블록, 덮어쓰기 불가, 가비지 컬렉션)은 단계별 그림으로 따로 있습니다 → <a href="ssd-wear.html">SSD 셀 · 페이지 · 블록과 수명</a></div>
+
+<h2>1. SLC · MLC · TLC · QLC 비교</h2>
+<p>셀 하나의 전압 범위는 정해져 있습니다. 셀당 비트가 하나 늘 때마다 그 범위를 두 배로 잘게 나눠야 해서 상태 사이 여유가 좁아지고, 이 차이가 속도와 수명의 차이가 됩니다.</p>
+<div class="panel"><svg width="100%" viewBox="0 20 680 436" role="img" aria-label="같은 전압 범위를 2, 4, 8, 16개 상태로 나눈 비교와 수명 · 속도 · 가격 · 용도">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-purple"><rect x="40" y="40" width="140" height="50" rx="8" stroke-width="0.5"/><text class="th" x="110" y="57" text-anchor="middle" dominant-baseline="central">SLC</text><text class="ts" x="110" y="76" text-anchor="middle" dominant-baseline="central">1비트 · 2상태</text></g>
+<g class="c-purple"><rect x="193" y="40" width="140" height="50" rx="8" stroke-width="0.5"/><text class="th" x="263" y="57" text-anchor="middle" dominant-baseline="central">MLC</text><text class="ts" x="263" y="76" text-anchor="middle" dominant-baseline="central">2비트 · 4상태</text></g>
+<g class="c-purple"><rect x="346" y="40" width="140" height="50" rx="8" stroke-width="0.5"/><text class="th" x="416" y="57" text-anchor="middle" dominant-baseline="central">TLC</text><text class="ts" x="416" y="76" text-anchor="middle" dominant-baseline="central">3비트 · 8상태</text></g>
+<g class="c-purple"><rect x="499" y="40" width="140" height="50" rx="8" stroke-width="0.5"/><text class="th" x="569" y="57" text-anchor="middle" dominant-baseline="central">QLC</text><text class="ts" x="569" y="76" text-anchor="middle" dominant-baseline="central">4비트 · 16상태</text></g>
+<g class="c-teal"><rect x="40" y="104" width="140" height="73.5" rx="3" stroke-width="0.5"/><text class="ts" x="110" y="140.75" text-anchor="middle" dominant-baseline="central">1</text></g>
+<g class="c-teal"><rect x="40" y="180.5" width="140" height="73.5" rx="3" stroke-width="0.5"/><text class="ts" x="110" y="217.25" text-anchor="middle" dominant-baseline="central">0</text></g>
+<g class="c-teal"><rect x="193" y="104" width="140" height="35.25" rx="3" stroke-width="0.5"/><text class="ts" x="263" y="121.6" text-anchor="middle" dominant-baseline="central">11</text></g>
+<g class="c-teal"><rect x="193" y="142.25" width="140" height="35.25" rx="3" stroke-width="0.5"/><text class="ts" x="263" y="159.9" text-anchor="middle" dominant-baseline="central">10</text></g>
+<g class="c-teal"><rect x="193" y="180.5" width="140" height="35.25" rx="3" stroke-width="0.5"/><text class="ts" x="263" y="198.1" text-anchor="middle" dominant-baseline="central">01</text></g>
+<g class="c-teal"><rect x="193" y="218.75" width="140" height="35.25" rx="3" stroke-width="0.5"/><text class="ts" x="263" y="236.4" text-anchor="middle" dominant-baseline="central">00</text></g>
+<g id="tlc"></g><g id="qlc"></g>
+<text class="ts" x="340" y="272" text-anchor="middle" dominant-baseline="central">칸 = 전압 상태 · 칸 사이 틈 = 구분 여유 (좁을수록 오차에 약함)</text>
+<rect class="box" x="40" y="288" width="140" height="104" rx="8" stroke-width="0.5"/>
+<text class="ts" x="52" y="308" dominant-baseline="central">수명 5만–10만회</text><text class="ts" x="52" y="330" dominant-baseline="central">속도 가장 빠름</text><text class="ts" x="52" y="352" dominant-baseline="central">가격 가장 비쌈</text><text class="ts" x="52" y="374" dominant-baseline="central">산업용 · 캐시</text>
+<rect class="box" x="193" y="288" width="140" height="104" rx="8" stroke-width="0.5"/>
+<text class="ts" x="205" y="308" dominant-baseline="central">수명 3천–1만회</text><text class="ts" x="205" y="330" dominant-baseline="central">속도 빠름</text><text class="ts" x="205" y="352" dominant-baseline="central">가격 비쌈</text><text class="ts" x="205" y="374" dominant-baseline="central">구형 고급 · 기업</text>
+<rect class="box" x="346" y="288" width="140" height="104" rx="8" stroke-width="0.5"/>
+<text class="ts" x="358" y="308" dominant-baseline="central">수명 1천–3천회</text><text class="ts" x="358" y="330" dominant-baseline="central">속도 보통</text><text class="ts" x="358" y="352" dominant-baseline="central">가격 보통</text><text class="ts" x="358" y="374" dominant-baseline="central">일반 PC · 폰 · 서버</text>
+<rect class="box" x="499" y="288" width="140" height="104" rx="8" stroke-width="0.5"/>
+<text class="ts" x="511" y="308" dominant-baseline="central">수명 수백–1천회</text><text class="ts" x="511" y="330" dominant-baseline="central">속도 느림 (캐시 의존)</text><text class="ts" x="511" y="352" dominant-baseline="central">가격 가장 쌈</text><text class="ts" x="511" y="374" dominant-baseline="central">대용량 · 읽기 위주</text>
+<line x1="44" y1="414" x2="636" y2="414" class="arr" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<text class="ts" x="40" y="434" dominant-baseline="central">속도 · 수명 · 신뢰성 유리</text>
+<text class="ts" x="640" y="434" text-anchor="end" dominant-baseline="central">용량 · 가격 유리</text>
+</svg></div>
+<div class="wrap"><table>
+<tr><th>종류</th><th>주로 쓰는 곳</th><th>이유</th></tr>
+<tr><td>SLC</td><td>산업용 장비, 자동차 · 의료 장비, 기업용 쓰기 캐시</td><td>온도 변화와 잦은 쓰기에 강하고 보존 기간이 김. 용량당 가격이 아주 비쌈</td></tr>
+<tr><td>MLC</td><td>예전 고급형 SSD(삼성 860 PRO 등), 예전 기업용(eMLC)</td><td>TLC 품질이 좋아지면서 지금은 거의 단종</td></tr>
+<tr><td>TLC</td><td>일반 PC SSD, 스마트폰(UFS), 대부분의 서버 SSD</td><td>가격 · 속도 · 수명 균형이 가장 좋은 현재 표준</td></tr>
+<tr><td>QLC</td><td>저가 대용량 SSD, NAS, AI 학습 데이터 · 백업 저장소</td><td>한 번 쓰고 여러 번 읽는 용도. 60TB급 이상 초대용량을 저렴하게</td></tr>
+</table></div>
+<p>실무: STT 녹취 원본처럼 한 번 쓰고 주로 읽는 데이터는 QLC로도 충분하고, DB · 로그처럼 계속 쓰는 데이터는 TLC 이상이 안전합니다.</p>
+
+<h2>2. SLC 캐시</h2>
+<p><b>역사적 배경</b> · 2012년 삼성 840이 첫 TLC 소비자용 SSD로 나왔지만 셀에 8단계를 정밀하게 맞춰 넣어야 해서 쓰기가 MLC보다 확연히 느렸습니다. 2013년 840 EVO가 TLC 셀 일부를 1비트처럼 쓰는 TurboWrite로 이를 가렸고, 2018년 QLC SSD(인텔 660p 등)가 나오면서 SLC 캐시는 사실상 모든 소비자용 SSD의 필수가 됐습니다.</p>
+<p><b>원리</b> · SLC 모드는 상태를 2개만 구분하면 돼서 빠르고 덜 닳습니다. 쓰기는 일단 SLC 영역에 빠르게 받고, 한가할 때 TLC · QLC 영역으로 옮겨 담습니다(폴딩).</p>
+<div class="panel"><svg width="100%" viewBox="0 20 680 396" role="img" aria-label="호스트 쓰기를 SLC 캐시에 받고 TLC로 옮기며, 캐시가 가득 차면 쓰기 속도가 급락하는 그래프">
+<defs><marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="40" y="40" width="120" height="56" rx="8" stroke-width="0.5"/><text class="th" x="100" y="58" text-anchor="middle" dominant-baseline="central">호스트</text><text class="ts" x="100" y="78" text-anchor="middle" dominant-baseline="central">PC · 서버</text></g>
+<g class="c-teal"><rect x="220" y="40" width="180" height="56" rx="8" stroke-width="0.5"/><text class="th" x="310" y="58" text-anchor="middle" dominant-baseline="central">SLC 캐시</text><text class="ts" x="310" y="78" text-anchor="middle" dominant-baseline="central">1비트 모드 · 빠름</text></g>
+<g class="c-purple"><rect x="460" y="40" width="180" height="56" rx="8" stroke-width="0.5"/><text class="th" x="550" y="58" text-anchor="middle" dominant-baseline="central">TLC · QLC 영역</text><text class="ts" x="550" y="78" text-anchor="middle" dominant-baseline="central">3–4비트 · 최종 저장</text></g>
+<line x1="160" y1="68" x2="216" y2="68" class="arr" marker-end="url(#arrow2)"/>
+<line x1="400" y1="68" x2="456" y2="68" class="arr" stroke-dasharray="5 4" marker-end="url(#arrow2)"/>
+<text class="ts" x="340" y="122" text-anchor="middle" dominant-baseline="central">쓰기는 SLC 캐시에 먼저 받고, 한가할 때 TLC로 옮겨 담음 (SLC 3칸 → TLC 1칸, 폴딩)</text>
+<text class="ts" x="340" y="144" text-anchor="middle" dominant-baseline="central">캐시 크기 = 고정(정적) + 빈 공간 비례(동적) → 드라이브가 찰수록 캐시도 작아짐</text>
+<text class="ts" x="74" y="196" dominant-baseline="central">쓰기 속도</text>
+<line x1="70" y1="206" x2="70" y2="380" stroke="var(--line)" stroke-width="0.5"/>
+<line x1="70" y1="380" x2="640" y2="380" stroke="var(--line)" stroke-width="0.5"/>
+<path d="M70 230 L360 230 L372 310 L630 310" fill="none" stroke="#1D9E75" stroke-width="2"/>
+<path d="M360 230 L374 345 L630 345" fill="none" stroke="#D85A30" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text class="ts" x="215" y="216" text-anchor="middle" dominant-baseline="central">SLC 캐시 구간 · 빠름</text>
+<text class="ts" x="392" y="268" dominant-baseline="central">캐시 가득 참 → 속도 급락 (쓰기 절벽)</text>
+<text class="ts" x="510" y="298" text-anchor="middle" dominant-baseline="central">TLC 직접 쓰기</text>
+<text class="ts" x="510" y="362" text-anchor="middle" dominant-baseline="central">QLC 직접 쓰기 (더 느림)</text>
+<text class="ts" x="640" y="398" text-anchor="end" dominant-baseline="central">한 번에 쓴 데이터 양 →</text>
+</svg></div>
+<p>실무: 녹취 파일 수백 GB를 한 번에 옮기거나 DB 덤프를 복원하면 처음엔 빠르다가 갑자기 HDD보다 느려지는 절벽을 만납니다. QLC 드라이브가 거의 찼다면 더 일찍 옵니다. 기업용 SSD는 캐시 대신 여유 공간(OP)을 넉넉히 잡아 일정한 속도를 냅니다.</p>
+
+<h2>3. 하드디스크(HDD) 역사</h2>
+<p>"더 작게"와 "같은 원판에 더 빽빽하게"라는 두 흐름입니다.</p>
+<div class="panel"><svg width="100%" viewBox="0 20 680 600" role="img" aria-label="1956년 RAMAC부터 2024년 HAMR까지 하드디스크 연표">
+<line x1="120" y1="40" x2="120" y2="566" stroke="var(--b)" stroke-width="1"/>
+<g id="hdd"></g>
+<circle cx="46" cy="600" r="6" fill="#888780"/><text class="ts" x="58" y="600" dominant-baseline="central">초기 대형기</text>
+<circle cx="160" cy="600" r="6" fill="#1D9E75"/><text class="ts" x="172" y="600" dominant-baseline="central">소형화</text>
+<circle cx="250" cy="600" r="6" fill="#7F77DD"/><text class="ts" x="262" y="600" dominant-baseline="central">헤드 기술</text>
+<circle cx="350" cy="600" r="6" fill="#D85A30"/><text class="ts" x="362" y="600" dominant-baseline="central">기록 밀도 · 대용량</text>
+</svg></div>
+<p>SMR HDD는 덮어쓸 때 겹친 트랙을 다시 써야 해서 SSD의 블록 지우기와 비슷한 약점이 있습니다. NAS · RAID에 SMR 디스크를 섞으면 재구축이 매우 느려질 수 있으니 서버용 디스크는 PMR인지 SMR인지 확인합니다.</p>
+
+<h2>4. 용어 정리</h2>
+<h3 style="font-size:16px;font-weight:500">셀과 동작</h3>
+<div class="wrap"><table>
+<tr><th>용어</th><th>뜻</th></tr>
+<tr><td>NAND 플래시</td><td>전원이 꺼져도 데이터가 남는 SSD의 저장 칩. 1980년대 도시바(마스오카 후지오)가 발명</td></tr>
+<tr><td>셀</td><td>비트를 저장하는 가장 작은 단위. 전자를 얼마나 담았는지(전압)로 값을 구분</td></tr>
+<tr><td>SLC / MLC / TLC / QLC</td><td>셀당 1 / 2 / 3 / 4비트. 셀당 5비트인 PLC는 연구 중</td></tr>
+<tr><td>전하 저장층</td><td>전자를 가둬 두는 층. 2D NAND는 플로팅 게이트, 3D NAND는 차지 트랩</td></tr>
+<tr><td>터널 산화막</td><td>전자가 드나드는 수 nm 절연막. 쓰고 지울 때마다 손상되는 수명의 핵심</td></tr>
+<tr><td>프로그램 / 소거</td><td>전자를 넣는 쓰기 / 빼는 지우기. 둘 다 약 20V 고전압</td></tr>
+<tr><td>P/E 사이클</td><td>쓰기와 지우기를 한 번씩 한 횟수. 셀 수명 단위</td></tr>
+<tr><td>3D NAND (V-NAND)</td><td>셀을 수직으로 수백 층 쌓은 구조. 2013년 삼성이 처음 양산</td></tr>
+</table></div>
+<h3 style="font-size:16px;font-weight:500">SSD 내부 관리</h3>
+<div class="wrap"><table>
+<tr><th>용어</th><th>뜻</th></tr>
+<tr><td>페이지 / 블록</td><td>쓰기 단위(4~16KB) / 지우기 단위(수백 페이지, 수 MB)</td></tr>
+<tr><td>FTL</td><td>"OS가 보는 주소 → 실제 플래시 위치"를 바꿔 주는 컨트롤러 소프트웨어. MMU와 비슷</td></tr>
+<tr><td>가비지 컬렉션(GC)</td><td>유효 페이지를 다른 블록으로 옮기고 블록을 비우는 정리 작업</td></tr>
+<tr><td>쓰기 증폭(WAF)</td><td>실제 플래시 쓰기량 ÷ 호스트 요청 쓰기량. 1에 가까울수록 좋음</td></tr>
+<tr><td>웨어 레벨링</td><td>특정 블록만 닳지 않게 쓰기를 고르게 분산</td></tr>
+<tr><td>TRIM</td><td>OS가 지운 파일을 SSD에 알려 주는 명령. 리눅스는 <code>fstrim</code></td></tr>
+<tr><td>오버프로비저닝(OP)</td><td>사용자에게 보이지 않게 남겨 둔 여유 공간</td></tr>
+<tr><td>ECC / LDPC</td><td>읽기 오류를 바로잡는 오류 정정 코드</td></tr>
+<tr><td>리텐션</td><td>전원 없이 데이터를 유지하는 기간. 셀이 닳을수록 · 온도가 높을수록 짧아짐</td></tr>
+<tr><td>TBW / DWPD</td><td>수명 동안 쓸 수 있는 총량 / 하루에 전체 용량의 몇 배를 쓸 수 있는지</td></tr>
+<tr><td>배드 블록</td><td>더 이상 믿을 수 없어 사용 중지한 블록. 예비 블록으로 교체</td></tr>
+</table></div>
+<h3 style="font-size:16px;font-weight:500">SLC 캐시</h3>
+<div class="wrap"><table>
+<tr><th>용어</th><th>뜻</th></tr>
+<tr><td>SLC 캐시</td><td>TLC · QLC 셀 일부를 1비트 모드로 써서 쓰기를 빠르게 받는 영역</td></tr>
+<tr><td>정적 / 동적 캐시</td><td>크기 고정 / 빈 공간에 따라 크기 변동</td></tr>
+<tr><td>폴딩</td><td>SLC 캐시 데이터를 TLC · QLC 영역으로 옮겨 담는 작업</td></tr>
+<tr><td>쓰기 절벽</td><td>캐시가 가득 차 쓰기 속도가 급락하는 현상</td></tr>
+</table></div>
+<h3 style="font-size:16px;font-weight:500">HDD</h3>
+<div class="wrap"><table>
+<tr><th>용어</th><th>뜻</th></tr>
+<tr><td>플래터 / 헤드</td><td>데이터를 기록하는 자성 원판 / 원판 위에 떠서 읽고 쓰는 장치</td></tr>
+<tr><td>윈체스터 구조</td><td>헤드와 원판을 밀봉한 구조. 지금 HDD의 기본형</td></tr>
+<tr><td>MR / GMR 헤드</td><td>자기저항 효과로 미세한 자기 신호를 읽는 헤드</td></tr>
+<tr><td>PMR / SMR / HAMR</td><td>수직 기록 / 트랙을 기와처럼 겹쳐 쓰기 / 레이저로 가열해 기록</td></tr>
+</table></div>
+<h2>5. 실무 명령어</h2>
+<div class="panel"><pre style="margin:0;font-size:13px;white-space:pre-wrap">systemctl status fstrim.timer    # TRIM 주기 실행 확인
+lsblk --discard                  # DISC-GRAN이 0이 아니면 TRIM 지원
+lsblk -d -o NAME,ROTA,SIZE,MODEL # ROTA 1 = HDD, 0 = SSD
+sudo smartctl -a /dev/nvme0n1 | grep -Ei "percentage used|data units written"   # SSD 수명 · 총 쓰기량</pre></div>
+<footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 8 "다양한 보조기억장치" 학습 정리</footer>
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+function mk(t,a,p,txt){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt)e.textContent=txt;p.append(e);return e;}
+function slices(id,x,n){const g=document.getElementById(id),gap=3,h=(150-(n-1)*gap)/n;for(let k=0;k<n;k++)mk('rect',{class:'c-teal',x:x,y:104+k*(h+gap),width:140,height:h,rx:2,'stroke-width':0.5},g);}
+slices('tlc',346,8);slices('qlc',499,16);
+const C={g:'#888780',t:'#1D9E75',p:'#7F77DD',c:'#D85A30'};
+const H=[['1956','g','IBM 350 RAMAC · 최초의 HDD','500만 문자(약 3.75MB) · 24인치 원판 50장 · 무게 약 1톤'],
+['1973','g','IBM 3340 "윈체스터"','헤드와 원판을 밀봉 · 헤드가 원판 위에 떠서 이동 → 지금 HDD의 기본 구조'],
+['1980','t','Seagate ST-506 · 첫 5.25인치','5MB · 개인용 컴퓨터 시대 시작'],
+['1983','t','Rodime RO352 · 첫 3.5인치','지금 데스크톱 · 서버 HDD의 표준 크기'],
+['1988','t','PrairieTek 220 · 첫 2.5인치','노트북용 표준 크기'],
+['1991','p','IBM 0663 · MR(자기저항) 헤드','읽기 헤드가 더 작은 자기 신호를 읽음 → 밀도 급상승'],
+['1997','p','IBM Deskstar 16GP · GMR(거대 자기저항) 헤드','2007년 노벨 물리학상 받은 원리 · 용량 연 100%씩 증가'],
+['2005','c','수직 자기 기록 (PMR)','자석을 세워서 기록 · 2005 도시바, 2006 시게이트 양산'],
+['2007','c','Hitachi Deskstar 7K1000 · 첫 1TB','5MB(1980)에서 27년 만에 20만 배'],
+['2013','c','HGST Ultrastar He6 · 헬륨 충전 6TB','공기보다 저항이 작아 원판을 더 많이 · 전력은 덜'],
+['2014','c','SMR(기와식 기록) · Seagate Archive 8TB','트랙을 기와처럼 겹쳐 씀 · 용량 ↑, 덮어쓰기는 느림 (SSD 블록 지우기와 비슷)'],
+['2024','c','HAMR(열 보조 기록) · 30TB 이상','레이저로 순간 가열해 더 작은 영역에 기록 · Seagate Mozaic 3+']];
+const hg=document.getElementById('hdd');
+H.forEach((r,k)=>{const y=48+k*44;mk('text',{class:'th',x:40,y:y,'dominant-baseline':'central'},hg,r[0]);mk('circle',{cx:120,cy:y,r:6,fill:C[r[1]]},hg);
+mk('text',{class:'th',x:140,y:y,'dominant-baseline':'central'},hg,r[2]);mk('text',{class:'ts',x:140,y:y+18,'dominant-baseline':'central'},hg,r[3]);});
+</script></body></html>
