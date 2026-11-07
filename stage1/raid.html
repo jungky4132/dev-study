@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RAID 정리</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:52px}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts,.c-amber>.tm{fill:var(--am-s)}
+.tm{font-size:11px;font-weight:500}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+.cv>rect{fill:var(--te-f);stroke:var(--te-s)}.cv>text{fill:var(--te-t)}
+.cx>rect{fill:var(--gr-f);stroke:var(--gr-s)}.cx>text{fill:var(--gr-s)}
+.cf>rect{fill:none;stroke:var(--b);stroke-dasharray:3 3}.cf>text{fill:var(--muted)}
+.cell text{font-size:12px}
+.hl{opacity:0}.dim .el.hl{opacity:0}.dim .el.hl.on{opacity:1}
+.box{fill:var(--card);stroke:var(--b)}.leader{stroke:var(--line);stroke-width:.5;stroke-dasharray:3 3}
+:root{--t:var(--line)}
+h2{font-size:18px;font-weight:500;margin:28px 0 8px}
+p{margin:0 0 12px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0 16px}
+th,td{border-bottom:1px solid var(--border);padding:7px 8px;text-align:left;vertical-align:top}
+th{font-weight:500;background:var(--bg)}
+td:first-child{white-space:nowrap;font-weight:500}
+.wrap{overflow-x:auto}
+code{font-size:13px;background:var(--bg);padding:1px 5px;border-radius:4px}
+.disks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:8px 0}
+.dk{border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;background:var(--bg)}
+.dk .nm{font-size:14px;font-weight:500}.dk .bits{font-family:ui-monospace,Menlo,monospace;font-size:22px;letter-spacing:3px;margin:4px 0}
+.dk.par{background:var(--am-f);border-color:var(--am-s)}.dk.fail{background:var(--co-f);border-color:var(--co-s)}
+.dk.fail .bits{color:var(--co-t)}.dk .st{font-size:12px;color:var(--muted);min-height:18px}
+.dk button{font-size:13px;padding:3px 10px;margin-top:4px}
+#pexp{font-size:14px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;white-space:pre-wrap;margin-top:8px}
+</style></head><body><main>
+<h1>RAID 정리</h1>
+<p class="sub">개념과 등장 배경, 패리티로 복구하는 원리, RAID 레벨이 늘어난 이유 · STAGE 1 컴퓨터 시스템 (보조기억장치)</p>
+
+<h2>1. RAID란</h2>
+<p>RAID(Redundant Array of Independent Disks)는 <b>디스크 여러 개를 하나처럼 묶어</b> 속도를 높이거나, 일부가 고장 나도 데이터를 지키는 기술입니다. 처음 이름은 Redundant Array of <b>Inexpensive</b> Disks, 즉 "싼 디스크로 만든 중복 배열"이었습니다.</p>
+
+<h2>2. 왜 필요했나 · 역사적 배경</h2>
+<p>1980년대 메인프레임은 크고 비싼 디스크 한 대(SLED)를 썼습니다. 같은 시기 PC용 소형 디스크는 훨씬 싸졌고, 버클리 대학 연구진은 "싼 디스크를 여러 대 묶으면 더 싸고 빠르지 않을까?"라고 제안했습니다. 그런데 디스크가 많아지면 그중 하나가 고장 날 확률도 커지기 때문에, <b>중복(Redundancy)</b>을 넣어야 했습니다. 이것이 RAID의 R입니다.</p>
+<div class="panel"><svg width="100%" viewBox="0 40 680 282" role="img" aria-label="대형 디스크 한 대와 싼 디스크 여러 대 비교, 디스크가 많을수록 고장 확률이 커지는 문제와 중복으로 해결">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="40" y="60" width="220" height="120" rx="12" stroke-width="0.5"/><text class="th" x="150" y="96" text-anchor="middle" dominant-baseline="central">대형 디스크 1대 (SLED)</text><text class="ts" x="150" y="122" text-anchor="middle" dominant-baseline="central">메인프레임용 · 매우 비쌈</text><text class="ts" x="150" y="146" text-anchor="middle" dominant-baseline="central">1대 고장 = 전부 멈춤</text></g>
+<line x1="268" y1="120" x2="370" y2="120" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="319" y="104" text-anchor="middle" dominant-baseline="central">1987 버클리 제안</text>
+<text class="th" x="510" y="72" text-anchor="middle" dominant-baseline="central">싼 디스크 여러 대 (배열)</text>
+<g id="small"></g>
+<g class="c-coral"><rect x="40" y="210" width="600" height="96" rx="10" stroke-width="0.5"/>
+<text class="th" x="60" y="234" dominant-baseline="central">문제: 디스크가 많을수록 어딘가 고장 날 확률도 커짐</text>
+<text class="ts" x="60" y="258" dominant-baseline="central">MTTF 3만 시간짜리 디스크 100대 → 배열 전체 MTTF ≈ 300시간 (약 12일에 한 번 고장)</text>
+<text class="ts" x="60" y="282" dominant-baseline="central">해결: 중복(Redundancy)을 넣어 1대가 고장 나도 데이터 유지 → RAID의 R</text></g>
+</svg></div>
+<div class="panel"><svg width="100%" viewBox="0 20 680 446" role="img" aria-label="미러링부터 ZFS RAID-Z, 이레이저 코딩까지 RAID의 역사 연표">
+<line x1="120" y1="40" x2="120" y2="396" stroke="var(--b)" stroke-width="1"/>
+<g id="hist"></g>
+<circle cx="46" cy="450" r="6" fill="#888780"/><text class="ts" x="58" y="450" dominant-baseline="central">이전 기술</text>
+<circle cx="150" cy="450" r="6" fill="#7F77DD"/><text class="ts" x="162" y="450" dominant-baseline="central">RAID 탄생</text>
+<circle cx="250" cy="450" r="6" fill="#1D9E75"/><text class="ts" x="262" y="450" dominant-baseline="central">표준화 · 보급</text>
+<circle cx="370" cy="450" r="6" fill="#D85A30"/><text class="ts" x="382" y="450" dominant-baseline="central">대용량 시대</text>
+</svg></div>
+
+<h2>3. 패리티 · 복구의 원리</h2>
+<p>패리티는 <b>XOR(배타적 논리합)</b>로 만든 검산 값입니다. 같은 자리의 비트를 모두 XOR하면 패리티가 나옵니다. 1의 개수가 홀수면 1, 짝수면 0입니다. XOR은 순서를 바꿔도 결과가 같아서, <b>디스크 하나가 사라져도 나머지를 모두 XOR하면 사라진 값이 그대로 나옵니다.</b> 아래에서 디스크 하나를 고장 내 보세요.</p>
+<div class="panel" id="parity">
+<div class="disks" id="disks"></div>
+<div class="ctrl"><button id="rnd">데이터 바꾸기</button><button id="fix">모두 정상으로</button></div>
+<div id="pexp"></div>
+</div>
+<p>한계: 패리티 하나로는 <b>한 번에 한 디스크</b>만 복구할 수 있습니다. 두 개가 동시에 사라지면 식 하나로 미지수 두 개를 풀 수 없기 때문입니다. 그래서 RAID 6은 계산 방식이 다른 두 번째 패리티(Q, 리드-솔로몬 방식)를 더해 식을 두 개로 만듭니다.</p>
+
+<h2>4. 주요 RAID 레벨의 디스크 배치</h2>
+<div class="panel"><svg width="100%" viewBox="0 20 680 720" role="img" aria-label="RAID 0, 1, 5, 6, 10의 디스크별 블록 배치">
+<g id="levels"></g>
+<rect class="c-teal" x="40" y="712" width="16" height="14" rx="3" stroke-width="0.5"/><text class="ts" x="62" y="719" dominant-baseline="central">데이터</text>
+<rect class="c-amber" x="130" y="712" width="16" height="14" rx="3" stroke-width="0.5"/><text class="ts" x="152" y="719" dominant-baseline="central">패리티 P (XOR)</text>
+<rect class="c-coral" x="270" y="712" width="16" height="14" rx="3" stroke-width="0.5"/><text class="ts" x="292" y="719" dominant-baseline="central">패리티 Q (리드-솔로몬)</text>
+<text class="ts" x="450" y="719" dominant-baseline="central">같은 글자 = 같은 데이터 복사본</text>
+</svg></div>
+<div class="wrap"><table>
+<tr><th>레벨</th><th>최소 디스크</th><th>쓸 수 있는 용량</th><th>견디는 고장</th><th>성능</th><th>주로 쓰는 곳</th></tr>
+<tr><td>RAID 0</td><td>2</td><td>100%</td><td>없음 (1대만 고장 나도 전부 손실)</td><td>읽기 · 쓰기 가장 빠름</td><td>임시 작업 공간, 캐시</td></tr>
+<tr><td>RAID 1</td><td>2</td><td>50%</td><td>1대 (짝마다)</td><td>읽기 빠름, 쓰기 보통</td><td>OS 디스크, 소규모 서버</td></tr>
+<tr><td>RAID 5</td><td>3</td><td>(N−1)/N</td><td>1대</td><td>읽기 빠름, 쓰기 느림 (패리티 계산)</td><td>파일 서버, 읽기 위주</td></tr>
+<tr><td>RAID 6</td><td>4</td><td>(N−2)/N</td><td>2대</td><td>읽기 빠름, 쓰기 더 느림</td><td>대용량 NAS, 백업 · 아카이브</td></tr>
+<tr><td>RAID 10</td><td>4</td><td>50%</td><td>짝마다 1대</td><td>읽기 · 쓰기 모두 빠름</td><td>DB 서버, 녹취 · 로그처럼 쓰기 많은 곳</td></tr>
+</table></div>
+
+<h2>5. RAID 레벨이 늘어난 배경</h2>
+<p>레벨 번호는 등급이 아니라 <b>1987년 논문이 방식을 분류하려고 붙인 번호</b>입니다. 논문은 1~5를 정의했고, 각 레벨은 앞 방식의 한계를 해결하는 흐름이었습니다. 0과 6은 나중에 붙었고, 10 · 50 · 60은 레벨을 겹쳐 쓴 조합입니다.</p>
+<div class="panel"><svg width="100%" viewBox="0 20 680 400" role="img" aria-label="RAID 1부터 6까지 각 레벨의 방식과 한계, 그리고 RAID 0과 조합 레벨">
+<defs><marker id="arrow3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-purple"><rect x="40" y="40" width="180" height="76" rx="8" stroke-width="0.5"/><text class="th" x="130" y="60" text-anchor="middle" dominant-baseline="central">RAID 1 · 미러링</text><text class="ts" x="130" y="82" text-anchor="middle" dominant-baseline="central">같은 데이터 두 벌</text><text class="ts" x="130" y="100" text-anchor="middle" dominant-baseline="central">한계: 용량 절반</text></g>
+<g class="c-gray"><rect x="250" y="40" width="180" height="76" rx="8" stroke-width="0.5"/><text class="th" x="340" y="60" text-anchor="middle" dominant-baseline="central">RAID 2 · 해밍 코드</text><text class="ts" x="340" y="82" text-anchor="middle" dominant-baseline="central">비트 단위 오류 정정</text><text class="ts" x="340" y="100" text-anchor="middle" dominant-baseline="central">디스크에 ECC 내장 → 소멸</text></g>
+<g class="c-gray"><rect x="460" y="40" width="180" height="76" rx="8" stroke-width="0.5"/><text class="th" x="550" y="60" text-anchor="middle" dominant-baseline="central">RAID 3 · 바이트 패리티</text><text class="ts" x="550" y="82" text-anchor="middle" dominant-baseline="central">패리티 디스크 1개</text><text class="ts" x="550" y="100" text-anchor="middle" dominant-baseline="central">한계: 한 번에 I/O 1개</text></g>
+<g class="c-gray"><rect x="40" y="170" width="180" height="76" rx="8" stroke-width="0.5"/><text class="th" x="130" y="190" text-anchor="middle" dominant-baseline="central">RAID 4 · 블록 패리티</text><text class="ts" x="130" y="212" text-anchor="middle" dominant-baseline="central">작은 I/O 동시 처리</text><text class="ts" x="130" y="230" text-anchor="middle" dominant-baseline="central">한계: 패리티 디스크 병목</text></g>
+<g class="c-purple"><rect x="250" y="170" width="180" height="76" rx="8" stroke-width="0.5"/><text class="th" x="340" y="190" text-anchor="middle" dominant-baseline="central">RAID 5 · 분산 패리티</text><text class="ts" x="340" y="212" text-anchor="middle" dominant-baseline="central">패리티를 돌려가며 저장</text><text class="ts" x="340" y="230" text-anchor="middle" dominant-baseline="central">한계: 1대 고장만 견딤</text></g>
+<g class="c-purple"><rect x="460" y="170" width="180" height="76" rx="8" stroke-width="0.5"/><text class="th" x="550" y="190" text-anchor="middle" dominant-baseline="central">RAID 6 · 이중 패리티</text><text class="ts" x="550" y="212" text-anchor="middle" dominant-baseline="central">P + Q, 2대 고장 견딤</text><text class="ts" x="550" y="230" text-anchor="middle" dominant-baseline="central">1989 제안 · 대용량 표준</text></g>
+<line x1="220" y1="78" x2="246" y2="78" class="arr" marker-end="url(#arrow3)"/>
+<line x1="430" y1="78" x2="456" y2="78" class="arr" marker-end="url(#arrow3)"/>
+<path d="M550 116 V143 H130 V166" class="arr" marker-end="url(#arrow3)"/>
+<line x1="220" y1="208" x2="246" y2="208" class="arr" marker-end="url(#arrow3)"/>
+<line x1="430" y1="208" x2="456" y2="208" class="arr" marker-end="url(#arrow3)"/>
+<g class="c-teal"><rect x="40" y="290" width="285" height="76" rx="8" stroke-width="0.5"/><text class="th" x="182" y="310" text-anchor="middle" dominant-baseline="central">RAID 0 · 스트라이핑 (나중에 붙은 번호)</text><text class="ts" x="182" y="332" text-anchor="middle" dominant-baseline="central">중복이 없음 = "R"이 없는 RAID</text><text class="ts" x="182" y="350" text-anchor="middle" dominant-baseline="central">속도만 얻고 안전은 포기</text></g>
+<g class="c-teal"><rect x="355" y="290" width="285" height="76" rx="8" stroke-width="0.5"/><text class="th" x="497" y="310" text-anchor="middle" dominant-baseline="central">RAID 10 · 50 · 60 (조합)</text><text class="ts" x="497" y="332" text-anchor="middle" dominant-baseline="central">10 = 미러(1) 묶음을 스트라이프(0)</text><text class="ts" x="497" y="350" text-anchor="middle" dominant-baseline="central">속도와 안전을 함께 · DB 서버 단골</text></g>
+<text class="ts" x="340" y="396" text-anchor="middle" dominant-baseline="central">보라 = 지금도 쓰는 레벨 · 회색 = 역사 속으로 사라진 레벨 · 청록 = 나중에 추가된 레벨</text>
+</svg></div>
+<div class="wrap"><table>
+<tr><th>질문</th><th>답</th></tr>
+<tr><td>왜 2 · 3 · 4는 사라졌나</td><td>RAID 2는 디스크 자체에 오류 정정(ECC)이 들어가면서 의미가 없어졌습니다. RAID 3은 모든 디스크가 함께 움직여 한 번에 요청 하나만 처리합니다. RAID 4는 쓰기마다 패리티 디스크 한 대에 몰려 병목이 생겼습니다. 패리티를 모든 디스크에 돌려 쓰는 RAID 5가 이 문제를 해결하면서 대체했습니다.</td></tr>
+<tr><td>왜 5에서 6으로 갔나</td><td>디스크가 수 TB로 커지면서 고장 난 디스크를 재구축하는 데 하루 이상 걸리게 됐습니다. 그동안 남은 디스크가 하나 더 고장 나거나, 읽을 수 없는 섹터(URE)를 만나면 RAID 5는 전체를 잃습니다. 일반 디스크의 URE 사양은 대략 12TB를 읽을 때 1번 수준이라, 대용량 RAID 5 재구축은 위험한 도박이 됐습니다.</td></tr>
+<tr><td>0은 왜 0인가</td><td>논문의 분류에는 없었고, 중복 없이 나눠 쓰기만 하는 방식이라 "중복 0"이라는 뜻으로 나중에 붙었습니다.</td></tr>
+<tr><td>그다음은</td><td>ZFS RAID-Z(2005)처럼 파일시스템이 직접 패리티를 관리하거나, 클라우드는 서버 여러 대에 조각을 흩어 저장하는 이레이저 코딩으로 확장했습니다.</td></tr>
+</table></div>
+
+<h2>6. 실무에서 꼭 알아야 할 것</h2>
+<div class="wrap"><table>
+<tr><th>포인트</th><th>내용</th></tr>
+<tr><td>RAID ≠ 백업</td><td>실수로 지운 파일, 랜섬웨어, 잘못된 업데이트는 모든 디스크에 똑같이 반영됩니다. RAID는 "디스크 고장"만 막습니다. 백업은 따로 해야 합니다.</td></tr>
+<tr><td>하드웨어 RAID</td><td>서버의 RAID 컨트롤러(Dell PERC, HPE Smart Array 등)가 처리. OS에는 디스크 하나로 보입니다. 배터리 · 플래시 캐시로 쓰기를 보호합니다.</td></tr>
+<tr><td>소프트웨어 RAID</td><td>리눅스 md(mdadm)처럼 OS가 처리. 컨트롤러 없이도 되고 장비를 바꿔도 디스크를 그대로 옮길 수 있습니다.</td></tr>
+<tr><td>write hole</td><td>데이터와 패리티를 쓰는 도중 정전되면 둘이 어긋나는 문제. 배터리 캐시, 저널, ZFS 같은 구조로 막습니다.</td></tr>
+<tr><td>디스크 선택</td><td>SMR HDD는 재구축이 매우 느려 RAID에 부적합. 같은 시기 같은 모델 디스크는 비슷한 때 고장 나기 쉬우니, 고장 1대를 갈았으면 남은 디스크도 점검합니다.</td></tr>
+</table></div>
+<div class="panel"><pre style="margin:0;font-size:13px;white-space:pre-wrap">cat /proc/mdstat                     # 소프트웨어 RAID 상태 · 재구축 진행률
+sudo mdadm --detail /dev/md0         # 레벨 · 디스크 상태 · 고장 여부
+sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sdb /dev/sdc   # RAID 1 만들기 (실습용 디스크로만)
+sudo mdadm /dev/md0 --fail /dev/sdb --remove /dev/sdb    # 고장 처리 후 제거
+sudo mdadm /dev/md0 --add /dev/sdd   # 새 디스크 추가 → 자동 재구축
+lsblk -o NAME,TYPE,SIZE,MOUNTPOINT   # md 장치와 디스크 관계 확인</pre></div>
+
+<h2>7. 용어 정리</h2>
+<div class="wrap"><table>
+<tr><th>용어</th><th>뜻</th></tr>
+<tr><td>RAID 레벨</td><td>디스크를 묶는 방식을 구분하는 분류 번호. 숫자가 크다고 더 좋은 것은 아님</td></tr>
+<tr><td>SLED</td><td>Single Large Expensive Disk. RAID 이전 메인프레임의 대형 디스크</td></tr>
+<tr><td>스트라이핑</td><td>데이터를 일정 크기(스트라이프)로 잘라 여러 디스크에 나눠 쓰기. 동시에 읽고 써서 빠름</td></tr>
+<tr><td>미러링</td><td>같은 데이터를 두 디스크에 똑같이 쓰기</td></tr>
+<tr><td>패리티</td><td>XOR로 만든 검산 값. 사라진 데이터를 계산으로 되살림</td></tr>
+<tr><td>XOR</td><td>두 비트가 다르면 1, 같으면 0. A ⊕ B ⊕ B = A 성질로 복구 가능</td></tr>
+<tr><td>리드-솔로몬</td><td>RAID 6의 두 번째 패리티(Q)에 쓰는 오류 정정 수학. CD · QR 코드에도 사용</td></tr>
+<tr><td>재구축(리빌드)</td><td>새 디스크에 고장 난 디스크의 내용을 계산해서 다시 채우는 작업</td></tr>
+<tr><td>핫 스페어</td><td>미리 꽂아 둔 예비 디스크. 고장 시 자동으로 재구축 시작</td></tr>
+<tr><td>디그레이드</td><td>디스크가 고장 나 중복 없이 버티는 상태. 이때 하나 더 고장 나면 손실</td></tr>
+<tr><td>MTTF</td><td>Mean Time To Failure. 고장까지의 평균 시간</td></tr>
+<tr><td>URE</td><td>Unrecoverable Read Error. 디스크가 읽지 못하는 섹터. 재구축 실패의 주된 원인</td></tr>
+<tr><td>write hole</td><td>데이터와 패리티 쓰기 사이에 정전되어 둘이 어긋나는 문제</td></tr>
+<tr><td>이레이저 코딩</td><td>데이터를 조각과 패리티로 나눠 여러 서버에 흩어 저장. 클라우드 스토리지 방식</td></tr>
+</table></div>
+<footer><a href="../">← dev-study 목차</a> · 관련: <a href="storage-notes.html">보조기억장치 정리</a> · <a href="ssd-wear.html">SSD 셀 · 페이지 · 블록과 수명</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 8, Patterson · Gibson · Katz "A Case for Redundant Arrays of Inexpensive Disks (RAID)" (1987)</footer>
+</main>
+<script>
+const NS='http://www.w3.org/2000/svg';
+function mk(t,a,p,txt){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!==undefined)e.textContent=txt;p.append(e);return e;}
+const sm=document.getElementById('small');
+for(let r=0;r<2;r++)for(let c=0;c<5;c++){const g=mk('g',{class:'c-teal'},sm);mk('rect',{x:380+c*54,y:92+r*50,width:44,height:40,rx:6,'stroke-width':0.5},g);mk('text',{class:'ts',x:402+c*54,y:112+r*50,'text-anchor':'middle','dominant-baseline':'central'},g,'디스크');}
+const C={g:'#888780',p:'#7F77DD',t:'#1D9E75',c:'#D85A30'};
+const H=[['1970s','g','미러링 (Tandem NonStop 등)','같은 데이터를 두 디스크에 · 확실하지만 용량 2배'],
+['1978','g','IBM 오우치(Ouchi) 패리티 특허','XOR 패리티로 고장 난 장치의 데이터를 계산해 복구'],
+['1987','p','버클리 논문 "A Case for RAID"','패터슨 · 깁슨 · 카츠 · 싼 디스크 여러 대로 대형 디스크 대체'],
+['1988','p','SIGMOD 학회 발표 · RAID 레벨 1–5 정의','레벨 번호 = 등급이 아닌 방식의 분류'],
+['1989','p','RAID 6 (P + Q 이중 패리티) 제안','디스크 2대 동시 고장 대비'],
+['1992','t','RAID Advisory Board · Inexpensive → Independent','싸지 않아도 RAID · 업계 표준 용어로 정착'],
+['1990s','t','하드웨어 RAID 컨트롤러 · 소프트웨어 RAID 보급','서버의 기본 구성 (리눅스 md / mdadm 등)'],
+['2005','c','ZFS RAID-Z (썬 마이크로시스템즈)','파일시스템이 직접 패리티 관리 · write hole 해결'],
+['2010s','c','수 TB 디스크 · 클라우드 분산 저장','재구축 수일 → RAID 6 · 이레이저 코딩으로']];
+const hg=document.getElementById('hist');
+H.forEach((r,k)=>{const y=48+k*44;mk('text',{class:'th',x:40,y:y,'dominant-baseline':'central'},hg,r[0]);mk('circle',{cx:120,cy:y,r:6,fill:C[r[1]]},hg);mk('text',{class:'th',x:140,y:y,'dominant-baseline':'central'},hg,r[2]);mk('text',{class:'ts',x:140,y:y+18,'dominant-baseline':'central'},hg,r[3]);});
+const L=[['RAID 0','스트라이핑',[['A1','A2','A3','A4'],['A5','A6','A7','A8'],['A9','A10','A11','A12']]],
+['RAID 1','미러링',[['A1','A1'],['A2','A2'],['A3','A3']]],
+['RAID 5','분산 패리티',[['A1','A2','A3','Ap'],['B1','B2','Bp','B3'],['C1','Cp','C2','C3']]],
+['RAID 6','이중 패리티',[['A1','A2','A3','Ap','Aq'],['B1','B2','Bp','Bq','B3'],['C1','Cp','Cq','C2','C3']]],
+['RAID 10','미러 + 스트라이프',[['A1','A1','A2','A2'],['A3','A3','A4','A4'],['A5','A5','A6','A6']]]];
+const lg=document.getElementById('levels');
+L.forEach((lv,k)=>{const y0=40+k*134;const g=mk('g',{class:'c-purple'},lg);mk('rect',{x:20,y:y0+24,width:130,height:56,rx:8,'stroke-width':0.5},g);
+mk('text',{class:'th',x:85,y:y0+42,'text-anchor':'middle','dominant-baseline':'central'},g,lv[0]);mk('text',{class:'ts',x:85,y:y0+62,'text-anchor':'middle','dominant-baseline':'central'},g,lv[1]);
+const n=lv[2][0].length;for(let j=0;j<n;j++){const x=162+j*96;mk('rect',{class:'box',x:x,y:y0,width:80,height:108,rx:8,'stroke-width':0.5},lg);
+mk('text',{class:'ts',x:x+40,y:y0+14,'text-anchor':'middle','dominant-baseline':'central'},lg,'디스크 '+(j+1));
+for(let r=0;r<3;r++){const lab=lv[2][r][j];const cls=lab.endsWith('p')?'c-amber':lab.endsWith('q')?'c-coral':'c-teal';
+const b=mk('g',{class:cls},lg);mk('rect',{x:x+8,y:y0+28+r*26,width:64,height:22,rx:4,'stroke-width':0.5},b);
+mk('text',{class:'ts',x:x+40,y:y0+39+r*26,'text-anchor':'middle','dominant-baseline':'central'},b,lab.replace(/p$/,' P').replace(/q$/,' Q'));}}
+if(k===4){mk('text',{class:'ts',x:250,y:y0+122,'text-anchor':'middle','dominant-baseline':'central'},lg,'짝 1 (미러)');mk('text',{class:'ts',x:442,y:y0+122,'text-anchor':'middle','dominant-baseline':'central'},lg,'짝 2 (미러)');}});
+let D=[[1,0,1,1],[0,1,1,0],[1,1,0,0]],fail=-1;
+const box=document.getElementById('disks'),exp=document.getElementById('pexp');
+const xor=(a,b)=>a.map((v,i)=>v^b[i]);const par=()=>D.reduce(xor);const s=a=>a.join('');
+function render(){const P=par();const all=[...D,P];box.innerHTML='';
+all.forEach((v,k)=>{const d=document.createElement('div');d.className='dk'+(k===3?' par':'')+(k===fail?' fail':'');
+const nm=k===3?'패리티 P':'디스크 '+(k+1);
+let bits=s(v),st=k===3?'D1 ⊕ D2 ⊕ D3':'데이터';
+if(k===fail){const others=all.filter((_,j)=>j!==k);bits=s(others.reduce(xor));st='고장 → 계산으로 복구';}
+d.innerHTML='<div class="nm">'+nm+'</div><div class="bits">'+bits+'</div><div class="st">'+st+'</div>';
+const b=document.createElement('button');b.textContent=k===fail?'교체 완료':'고장 내기';b.onclick=()=>{fail=(fail===k)?-1:k;render();};d.append(b);box.append(d);});
+if(fail<0){exp.textContent='P = '+s(D[0])+' ⊕ '+s(D[1])+' ⊕ '+s(D[2])+' = '+s(P)+'\n(자리마다 1의 개수가 홀수면 1, 짝수면 0)';}
+else{const nm=fail===3?'P':'D'+(fail+1);const others=all.map((v,j)=>[j,v]).filter(x=>x[0]!==fail);
+exp.textContent=nm+' = '+others.map(x=>s(x[1])).join(' ⊕ ')+' = '+s(others.map(x=>x[1]).reduce(xor))+'\n남은 디스크를 모두 XOR하면 사라진 값이 그대로 나옵니다 (재구축이 하는 일).';}}
+document.getElementById('rnd').onclick=()=>{D=D.map(r=>r.map(()=>Math.random()<.5?1:0));render();};
+document.getElementById('fix').onclick=()=>{fail=-1;render();};
+render();
+</script></body></html>
