@@ -10,3 +10,11 @@
 - [보조기억장치 정리](https://jungky4132.github.io/dev-study/stage1/storage-notes.html) — SLC · MLC · TLC · QLC 비교와 용도, SLC 캐시, HDD 역사 연표, 용어 정리
 - [RAID 정리](https://jungky4132.github.io/dev-study/stage1/raid.html) — 등장 배경, 패리티(XOR) 복구 데모, RAID 레벨별 디스크 배치, 레벨이 늘어난 이유, mdadm 실무, 용어
 - [입출력 방식 한 장 그림](https://jungky4132.github.io/dev-study/stage1/io-methods.html) — 프로그램 입출력, 인터럽트(PIC · NMI), DMA, 메모리 맵/고립형 입출력, 사이클 스틸링, 입출력 버스 (단계별)
+- [데이터와 문자 인코딩 한 장 그림](https://jungky4132.github.io/dev-study/stage1/data-encoding.html) — 2진수 · 16진수, 2의 보수, 문자 집합과 인코딩(UTF-8 · EUC-KR), 한글이 깨지는 이유 (단계별)
+- [메모리 계층과 캐시 한 장 그림](https://jungky4132.github.io/dev-study/stage1/memory-hierarchy.html) — 레지스터 · 캐시 · RAM · 보조기억장치, 캐시 히트와 미스, 참조 지역성 (단계별)
+- [시스템 콜과 사용자 · 커널 모드 한 장 그림](https://jungky4132.github.io/dev-study/stage1/syscall-mode.html) — 사용자 · 커널 모드, 시스템 콜, 트랩, strace (단계별)
+- [프로세스와 스레드 한 장 그림](https://jungky4132.github.io/dev-study/stage1/process-thread.html) — 메모리 구조, PCB, 프로세스 상태, 스레드가 공유하는 것과 따로 가지는 것 (단계별)
+- [CPU 스케줄링 한 장 그림](https://jungky4132.github.io/dev-study/stage1/cpu-scheduling.html) — FCFS · SJF · 라운드 로빈 간트 차트와 평균 대기 시간, 선점, 에이징 (단계별)
+- [파일 시스템과 inode 한 장 그림](https://jungky4132.github.io/dev-study/stage1/filesystem.html) — 디렉터리 계층, 디렉터리 항목 → inode → 데이터 블록, 인덱스 할당 (단계별)
+- [리눅스 권한 (755) 한 장 그림](https://jungky4132.github.io/dev-study/stage1/linux-permission.html) — ls -l 읽기, rwx와 755, 디렉터리의 x 권한, 판정 순서, umask (단계별)
+- [systemd와 패키지 관리 한 장 그림](https://jungky4132.github.io/dev-study/stage1/systemd-dnf.html) — systemd와 유닛 파일, start와 enable, 확인 순서, rpm과 dnf (단계별)
