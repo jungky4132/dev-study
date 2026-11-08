@@ -5,7 +5,7 @@
 - 사이트: https://jungky4132.github.io/dev-study/
 
 ## STAGE 1 · 컴퓨터 시스템 + 리눅스 기초
-- [STAGE 1 용어 사전](https://jungky4132.github.io/dev-study/stage1/glossary.html) — STAGE 1 그림에 나오는 용어 129개(핵심 77 + 설명 속 기초 52)를, 그 개념이 왜 생길 수밖에 없었는지(시대 → 문제 → 개념) 순서로 정리
+- [STAGE 1 용어 사전](https://jungky4132.github.io/dev-study/stage1/glossary.html) — STAGE 1 그림에 나오는 용어 133개(핵심 81 + 설명 속 기초 52)를, 그 개념이 왜 생길 수밖에 없었는지(시대 → 문제 → 개념) 순서로 정리
 - [CPU 레지스터 한 장 그림](https://jungky4132.github.io/dev-study/stage1/cpu-register.html) — if 문 한 줄이 CPU 안에서 어떻게 실행되는지(비교 → 결과 표시 → 건너뛰기), 장치가 끼어들 때(인터럽트) 무슨 일이 일어나는지, 프로그램이 쓰는 주소가 실제 메모리 위치로 어떻게 바뀌는지(MMU)를 레지스터 하나하나까지 따라가기
 - [SSD 셀 · 페이지 · 블록과 수명](https://jungky4132.github.io/dev-study/stage1/ssd-wear.html) — SSD는 왜 덮어쓰지 못하고 블록 단위로만 지우는지, 그리고 지울 때마다 수명이 줄어드는 과정
 - [보조기억장치 정리](https://jungky4132.github.io/dev-study/stage1/storage-notes.html) — SSD 종류(셀 하나에 1~4비트)별 차이와 용도, 빠른 쓰기 영역(SLC 캐시), 하드디스크의 역사, 용어 정리
