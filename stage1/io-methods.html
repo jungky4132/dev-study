@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>입출력 방식 한 장 그림</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--pk-f:#FBEAF0;--pk-s:#993556;--pk-t:#72243E;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--pk-f:#72243E;--pk-s:#ED93B1;--pk-t:#FBEAF0;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:96px}
+.ptitle{font-size:17px;font-weight:500;margin:0 0 4px}
+.pdesc{font-size:14px;color:var(--muted);margin:0 0 8px}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-pink>rect{fill:var(--pk-f);stroke:var(--pk-s)}.c-pink>.th{fill:var(--pk-t)}.c-pink>.ts{fill:var(--pk-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts{fill:var(--am-s)}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+</style>
+</head>
+<body>
+<main>
+<h1>입출력 방식 한 장 그림</h1>
+<p class="sub">프로그램 입출력 · 인터럽트 기반 · DMA 세 방식과, 메모리 맵/고립형 · PIC · NMI · 사이클 스틸링 · 입출력 버스까지 · STAGE 1 컴퓨터 시스템</p>
+
+<div class="panel">
+  <div class="ctrl">
+    <button id="prev" disabled>이전</button><button id="next">다음</button>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div id="stitle"></div>
+  <div id="sdesc"></div>
+</div>
+
+<div class="panel">
+<svg id="fig" viewBox="0 0 830 690" width="100%" role="img" aria-labelledby="ft fd">
+<title id="ft">입출력 장치와 CPU, 메모리, DMA 컨트롤러의 연결 구조</title>
+<desc id="fd">CPU와 메모리가 시스템 버스에 연결되고, 장치 컨트롤러는 입출력 버스를 거쳐 연결됩니다. DMA 컨트롤러, PIC, 입출력 채널도 시스템 버스에 붙어 있습니다.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+<g class="el c-purple" id="cpu"><rect x="20" y="20" width="380" height="280" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="36" y="42" dominant-baseline="central">CPU</text></g>
+<g class="el c-gray" id="mem"><rect x="450" y="20" width="360" height="280" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="466" y="42" dominant-baseline="central">메모리와 주소 공간</text></g>
+<g class="el c-teal" id="dc"><rect x="20" y="540" width="420" height="110" rx="12" stroke-width="0.5" style="fill:none"/><text class="th" x="36" y="560" dominant-baseline="central">장치 컨트롤러</text></g>
+
+<g class="el c-amber" id="sysbus"><rect x="20" y="326" width="790" height="26" rx="4" stroke-width="0.5"/><text class="th" x="415" y="339" text-anchor="middle" dominant-baseline="central">시스템 버스</text></g>
+<g class="el c-amber" id="iobus"><rect x="20" y="480" width="790" height="26" rx="4" stroke-width="0.5"/><text class="th" x="415" y="493" text-anchor="middle" dominant-baseline="central">입출력 버스</text></g>
+
+<line class="el arr" id="l_cpu" x1="210" y1="300" x2="210" y2="326"/>
+<line class="el arr" id="l_mem" x1="630" y1="300" x2="630" y2="326"/>
+<line class="el arr" id="l_dma" x1="130" y1="352" x2="130" y2="376"/>
+<line class="el arr" id="l_pic" x1="370" y1="352" x2="370" y2="376"/>
+<line class="el arr" id="l_chan" x1="610" y1="352" x2="610" y2="376"/>
+<line class="el arr" id="l_dc" x1="230" y1="506" x2="230" y2="540"/>
+<line class="el arr" id="l_dev" x1="440" y1="596" x2="490" y2="596"/>
+<g class="el" id="bridge"><line class="arr" x1="770" y1="352" x2="770" y2="480"/><text class="ts" x="778" y="416" dominant-baseline="central">브리지</text></g>
+
+<g class="el c-purple" id="flag"><rect x="40" y="56" width="340" height="52" rx="8" stroke-width="0.5"/><text class="th" x="210" y="74" text-anchor="middle" dominant-baseline="central">플래그 레지스터</text><text class="ts" id="flagv" x="210" y="93" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-purple" id="cu"><rect x="40" y="120" width="165" height="52" rx="8" stroke-width="0.5"/><text class="th" x="122" y="138" text-anchor="middle" dominant-baseline="central">제어장치</text><text class="ts" id="cuv" x="122" y="157" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-purple" id="reg"><rect x="215" y="120" width="165" height="52" rx="8" stroke-width="0.5"/><text class="th" x="297" y="138" text-anchor="middle" dominant-baseline="central">레지스터</text><text class="ts" id="regv" x="297" y="157" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-gray" id="busy"><rect x="40" y="184" width="340" height="44" rx="8" stroke-width="0.5"/><text class="th" x="210" y="200" text-anchor="middle" dominant-baseline="central">CPU 작업</text><text class="ts" id="busyv" x="210" y="217" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-purple" id="isr"><rect x="40" y="240" width="190" height="48" rx="8" stroke-width="0.5"/><text class="th" x="135" y="257" text-anchor="middle" dominant-baseline="central">인터럽트 서비스 루틴</text><text class="ts" id="isrv" x="135" y="275" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-pink" id="nmi"><rect x="240" y="240" width="140" height="48" rx="8" stroke-width="0.5"/><text class="th" x="310" y="257" text-anchor="middle" dominant-baseline="central">NMI 핀</text><text class="ts" x="310" y="275" text-anchor="middle" dominant-baseline="central">마스크 불가</text></g>
+
+<g class="el c-gray" id="amem"><rect x="466" y="56" width="328" height="90" rx="8" stroke-width="0.5"/><text class="th" x="630" y="88" text-anchor="middle" dominant-baseline="central">메모리 영역</text><text class="ts" id="amemv" x="630" y="112" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-teal" id="aio"><rect x="466" y="160" width="328" height="90" rx="8" stroke-width="0.5"/><text class="th" x="630" y="192" text-anchor="middle" dominant-baseline="central">입출력 장치 영역</text><text class="ts" id="aiov" x="630" y="216" text-anchor="middle" dominant-baseline="central"></text></g>
+
+<g class="el c-coral" id="dma"><rect x="20" y="376" width="220" height="60" rx="8" stroke-width="0.5"/><text class="th" x="130" y="397" text-anchor="middle" dominant-baseline="central">DMA 컨트롤러</text><text class="ts" id="dmav" x="130" y="417" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-pink" id="pic"><rect x="260" y="376" width="220" height="60" rx="8" stroke-width="0.5"/><text class="th" x="370" y="397" text-anchor="middle" dominant-baseline="central">PIC</text><text class="ts" x="370" y="417" text-anchor="middle" dominant-baseline="central">인터럽트 우선순위 판단</text></g>
+<g class="el c-coral" id="chan"><rect x="500" y="376" width="220" height="60" rx="8" stroke-width="0.5"/><text class="th" x="610" y="397" text-anchor="middle" dominant-baseline="central">입출력 채널</text><text class="ts" x="610" y="417" text-anchor="middle" dominant-baseline="central">입출력 전용 프로세서</text></g>
+
+<g class="el c-gray" id="sreg"><rect x="36" y="574" width="190" height="52" rx="8" stroke-width="0.5"/><text class="th" x="131" y="592" text-anchor="middle" dominant-baseline="central">상태 레지스터</text><text class="ts" id="sregv" x="131" y="611" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-gray" id="dreg"><rect x="240" y="574" width="190" height="52" rx="8" stroke-width="0.5"/><text class="th" x="335" y="592" text-anchor="middle" dominant-baseline="central">데이터 레지스터</text><text class="ts" id="dregv" x="335" y="611" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-teal" id="dev"><rect x="490" y="556" width="210" height="80" rx="8" stroke-width="0.5"/><text class="th" x="595" y="586" text-anchor="middle" dominant-baseline="central">입출력 장치</text><text class="ts" x="595" y="608" text-anchor="middle" dominant-baseline="central">키보드 · 디스크 등</text></g>
+
+<g class="el" id="aint"><path class="arr" d="M250 540 L250 304" marker-end="url(#arrow)" style="stroke:var(--am-s);stroke-dasharray:5 4"/><text class="ts" x="258" y="462" dominant-baseline="central">인터럽트 요청</text></g>
+<g class="el" id="aint2"><path class="arr" d="M240 400 L250 400 L250 304" marker-end="url(#arrow)" style="stroke:var(--am-s);stroke-dasharray:5 4"/><text class="ts" x="242" y="458" text-anchor="end" dominant-baseline="central">완료 인터럽트</text></g>
+</svg>
+</div>
+
+<div class="panel">
+<p class="ptitle">세 방식 한눈에 비교</p>
+<p class="pdesc">노란 점선은 인터럽트입니다. 오른쪽으로 갈수록 CPU의 부담이 줄어듭니다.</p>
+<svg viewBox="0 0 680 570" width="100%" role="img" aria-labelledby="ct cd">
+<title id="ct">입출력 3가지 방식 비교</title>
+<desc id="cd">프로그램 입출력, 인터럽트 기반 입출력, DMA 입출력에서 CPU와 데이터의 이동 경로를 비교한 그림</desc>
+<text class="th" x="40" y="36">1. 프로그램 입출력</text>
+<text class="ts" x="640" y="36" text-anchor="end">CPU가 직접 확인하고 직접 옮김</text>
+<g class="c-teal"><rect x="40" y="52" width="150" height="44" rx="8" stroke-width="0.5"/><text class="th" x="115" y="74" text-anchor="middle" dominant-baseline="central">장치 컨트롤러</text></g>
+<g class="c-purple"><rect x="265" y="52" width="150" height="44" rx="8" stroke-width="0.5"/><text class="th" x="340" y="74" text-anchor="middle" dominant-baseline="central">CPU</text></g>
+<g class="c-gray"><rect x="490" y="52" width="150" height="44" rx="8" stroke-width="0.5"/><text class="th" x="565" y="74" text-anchor="middle" dominant-baseline="central">메모리</text></g>
+<line x1="192" y1="74" x2="263" y2="74" class="arr" marker-end="url(#arrow)"/>
+<line x1="417" y1="74" x2="488" y2="74" class="arr" marker-end="url(#arrow)"/>
+<path d="M340 98 L340 120 L115 120 L115 100" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="228" y="138" text-anchor="middle">상태를 계속 확인 (폴링)</text>
+<text class="ts" x="40" y="164">데이터가 CPU를 거쳐 이동하고, 그동안 CPU는 대기</text>
+<line x1="40" y1="182" x2="640" y2="182" stroke="var(--b)" stroke-width="0.5"/>
+<text class="th" x="40" y="212">2. 인터럽트 기반 입출력</text>
+<text class="ts" x="640" y="212" text-anchor="end">개선: 기다림 없앰</text>
+<g class="c-teal"><rect x="40" y="228" width="150" height="44" rx="8" stroke-width="0.5"/><text class="th" x="115" y="250" text-anchor="middle" dominant-baseline="central">장치 컨트롤러</text></g>
+<g class="c-purple"><rect x="265" y="228" width="150" height="44" rx="8" stroke-width="0.5"/><text class="th" x="340" y="250" text-anchor="middle" dominant-baseline="central">CPU</text></g>
+<g class="c-gray"><rect x="490" y="228" width="150" height="44" rx="8" stroke-width="0.5"/><text class="th" x="565" y="250" text-anchor="middle" dominant-baseline="central">메모리</text></g>
+<line x1="192" y1="250" x2="263" y2="250" class="arr" marker-end="url(#arrow)"/>
+<line x1="417" y1="250" x2="488" y2="250" class="arr" marker-end="url(#arrow)"/>
+<path d="M115 274 L115 296 L340 296 L340 276" class="arr" style="stroke:var(--am-s);stroke-dasharray:4 3" marker-end="url(#arrow)"/>
+<text class="ts" x="228" y="314" text-anchor="middle">인터럽트 요청 (준비되면 알림)</text>
+<text class="ts" x="40" y="340">CPU는 다른 일을 하다가 알림이 오면 처리, 데이터 이동은 여전히 CPU</text>
+<line x1="40" y1="358" x2="640" y2="358" stroke="var(--b)" stroke-width="0.5"/>
+<text class="th" x="40" y="388">3. DMA 입출력</text>
+<text class="ts" x="640" y="388" text-anchor="end">개선: 데이터 이동까지 대행</text>
+<g class="c-teal"><rect x="40" y="404" width="150" height="44" rx="8" stroke-width="0.5"/><text class="th" x="115" y="426" text-anchor="middle" dominant-baseline="central">장치 컨트롤러</text></g>
+<g class="c-coral"><rect x="265" y="404" width="150" height="44" rx="8" stroke-width="0.5"/><text class="th" x="340" y="426" text-anchor="middle" dominant-baseline="central">DMA 컨트롤러</text></g>
+<g class="c-gray"><rect x="490" y="404" width="150" height="44" rx="8" stroke-width="0.5"/><text class="th" x="565" y="426" text-anchor="middle" dominant-baseline="central">메모리</text></g>
+<line x1="192" y1="426" x2="263" y2="426" class="arr" marker-end="url(#arrow)"/>
+<line x1="417" y1="426" x2="488" y2="426" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="265" y="492" width="150" height="40" rx="8" stroke-width="0.5"/><text class="th" x="340" y="512" text-anchor="middle" dominant-baseline="central">CPU</text></g>
+<line x1="310" y1="490" x2="310" y2="450" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="300" y="472" text-anchor="end">시작 지시</text>
+<line x1="370" y1="450" x2="370" y2="490" class="arr" style="stroke:var(--am-s);stroke-dasharray:4 3" marker-end="url(#arrow)"/>
+<text class="ts" x="380" y="472">완료 인터럽트</text>
+<text class="ts" x="40" y="556">데이터는 CPU를 거치지 않고 직접 이동 (시스템 버스 공유 시 사이클 스틸링)</text>
+</svg>
+</div>
+
+<footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 입출력 강의(다양한 입출력방법) 학습 정리</footer>
+</main>
+
+<script>
+const D={
+flagv:'인터럽트 비트 = 1 (허용)',
+cuv:'명령어 해석 · 지시',
+regv:'데이터 임시 보관',
+busyv:'프로그램 실행 중',
+isrv:'인터럽트 처리 코드',
+amemv:'주소 0 ~ 511',
+aiov:'주소 512 ~ 1023',
+dmav:'CPU 대신 데이터 이동',
+sregv:'준비 상태 표시',
+dregv:'주고받을 데이터'
+};
+const S=[
+{t:'0. 전체 그림',d:'입출력 장치와 컴퓨터 내부가 정보를 주고받는 세 방식(프로그램 입출력, 인터럽트 기반, DMA)에 쓰이는 부품을 한 그림에 모았습니다. 다음 단계로 넘기며 어느 부품이 움직이는지 확인하세요.',on:null,v:{}},
+{t:'1. 장치 컨트롤러 (복습)',d:'CPU는 입출력 장치를 직접 다루지 않고, 장치에 연결된 장치 컨트롤러의 레지스터를 읽고 씁니다. 상태 레지스터는 장치가 준비됐는지를, 데이터 레지스터는 주고받을 데이터를 담습니다.',on:['dc','sreg','dreg','dev','l_dev'],v:{}},
+{t:'2. 프로그램 입출력 ① 상태 확인 (폴링)',d:'CPU가 프로그램 속 입출력 명령어를 실행해서 장치 컨트롤러의 상태 레지스터를 읽고, 장치가 준비됐는지 확인합니다. 준비가 안 됐으면 준비될 때까지 이 확인을 계속 반복합니다. 이런 방식을 폴링이라고도 합니다.',on:['cpu','cu','l_cpu','sysbus','bridge','iobus','l_dc','dc','sreg'],v:{cuv:'입출력 명령어',sregv:'준비됐나? 계속 확인'}},
+{t:'3. 프로그램 입출력 ② 데이터 쓰기',d:'준비되면 CPU가 백업할 데이터(메모리 값)를 읽어 장치 컨트롤러의 데이터 레지스터에 씁니다. 백업이 끝날 때까지 2~3단계를 반복합니다. 옮겨지는 데이터가 반드시 CPU를 거치고, 그동안 CPU는 입출력에 묶입니다.',on:['cpu','reg','cu','l_cpu','sysbus','l_mem','mem','amem','bridge','iobus','l_dc','dc','dreg'],v:{regv:'메모리에서 읽은 값',dregv:'CPU가 써 넣은 값',cuv:'입출력 명령어',busyv:'입출력에 묶임'}},
+{t:'4. 레지스터 지정 ① 메모리 맵 입출력',d:'CPU가 장치 컨트롤러의 레지스터를 알아내는 첫 번째 방법입니다. 메모리 주소 공간과 입출력 장치 주소 공간을 하나의 주소 공간으로 간주합니다. 예를 들어 1024개의 주소 중 0~511은 메모리, 512~1023은 장치 레지스터에 씁니다. 메모리 명령어를 그대로 써서 장치에 접근하지만, 메모리가 쓸 수 있는 주소는 줄어듭니다.',on:['cpu','cu','mem','amem','aio'],v:{amemv:'주소 0 ~ 511 · 메모리',aiov:'512 ~ 1023 · 장치 레지스터',cuv:'메모리 명령어 사용'}},
+{t:'5. 레지스터 지정 ② 고립형 입출력',d:'두 번째 방법은 메모리용 주소 공간과 입출력 장치용 주소 공간을 분리하는 것입니다. 제어 버스에는 메모리 읽기·쓰기선과 별도로 입출력 장치 읽기·쓰기선이 있어서, 입출력 전용 명령어(x86은 in, out)를 실행하면 장치에 접근합니다. 메모리 주소 공간은 줄지 않지만 전용 명령어가 필요합니다.',on:['cpu','cu','mem','amem','aio'],v:{amemv:'0 ~ 1023 · 메모리',aiov:'0 ~ 1023 · 입출력 장치',cuv:'in / out 명령어'}},
+{t:'6. 인터럽트 기반 ① 요청 신호',d:'장치가 준비되면 장치 컨트롤러가 CPU에 인터럽트 요청 신호를 보냅니다(일종의 알람). CPU는 그 전까지 기다리지 않고 다른 일을 합니다. CPU는 플래그 레지스터의 인터럽트 비트가 활성화돼 있을 때 이 요청을 받아들입니다.',on:['dev','l_dev','dc','sreg','aint','flag','cpu','busy'],v:{sregv:'준비 완료 → 알림',busyv:'다른 프로그램 실행 중'}},
+{t:'7. 인터럽트 기반 ② 서비스 루틴 실행',d:'요청을 받아들이면 CPU는 하던 작업을 잠시 멈추고 인터럽트 서비스 루틴(인터럽트를 처리하는 특별한 프로그램)을 실행하고, 끝나면 하던 작업으로 돌아갑니다. 데이터를 옮기는 일은 여전히 CPU가 합니다.',on:['isr','cpu','reg','l_cpu','sysbus','bridge','iobus','l_dc','dc','dreg','busy'],v:{isrv:'데이터 이동 코드 실행',busyv:'잠시 중단',regv:'장치에서 읽은 값',dregv:'읽어 갈 데이터'}},
+{t:'8. 동시 다발 인터럽트와 우선순위',d:'장치를 동시에 많이 쓰면 인터럽트 요청도 한꺼번에 옵니다. 인터럽트 비트를 끈 채 도착한 순서대로 처리할 수도 있지만, 더 급한 인터럽트가 있어서 현실적이지 않습니다. 그래서 비트를 켠 채 우선순위가 높은 인터럽트가 오면 현재 서비스 루틴을 중단하고 먼저 처리한 뒤 돌아옵니다.',on:['cpu','flag','isr','busy'],v:{flagv:'0: 순서대로 · 1: 우선순위 반영',isrv:'높은 우선순위가 끼어듦',busyv:'중단 후 복귀'}},
+{t:'9. PIC와 NMI',d:'우선순위를 판단해서 CPU에 알려 주는 대표적인 작은 하드웨어가 PIC(프로그래머블 인터럽트 컨트롤러)입니다. 여러 장치 컨트롤러가 PIC의 핀에 연결됩니다. 하드웨어 고장이나 정전 같은 NMI(막을 수 없는 인터럽트)는 인터럽트 비트를 꺼도 처리해야 하고, PIC를 거치지 않고 별도 핀으로 들어옵니다.',on:['pic','l_pic','sysbus','nmi','cpu'],v:{}},
+{t:'10. 두 방식의 한계: 데이터가 CPU를 거침',d:'프로그램 입출력과 인터럽트 기반 입출력은 장치와 메모리 사이 데이터 이동을 CPU가 주도하고, 이동하는 데이터가 반드시 CPU를 거칩니다. 디스크에서 메모리로 옮길 때는 데이터 레지스터 → CPU 레지스터 → 메모리 순이고, 반대 방향도 마찬가지입니다. 이 부담을 덜려고 DMA가 나왔습니다.',on:['cpu','reg','l_cpu','sysbus','l_mem','mem','amem','bridge','iobus','l_dc','dc','dreg'],v:{regv:'모든 데이터가 통과',busyv:'이동에 시간 사용',dregv:'읽어 갈 데이터'}},
+{t:'11. DMA ① CPU가 시작 지시',d:'DMA(Direct Memory Access)는 CPU를 거치지 않고 입출력 장치가 메모리에 직접 접근하는 기능입니다. 이를 위해 DMA 컨트롤러라는 하드웨어가 필요합니다. 먼저 CPU가 DMA 컨트롤러에 입출력 작업을 명령합니다.',on:['cpu','cu','l_cpu','sysbus','l_dma','dma'],v:{cuv:'DMA에 작업 명령',dmav:'작업 내용을 받음'}},
+{t:'12. DMA ② DMA 컨트롤러가 직접 전송',d:'DMA 컨트롤러가 CPU 대신 장치 컨트롤러와 상호작용하며, 필요할 때 메모리를 직접 읽고 씁니다. 그동안 CPU는 다른 작업을 할 수 있고, 장치와 메모리 사이의 데이터는 CPU를 거치지 않습니다.',on:['cpu','busy','dma','l_dma','sysbus','l_mem','mem','amem','bridge','iobus','l_dc','dc','dreg'],v:{busyv:'다른 작업 처리 중',dmav:'장치 ↔ 메모리 직접 전송',dregv:'전송 중'}},
+{t:'13. DMA ③ 완료 인터럽트',d:'입출력 작업이 끝나면 DMA 컨트롤러가 인터럽트로 CPU에 작업이 끝났음을 알립니다. 결국 CPU는 입출력의 시작과 끝에만 관여하면 되므로 훨씬 효율적으로 시간을 쓸 수 있습니다. DMA는 인터럽트를 대체하는 게 아니라 함께 씁니다.',on:['dma','aint2','flag','cpu','isr'],v:{dmav:'전송 완료',isrv:'완료 처리'}},
+{t:'14. 사이클 스틸링',d:'DMA 컨트롤러가 메모리를 읽고 쓰려면 시스템 버스를 써야 하는데, 시스템 버스는 공용 자원이라 CPU와 DMA 컨트롤러가 동시에 쓸 수 없습니다. 그래서 DMA는 CPU가 버스를 쓰지 않는 틈에 조금씩 쓰거나, 우선권을 높여 먼저 쓰기도 합니다. CPU 입장에서는 버스 사용 사이클을 빼앗기는 것 같아서 사이클 스틸링이라고 부릅니다.',on:['sysbus','dma','l_dma','cpu','l_cpu','busy','mem','l_mem'],v:{busyv:'버스를 못 쓰고 대기하기도 함',dmav:'버스 틈을 가져다 씀'}},
+{t:'15. 입출력 버스',d:'장치 컨트롤러가 모두 시스템 버스에 직접 붙어 있으면, 메모리 정보를 장치에 백업할 때 DMA 컨트롤러가 시스템 버스를 읽을 때 한 번, 쓸 때 한 번, 불필요하게 두 번 점유합니다. 그래서 장치 컨트롤러는 입출력 전용 버스에 연결하고, 입출력 버스를 시스템 버스에 연결합니다. 메인보드의 입출력 슬롯이 입출력 버스에 연결된 슬롯입니다.',on:['dc','l_dc','iobus','bridge','sysbus','dma','l_dma','dev','l_dev'],v:{}},
+{t:'16. 입출력 채널',d:'DMA는 최근 더 발전해서 입출력 전용 프로세서(입출력 채널)를 다는 데까지 왔습니다. 입출력 명령어를 실행하는 것까지 대신 처리합니다. 듀얼코어 CPU를 단 프린터나, 램을 탑재한 입출력 장치가 예입니다.',on:['chan','l_chan','sysbus','dma'],v:{}}
+];
+const $=id=>document.getElementById(id);
+const fig=$('fig'),prev=$('prev'),next=$('next'),dotsEl=$('dots');
+let cur=0;
+const dots=S.map((s,j)=>{const b=document.createElement('button');b.className='dot';b.setAttribute('aria-label',s.t);b.addEventListener('click',()=>show(j));dotsEl.appendChild(b);return b;});
+function show(n){
+  cur=n;const s=S[n];
+  $('stitle').textContent=s.t;$('sdesc').textContent=s.d;
+  fig.classList.toggle('dim',!!s.on);
+  fig.querySelectorAll('.el').forEach(e=>e.classList.toggle('on',!s.on||s.on.indexOf(e.id)>-1));
+  Object.keys(D).forEach(k=>{const e=$(k);if(e)e.textContent=(s.v&&s.v[k])||D[k];});
+  prev.disabled=n===0;next.disabled=n===S.length-1;
+  dots.forEach((d,j)=>d.classList.toggle('on',j===n));
+}
+prev.addEventListener('click',()=>show(Math.max(0,cur-1)));
+next.addEventListener('click',()=>show(Math.min(S.length-1,cur+1)));
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(Math.min(S.length-1,cur+1));if(e.key==='ArrowLeft')show(Math.max(0,cur-1));});
+show(0);
+</script>
+</body>
+</html>
