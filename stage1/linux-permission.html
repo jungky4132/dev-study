@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>리눅스 권한 (755) 한 장 그림</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--pk-f:#FBEAF0;--pk-s:#993556;--pk-t:#72243E;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--pk-f:#72243E;--pk-s:#ED93B1;--pk-t:#FBEAF0;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:96px}
+.ptitle{font-size:17px;font-weight:500;margin:0 0 6px}
+.sum{margin:0;padding-left:20px;font-size:15px}.sum li{margin:3px 0}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-pink>rect{fill:var(--pk-f);stroke:var(--pk-s)}.c-pink>.th{fill:var(--pk-t)}.c-pink>.ts{fill:var(--pk-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts{fill:var(--am-s)}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+</style>
+</head>
+<body>
+<main>
+<h1>리눅스 권한 (755) 한 장 그림</h1>
+<p class="sub">ls -l 권한 문자열 읽기, rwx와 숫자(755), 파일 · 디렉터리에서의 의미, 소유자 · 그룹 · 기타 판정 순서, umask · STAGE 1 리눅스</p>
+
+<div class="panel">
+  <div class="ctrl">
+    <button id="prev" disabled>이전</button><button id="next">다음</button>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div id="stitle"></div>
+  <div id="sdesc"></div>
+</div>
+
+<div class="panel">
+<svg id="fig" viewBox="0 0 680 582" width="100%" role="img" aria-labelledby="ft fd">
+<title id="ft">리눅스 권한 (755) 한 장 그림</title>
+<desc id="fd">-rwxr-xr-x를 소유자 · 그룹 · 기타로 나누어 7, 5, 5로 바꾸는 과정과 파일 · 디렉터리에서 r, w, x의 의미</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="el" id="lsl"><text class="ts" x="40" y="40" text-anchor="start" dominant-baseline="central">ls -l t.sh  →  -rwxr-xr-x  1  study  study  …  t.sh</text></g>
+<g class="el c-gray" id="gT"><rect x="36" y="60" width="44" height="100" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="44" y="82" dominant-baseline="central">종류</text></g>
+<g class="el c-purple" id="gO"><rect x="96" y="60" width="116" height="100" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="112" y="82" dominant-baseline="central">소유자 (u)</text></g>
+<g class="el c-teal" id="gG"><rect x="228" y="60" width="116" height="100" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="244" y="82" dominant-baseline="central">그룹 (g)</text></g>
+<g class="el c-coral" id="gX"><rect x="360" y="60" width="116" height="100" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="376" y="82" dominant-baseline="central">기타 (o)</text></g>
+<g class="el c-gray" id="c0"><rect x="40" y="100" width="36" height="44" rx="4" stroke-width="0.5"/><text class="th" x="58" y="122" text-anchor="middle" dominant-baseline="central">-</text></g>
+<g class="el c-purple" id="c1"><rect x="100" y="100" width="36" height="44" rx="4" stroke-width="0.5"/><text class="th" x="118" y="122" text-anchor="middle" dominant-baseline="central">r</text></g>
+<g class="el c-purple" id="c2"><rect x="136" y="100" width="36" height="44" rx="4" stroke-width="0.5"/><text class="th" x="154" y="122" text-anchor="middle" dominant-baseline="central">w</text></g>
+<g class="el c-purple" id="c3"><rect x="172" y="100" width="36" height="44" rx="4" stroke-width="0.5"/><text class="th" x="190" y="122" text-anchor="middle" dominant-baseline="central">x</text></g>
+<g class="el c-teal" id="c4"><rect x="232" y="100" width="36" height="44" rx="4" stroke-width="0.5"/><text class="th" x="250" y="122" text-anchor="middle" dominant-baseline="central">r</text></g>
+<g class="el c-teal" id="c5"><rect x="268" y="100" width="36" height="44" rx="4" stroke-width="0.5"/><text class="th" x="286" y="122" text-anchor="middle" dominant-baseline="central">-</text></g>
+<g class="el c-teal" id="c6"><rect x="304" y="100" width="36" height="44" rx="4" stroke-width="0.5"/><text class="th" x="322" y="122" text-anchor="middle" dominant-baseline="central">x</text></g>
+<g class="el c-coral" id="c7"><rect x="364" y="100" width="36" height="44" rx="4" stroke-width="0.5"/><text class="th" x="382" y="122" text-anchor="middle" dominant-baseline="central">r</text></g>
+<g class="el c-coral" id="c8"><rect x="400" y="100" width="36" height="44" rx="4" stroke-width="0.5"/><text class="th" x="418" y="122" text-anchor="middle" dominant-baseline="central">-</text></g>
+<g class="el c-coral" id="c9"><rect x="436" y="100" width="36" height="44" rx="4" stroke-width="0.5"/><text class="th" x="454" y="122" text-anchor="middle" dominant-baseline="central">x</text></g>
+<g class="el c-purple" id="nO"><rect x="96" y="190" width="116" height="52" rx="8" stroke-width="0.5"/><text class="th" x="154" y="208" text-anchor="middle" dominant-baseline="central">7</text><text class="ts" x="154" y="225" text-anchor="middle" dominant-baseline="central">4 + 2 + 1</text></g>
+<g class="el c-teal" id="nG"><rect x="228" y="190" width="116" height="52" rx="8" stroke-width="0.5"/><text class="th" x="286" y="208" text-anchor="middle" dominant-baseline="central">5</text><text class="ts" x="286" y="225" text-anchor="middle" dominant-baseline="central">4 + 0 + 1</text></g>
+<g class="el c-coral" id="nX"><rect x="360" y="190" width="116" height="52" rx="8" stroke-width="0.5"/><text class="th" x="418" y="208" text-anchor="middle" dominant-baseline="central">5</text><text class="ts" x="418" y="225" text-anchor="middle" dominant-baseline="central">4 + 0 + 1</text></g>
+<line class="el arr" id="a1" x1="154" y1="162" x2="154" y2="188" marker-end="url(#arrow)"/>
+<line class="el arr" id="a2" x1="286" y1="162" x2="286" y2="188" marker-end="url(#arrow)"/>
+<line class="el arr" id="a3" x1="418" y1="162" x2="418" y2="188" marker-end="url(#arrow)"/>
+<g class="el c-amber" id="val"><rect x="500" y="60" width="160" height="182" rx="8" stroke-width="0.5"/><text class="th" x="580" y="119" text-anchor="middle" dominant-baseline="central">권한 값</text><text class="ts" x="580" y="136" text-anchor="middle" dominant-baseline="central">r (읽기) = 4</text><text class="ts" x="580" y="152" text-anchor="middle" dominant-baseline="central">w (쓰기) = 2</text><text class="ts" x="580" y="168" text-anchor="middle" dominant-baseline="central">x (실행) = 1</text><text class="ts" x="580" y="184" text-anchor="middle" dominant-baseline="central">- (없음) = 0</text></g>
+<g class="el c-teal" id="mfile"><rect x="40" y="270" width="290" height="112" rx="8" stroke-width="0.5"/><text class="th" x="185" y="302" text-anchor="middle" dominant-baseline="central">파일일 때</text><text class="ts" x="185" y="319" text-anchor="middle" dominant-baseline="central">r: 내용 읽기 (cat)</text><text class="ts" x="185" y="335" text-anchor="middle" dominant-baseline="central">w: 내용 수정</text><text class="ts" x="185" y="351" text-anchor="middle" dominant-baseline="central">x: 실행 (./t.sh)</text></g>
+<g class="el c-pink" id="mdir"><rect x="350" y="270" width="290" height="112" rx="8" stroke-width="0.5"/><text class="th" x="495" y="302" text-anchor="middle" dominant-baseline="central">디렉터리일 때</text><text class="ts" x="495" y="319" text-anchor="middle" dominant-baseline="central">r: 안의 목록 보기 (ls)</text><text class="ts" x="495" y="335" text-anchor="middle" dominant-baseline="central">w: 안에 파일 만들기 · 지우기</text><text class="ts" x="495" y="351" text-anchor="middle" dominant-baseline="central">x: 안으로 들어가기 (cd)</text></g>
+<g class="el c-gray" id="who"><rect x="40" y="402" width="290" height="76" rx="8" stroke-width="0.5"/><text class="th" x="185" y="424" text-anchor="middle" dominant-baseline="central">누구의 권한이 적용되나</text><text class="ts" x="185" y="441" text-anchor="middle" dominant-baseline="central">소유자 → 그룹 → 기타 순으로 판정</text><text class="ts" x="185" y="457" text-anchor="middle" dominant-baseline="central">처음 해당하는 묶음만 적용</text></g>
+<g class="el c-gray" id="umask"><rect x="350" y="402" width="290" height="76" rx="8" stroke-width="0.5"/><text class="th" x="495" y="424" text-anchor="middle" dominant-baseline="central">umask 022</text><text class="ts" x="495" y="441" text-anchor="middle" dominant-baseline="central">그룹 · 기타의 w(2)를 끔</text><text class="ts" x="495" y="457" text-anchor="middle" dominant-baseline="central">새 파일 666 → 644 · 디렉터리 777 → 755</text></g>
+<g class="el c-amber" id="cmd"><rect x="40" y="498" width="600" height="64" rx="8" stroke-width="0.5"/><text class="th" x="340" y="514" text-anchor="middle" dominant-baseline="central">서버 확인</text><text class="ts" x="340" y="531" text-anchor="middle" dominant-baseline="central">chmod 755 t.sh; ls -l t.sh</text><text class="ts" x="340" y="547" text-anchor="middle" dominant-baseline="central">sudo -u study cat t.sh → 다른 사용자로 읽어 보기 (750이면 거부)</text></g>
+</svg>
+</div>
+
+<div class="panel">
+<p class="ptitle">핵심 정리</p>
+<ul class="sum">
+<li>권한 9칸 = 소유자 · 그룹 · 기타 × rwx, r=4 · w=2 · x=1을 더해 숫자로 쓴다</li>
+<li>755 = 소유자 rwx, 그룹 r-x, 기타 r-x</li>
+<li>디렉터리의 x는 들어가기(cd) 권한: 없으면 안의 파일에 접근할 수 없다</li>
+<li>판정 순서는 소유자 → 그룹 → 기타, umask 022면 새 파일 644 · 새 디렉터리 755 (뺄셈이 아니라 비트 가리기)</li>
+</ul>
+</div>
+
+<footer><a href="../">← dev-study 목차</a> · 출처: 생활코딩 Linux 섹션 8–9 · 홈서버 실습 학습 정리</footer>
+</main>
+
+<script>
+const D={};
+const S=[
+{
+"t": "0. 전체 그림",
+"d": "ls -l에 보이는 권한 문자열을 쪼개서 숫자(755)로 바꾸는 법(위)과, 파일 · 디렉터리에서의 의미, 적용 순서, umask(아래)를 모았습니다.",
+"on": null
+},
+{
+"t": "1. ls -l 읽는 법",
+"d": "첫 글자는 종류(- 일반 파일, d 디렉터리)이고, 이어지는 9칸은 소유자 · 그룹 · 기타 세 묶음의 권한(각 rwx)입니다. -rwxr-xr-x는 일반 파일이고 소유자 rwx, 그룹 r-x, 기타 r-x입니다.",
+"on": [
+"lsl",
+"gT",
+"gO",
+"gG",
+"gX",
+"c0",
+"c1",
+"c2",
+"c3",
+"c4",
+"c5",
+"c6",
+"c7",
+"c8",
+"c9"
+]
+},
+{
+"t": "2. r · w · x의 값",
+"d": "읽기(r)=4, 쓰기(w)=2, 실행(x)=1이고, 없으면(-) 0입니다. 한 묶음의 권한은 이 값들을 더해 숫자 하나로 씁니다.",
+"on": [
+"val",
+"gO",
+"c1",
+"c2",
+"c3"
+]
+},
+{
+"t": "3. 755 풀이",
+"d": "소유자 rwx = 4+2+1 = 7, 그룹 r-x = 4+0+1 = 5, 기타 r-x = 4+0+1 = 5라서 755입니다. 소유자는 읽기 · 쓰기 · 실행, 그룹과 기타는 읽기 · 실행만 허용한다는 뜻입니다.",
+"on": [
+"gO",
+"gG",
+"gX",
+"nO",
+"nG",
+"nX",
+"a1",
+"a2",
+"a3",
+"val",
+"c1",
+"c2",
+"c3",
+"c4",
+"c5",
+"c6",
+"c7",
+"c8",
+"c9"
+]
+},
+{
+"t": "4. 파일에서의 의미",
+"d": "파일에서 r은 내용 읽기, w는 내용 수정, x는 프로그램이나 스크립트로 실행하는 권한입니다. t.sh에 x가 없으면 ./t.sh로 실행할 수 없습니다.",
+"on": [
+"mfile",
+"gO",
+"c1",
+"c2",
+"c3"
+]
+},
+{
+"t": "5. 디렉터리에서의 의미",
+"d": "디렉터리에서 r은 안의 목록 보기, w는 안에 파일을 만들거나 지우기, x는 안으로 들어가기(cd)와 안의 파일에 접근하는 권한입니다. 디렉터리에 x가 없으면 cd도, 안의 파일 접근도 안 됩니다.",
+"on": [
+"mdir",
+"gO",
+"c1",
+"c2",
+"c3"
+]
+},
+{
+"t": "6. 누구의 권한이 적용되나",
+"d": "접근하는 사람이 파일의 소유자면 소유자 권한, 소유자가 아니고 파일의 그룹에 속하면 그룹 권한, 둘 다 아니면 기타 권한이 적용됩니다. 다른 사용자 study가 755 파일을 읽을 수 있는 건 기타의 r 때문이고, 750이면(기타 0) 읽을 수 없습니다.",
+"on": [
+"who",
+"gO",
+"gG",
+"gX"
+]
+},
+{
+"t": "7. umask",
+"d": "새로 만드는 파일은 666, 디렉터리는 777에서 시작해 umask에 켜진 권한을 꺼서(가려서) 기본 권한을 정합니다. umask 022는 그룹 · 기타의 w(2)를 끄므로 새 파일은 644, 새 디렉터리는 755가 됩니다. 022처럼 흔한 값은 뺄셈과 결과가 같지만, 정확히는 뺄셈이 아니라 비트를 가리는 것입니다(umask 033이면 파일은 633이 아니라 644). 파일은 처음부터 실행 권한(x)을 주지 않습니다.",
+"on": [
+"umask"
+]
+},
+{
+"t": "8. 서버에서 확인",
+"d": "chmod 755 t.sh 후 ls -l로 확인하고, sudo -u study cat t.sh로 다른 사용자 입장에서 읽어 봅니다. chmod 750 t.sh로 바꾸면 study는 읽지 못합니다.",
+"on": [
+"cmd",
+"lsl"
+]
+}
+];
+const $=id=>document.getElementById(id);
+const fig=$('fig'),prev=$('prev'),next=$('next'),dotsEl=$('dots');
+let cur=0;
+const dots=S.map((s,j)=>{const b=document.createElement('button');b.className='dot';b.setAttribute('aria-label',s.t);b.addEventListener('click',()=>show(j));dotsEl.appendChild(b);return b;});
+function show(n){
+  cur=n;const s=S[n];
+  $('stitle').textContent=s.t;$('sdesc').textContent=s.d;
+  fig.classList.toggle('dim',!!s.on);
+  fig.querySelectorAll('.el').forEach(e=>e.classList.toggle('on',!s.on||s.on.indexOf(e.id)>-1));
+  Object.keys(D).forEach(k=>{const e=$(k);if(e)e.textContent=(s.v&&s.v[k])||D[k];});
+  prev.disabled=n===0;next.disabled=n===S.length-1;
+  dots.forEach((d,j)=>d.classList.toggle('on',j===n));
+}
+prev.addEventListener('click',()=>show(Math.max(0,cur-1)));
+next.addEventListener('click',()=>show(Math.min(S.length-1,cur+1)));
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(Math.min(S.length-1,cur+1));if(e.key==='ArrowLeft')show(Math.max(0,cur-1));});
+show(0);
+</script>
+</body>
+</html>

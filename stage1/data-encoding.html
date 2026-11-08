@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>데이터와 문자 인코딩 한 장 그림</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--pk-f:#FBEAF0;--pk-s:#993556;--pk-t:#72243E;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--pk-f:#72243E;--pk-s:#ED93B1;--pk-t:#FBEAF0;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:96px}
+.ptitle{font-size:17px;font-weight:500;margin:0 0 6px}
+.sum{margin:0;padding-left:20px;font-size:15px}.sum li{margin:3px 0}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-pink>rect{fill:var(--pk-f);stroke:var(--pk-s)}.c-pink>.th{fill:var(--pk-t)}.c-pink>.ts{fill:var(--pk-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts{fill:var(--am-s)}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+</style>
+</head>
+<body>
+<main>
+<h1>데이터와 문자 인코딩 한 장 그림</h1>
+<p class="sub">10진수 · 2진수 · 16진수, 2의 보수, 문자 집합과 인코딩(UTF-8 · EUC-KR), 한글이 깨지는 이유 · STAGE 1 컴퓨터 시스템</p>
+
+<div class="panel">
+  <div class="ctrl">
+    <button id="prev" disabled>이전</button><button id="next">다음</button>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div id="stitle"></div>
+  <div id="sdesc"></div>
+</div>
+
+<div class="panel">
+<svg id="fig" viewBox="0 0 680 612" width="100%" role="img" aria-labelledby="ft fd">
+<title id="ft">데이터와 문자 인코딩 한 장 그림</title>
+<desc id="fd">숫자의 2진수 표현과 2의 보수, 문자가 코드 포인트를 거쳐 UTF-8 또는 EUC-KR 바이트로 저장되고 읽히는 과정</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="el c-purple" id="num"><rect x="20" y="20" width="640" height="190" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="36" y="42" dominant-baseline="central">숫자 표현 · 2진수와 2의 보수</text></g>
+<g class="el c-purple" id="d10"><rect x="40" y="56" width="150" height="52" rx="8" stroke-width="0.5"/><text class="th" x="115" y="74" text-anchor="middle" dominant-baseline="central">10진수</text><text class="ts" x="115" y="91" text-anchor="middle" dominant-baseline="central">45</text></g>
+<g class="el c-purple" id="b2"><rect x="265" y="56" width="150" height="52" rx="8" stroke-width="0.5"/><text class="th" x="340" y="74" text-anchor="middle" dominant-baseline="central">2진수</text><text class="ts" x="340" y="91" text-anchor="middle" dominant-baseline="central">0010 1101</text></g>
+<g class="el c-purple" id="h16"><rect x="490" y="56" width="150" height="52" rx="8" stroke-width="0.5"/><text class="th" x="565" y="74" text-anchor="middle" dominant-baseline="central">16진수</text><text class="ts" x="565" y="91" text-anchor="middle" dominant-baseline="central">2D</text></g>
+<line class="el arr" id="a1" x1="192" y1="82" x2="263" y2="82" marker-end="url(#arrow)"/>
+<line class="el arr" id="a2" x1="417" y1="82" x2="488" y2="82" marker-end="url(#arrow)"/>
+<g class="el c-gray" id="t1"><rect x="40" y="140" width="170" height="52" rx="8" stroke-width="0.5"/><text class="th" x="125" y="158" text-anchor="middle" dominant-baseline="central">+5 (8비트)</text><text class="ts" x="125" y="175" text-anchor="middle" dominant-baseline="central">00000101</text></g>
+<g class="el c-gray" id="t2"><rect x="255" y="140" width="170" height="52" rx="8" stroke-width="0.5"/><text class="th" x="340" y="158" text-anchor="middle" dominant-baseline="central">비트 뒤집기</text><text class="ts" x="340" y="175" text-anchor="middle" dominant-baseline="central">11111010</text></g>
+<g class="el c-coral" id="t3"><rect x="470" y="140" width="170" height="52" rx="8" stroke-width="0.5"/><text class="th" x="555" y="158" text-anchor="middle" dominant-baseline="central">+1 하면 −5</text><text class="ts" x="555" y="175" text-anchor="middle" dominant-baseline="central">11111011</text></g>
+<line class="el arr" id="a3" x1="212" y1="166" x2="253" y2="166" marker-end="url(#arrow)"/>
+<line class="el arr" id="a4" x1="427" y1="166" x2="468" y2="166" marker-end="url(#arrow)"/>
+<g class="el c-teal" id="txt"><rect x="20" y="230" width="640" height="290" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="36" y="252" dominant-baseline="central">문자 · 인코딩</text></g>
+<g class="el c-teal" id="ch"><rect x="40" y="266" width="130" height="52" rx="8" stroke-width="0.5"/><text class="th" x="105" y="284" text-anchor="middle" dominant-baseline="central">문자</text><text class="ts" x="105" y="301" text-anchor="middle" dominant-baseline="central">한</text></g>
+<g class="el c-teal" id="cp"><rect x="215" y="266" width="170" height="52" rx="8" stroke-width="0.5"/><text class="th" x="300" y="284" text-anchor="middle" dominant-baseline="central">문자 집합</text><text class="ts" x="300" y="301" text-anchor="middle" dominant-baseline="central">한 → U+D55C</text></g>
+<g class="el c-amber" id="u8"><rect x="430" y="266" width="190" height="52" rx="8" stroke-width="0.5"/><text class="th" x="525" y="284" text-anchor="middle" dominant-baseline="central">UTF-8</text><text class="ts" x="525" y="301" text-anchor="middle" dominant-baseline="central">ED 95 9C · 3바이트</text></g>
+<g class="el c-amber" id="eu"><rect x="430" y="336" width="190" height="52" rx="8" stroke-width="0.5"/><text class="th" x="525" y="354" text-anchor="middle" dominant-baseline="central">EUC-KR</text><text class="ts" x="525" y="371" text-anchor="middle" dominant-baseline="central">C7 D1 · 2바이트</text></g>
+<g class="el c-gray" id="asc"><rect x="40" y="336" width="230" height="52" rx="8" stroke-width="0.5"/><text class="th" x="155" y="354" text-anchor="middle" dominant-baseline="central">영문 A (ASCII)</text><text class="ts" x="155" y="371" text-anchor="middle" dominant-baseline="central">41 · 1바이트 (셋 다 같음)</text></g>
+<line class="el arr" id="a5" x1="172" y1="292" x2="213" y2="292" marker-end="url(#arrow)"/>
+<line class="el arr" id="a6" x1="387" y1="292" x2="428" y2="292" marker-end="url(#arrow)"/>
+<path class="el arr" id="a7" d="M300 318 L300 362 L428 362" marker-end="url(#arrow)"/>
+<g class="el c-gray" id="sv"><rect x="40" y="420" width="170" height="52" rx="8" stroke-width="0.5"/><text class="th" x="125" y="438" text-anchor="middle" dominant-baseline="central">저장된 바이트</text><text class="ts" x="125" y="455" text-anchor="middle" dominant-baseline="central">ED 95 9C (UTF-8)</text></g>
+<g class="el c-teal" id="ok"><rect x="250" y="420" width="180" height="52" rx="8" stroke-width="0.5"/><text class="th" x="340" y="438" text-anchor="middle" dominant-baseline="central">UTF-8로 읽기</text><text class="ts" x="340" y="455" text-anchor="middle" dominant-baseline="central">→ 한 (정상)</text></g>
+<g class="el c-coral" id="bad"><rect x="470" y="420" width="150" height="52" rx="8" stroke-width="0.5"/><text class="th" x="545" y="438" text-anchor="middle" dominant-baseline="central">EUC-KR로 읽기</text><text class="ts" x="545" y="455" text-anchor="middle" dominant-baseline="central">→ 깨짐</text></g>
+<line class="el arr" id="a8" x1="212" y1="446" x2="248" y2="446" marker-end="url(#arrow)"/>
+<path class="el arr" id="a9" d="M125 472 L125 494 L545 494 L545 474" marker-end="url(#arrow)"/>
+<g class="el c-amber" id="cmd"><rect x="20" y="540" width="640" height="52" rx="8" stroke-width="0.5"/><text class="th" x="340" y="558" text-anchor="middle" dominant-baseline="central">서버 확인</text><text class="ts" x="340" y="575" text-anchor="middle" dominant-baseline="central">locale; echo $LANG → ko_KR.UTF-8처럼 UTF-8인지 확인</text></g>
+</svg>
+</div>
+
+<div class="panel">
+<p class="ptitle">핵심 정리</p>
+<ul class="sum">
+<li>컴퓨터는 0과 1만 다루고, 16진수는 2진수 4자리를 한 자리로 묶은 표기다</li>
+<li>음수는 2의 보수(비트를 뒤집고 +1)로 표현해서 뺄셈도 덧셈 회로로 처리한다</li>
+<li>문자 집합은 문자 → 번호, 인코딩은 번호 → 바이트 규칙이다</li>
+<li>저장할 때와 읽을 때 인코딩이 다르면 한글이 깨진다 (UTF-8 3바이트 vs EUC-KR 2바이트)</li>
+</ul>
+</div>
+
+<footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 1–3 학습 정리</footer>
+</main>
+
+<script>
+const D={};
+const S=[
+{
+"t": "0. 전체 그림",
+"d": "숫자를 2진수로 표현하는 방법(위)과, 문자를 바이트로 바꾸는 인코딩(아래)을 한 그림에 모았습니다. 다음 단계로 넘기며 확인하세요.",
+"on": null
+},
+{
+"t": "1. 10진수 · 2진수 · 16진수",
+"d": "컴퓨터는 0과 1(2진수)만 다룹니다. 사람이 읽기 쉽게 10진수로 쓰고, 2진수 4자리를 16진수 1자리로 묶어 짧게 씁니다. 예: 10진수 45 = 2진수 0010 1101 = 16진수 2D (0010 → 2, 1101 → D).",
+"on": [
+"num",
+"d10",
+"b2",
+"h16",
+"a1",
+"a2"
+]
+},
+{
+"t": "2. 음수와 2의 보수",
+"d": "음수는 2의 보수로 표현합니다. +5(00000101)의 모든 비트를 뒤집고(11111010) 1을 더하면 −5(11111011)입니다. 이렇게 하면 뺄셈도 덧셈 회로 하나로 처리할 수 있습니다. 5 + (−5)를 더하면 넘친 올림수를 버리고 00000000이 됩니다.",
+"on": [
+"num",
+"t1",
+"t2",
+"t3",
+"a3",
+"a4"
+]
+},
+{
+"t": "3. 문자 집합: 문자 → 번호",
+"d": "문자 집합은 문자마다 번호(코드 포인트)를 정해 둔 표입니다. 유니코드에서 \"한\"의 번호는 U+D55C입니다. 아직 컴퓨터에 저장하는 형태(바이트)는 아닙니다.",
+"on": [
+"txt",
+"ch",
+"cp",
+"a5"
+]
+},
+{
+"t": "4. 인코딩: 번호 → 바이트",
+"d": "인코딩은 번호를 실제로 저장할 바이트로 바꾸는 규칙입니다. 같은 \"한\"이 UTF-8에서는 ED 95 9C(3바이트), EUC-KR에서는 C7 D1(2바이트)입니다. 영문 A(41)는 ASCII · UTF-8 · EUC-KR 모두 같은 1바이트라서, 영문만 있을 때는 문제가 잘 드러나지 않습니다.",
+"on": [
+"txt",
+"cp",
+"u8",
+"eu",
+"asc",
+"a6",
+"a7"
+]
+},
+{
+"t": "5. 읽을 때도 같은 규칙으로",
+"d": "저장한 인코딩과 읽는 인코딩이 같아야 글자가 복원됩니다. UTF-8로 저장한 ED 95 9C를 UTF-8로 읽으면 \"한\"이 됩니다.",
+"on": [
+"txt",
+"sv",
+"ok",
+"a8"
+]
+},
+{
+"t": "6. 섞이면 깨진다",
+"d": "UTF-8로 저장한 바이트를 EUC-KR로 읽으면 바이트를 묶는 방식이 달라서 엉뚱한 글자나 읽을 수 없는 문자가 나옵니다. 파일 · DB · 화면(터미널) 중 하나만 인코딩이 달라도 한글이 깨지는 이유입니다.",
+"on": [
+"txt",
+"sv",
+"bad",
+"a9"
+]
+},
+{
+"t": "7. 서버에서 확인",
+"d": "locale과 echo $LANG으로 서버의 인코딩 설정을 확인합니다. ko_KR.UTF-8이나 en_US.UTF-8처럼 끝이 UTF-8이면 UTF-8을 쓰는 것입니다. 한글이 깨지면 파일 · DB · 터미널의 인코딩이 서로 같은지부터 확인합니다.",
+"on": [
+"cmd"
+]
+}
+];
+const $=id=>document.getElementById(id);
+const fig=$('fig'),prev=$('prev'),next=$('next'),dotsEl=$('dots');
+let cur=0;
+const dots=S.map((s,j)=>{const b=document.createElement('button');b.className='dot';b.setAttribute('aria-label',s.t);b.addEventListener('click',()=>show(j));dotsEl.appendChild(b);return b;});
+function show(n){
+  cur=n;const s=S[n];
+  $('stitle').textContent=s.t;$('sdesc').textContent=s.d;
+  fig.classList.toggle('dim',!!s.on);
+  fig.querySelectorAll('.el').forEach(e=>e.classList.toggle('on',!s.on||s.on.indexOf(e.id)>-1));
+  Object.keys(D).forEach(k=>{const e=$(k);if(e)e.textContent=(s.v&&s.v[k])||D[k];});
+  prev.disabled=n===0;next.disabled=n===S.length-1;
+  dots.forEach((d,j)=>d.classList.toggle('on',j===n));
+}
+prev.addEventListener('click',()=>show(Math.max(0,cur-1)));
+next.addEventListener('click',()=>show(Math.min(S.length-1,cur+1)));
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(Math.min(S.length-1,cur+1));if(e.key==='ArrowLeft')show(Math.max(0,cur-1));});
+show(0);
+</script>
+</body>
+</html>

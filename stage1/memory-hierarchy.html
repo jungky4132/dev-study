@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>메모리 계층과 캐시 한 장 그림</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--pk-f:#FBEAF0;--pk-s:#993556;--pk-t:#72243E;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--pk-f:#72243E;--pk-s:#ED93B1;--pk-t:#FBEAF0;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:96px}
+.ptitle{font-size:17px;font-weight:500;margin:0 0 6px}
+.sum{margin:0;padding-left:20px;font-size:15px}.sum li{margin:3px 0}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-pink>rect{fill:var(--pk-f);stroke:var(--pk-s)}.c-pink>.th{fill:var(--pk-t)}.c-pink>.ts{fill:var(--pk-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts{fill:var(--am-s)}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+</style>
+</head>
+<body>
+<main>
+<h1>메모리 계층과 캐시 한 장 그림</h1>
+<p class="sub">레지스터 · 캐시(L1 · L2 · L3) · RAM · 보조기억장치, 캐시 히트와 미스, 참조 지역성 · STAGE 1 컴퓨터 시스템</p>
+
+<div class="panel">
+  <div class="ctrl">
+    <button id="prev" disabled>이전</button><button id="next">다음</button>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div id="stitle"></div>
+  <div id="sdesc"></div>
+</div>
+
+<div class="panel">
+<svg id="fig" viewBox="0 0 680 486" width="100%" role="img" aria-labelledby="ft fd">
+<title id="ft">메모리 계층과 캐시 한 장 그림</title>
+<desc id="fd">CPU 칩 안의 레지스터와 캐시, 칩 밖의 RAM과 보조기억장치로 이어지는 메모리 계층과 캐시 히트 · 미스</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="el c-purple" id="cpu"><rect x="20" y="20" width="400" height="250" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="36" y="42" dominant-baseline="central">CPU 칩</text></g>
+<g class="el c-purple" id="reg"><rect x="140" y="54" width="160" height="44" rx="8" stroke-width="0.5"/><text class="th" x="220" y="68" text-anchor="middle" dominant-baseline="central">레지스터</text><text class="ts" id="regv" x="220" y="85" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-teal" id="l1"><rect x="110" y="104" width="220" height="44" rx="8" stroke-width="0.5"/><text class="th" x="220" y="118" text-anchor="middle" dominant-baseline="central">L1 캐시</text><text class="ts" id="l1v" x="220" y="135" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-teal" id="l2"><rect x="80" y="154" width="280" height="44" rx="8" stroke-width="0.5"/><text class="th" x="220" y="168" text-anchor="middle" dominant-baseline="central">L2 캐시</text><text class="ts" id="l2v" x="220" y="185" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-teal" id="l3"><rect x="50" y="204" width="340" height="44" rx="8" stroke-width="0.5"/><text class="th" x="220" y="218" text-anchor="middle" dominant-baseline="central">L3 캐시</text><text class="ts" id="l3v" x="220" y="235" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-gray" id="ram"><rect x="20" y="290" width="400" height="44" rx="8" stroke-width="0.5"/><text class="th" x="220" y="304" text-anchor="middle" dominant-baseline="central">메인 메모리 (RAM)</text><text class="ts" id="ramv" x="220" y="321" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-coral" id="disk"><rect x="20" y="350" width="400" height="44" rx="8" stroke-width="0.5"/><text class="th" x="220" y="364" text-anchor="middle" dominant-baseline="central">보조기억장치 (SSD · HDD)</text><text class="ts" id="diskv" x="220" y="381" text-anchor="middle" dominant-baseline="central"></text></g>
+<line class="el arr" id="lcr" x1="220" y1="270" x2="220" y2="290"/>
+<line class="el arr" id="lrd" x1="220" y1="334" x2="220" y2="350"/>
+<g class="el c-purple" id="rq"><rect x="450" y="54" width="210" height="52" rx="8" stroke-width="0.5"/><text class="th" x="555" y="72" text-anchor="middle" dominant-baseline="central">CPU 요청</text><text class="ts" id="rqv" x="555" y="89" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-teal" id="hit"><rect x="450" y="126" width="210" height="52" rx="8" stroke-width="0.5"/><text class="th" x="555" y="144" text-anchor="middle" dominant-baseline="central">캐시 히트</text><text class="ts" x="555" y="161" text-anchor="middle" dominant-baseline="central">있음 → 바로 가져옴</text></g>
+<g class="el c-coral" id="miss"><rect x="450" y="198" width="210" height="52" rx="8" stroke-width="0.5"/><text class="th" x="555" y="216" text-anchor="middle" dominant-baseline="central">캐시 미스</text><text class="ts" x="555" y="233" text-anchor="middle" dominant-baseline="central">없음 → RAM에서 가져옴</text></g>
+<g class="el c-pink" id="loc"><rect x="450" y="276" width="210" height="118" rx="8" stroke-width="0.5"/><text class="th" x="555" y="311" text-anchor="middle" dominant-baseline="central">참조 지역성</text><text class="ts" x="555" y="328" text-anchor="middle" dominant-baseline="central">시간: 방금 쓴 것을 또 씀</text><text class="ts" x="555" y="344" text-anchor="middle" dominant-baseline="central">공간: 근처 주소도 곧 씀</text><text class="ts" x="555" y="360" text-anchor="middle" dominant-baseline="central">→ 캐시가 자주 맞는 이유</text></g>
+<g class="el c-amber" id="cmd"><rect x="20" y="414" width="640" height="52" rx="8" stroke-width="0.5"/><text class="th" x="340" y="432" text-anchor="middle" dominant-baseline="central">서버 확인</text><text class="ts" x="340" y="449" text-anchor="middle" dominant-baseline="central">lscpu | grep cache → L1d · L1i · L2 · L3 크기 확인</text></g>
+</svg>
+</div>
+
+<div class="panel">
+<p class="ptitle">핵심 정리</p>
+<ul class="sum">
+<li>메모리 계층: 레지스터 → L1 → L2 → L3 → RAM → 보조기억장치 (위로 갈수록 빠르고 작고 비쌈)</li>
+<li>CPU는 캐시부터 찾고, 있으면 히트(빠름) · 없으면 미스(RAM에서 가져와 캐시에 복사)</li>
+<li>참조 지역성(시간 · 공간) 때문에 작은 캐시도 적중률이 높다</li>
+<li>캐시가 빠른 이유: CPU 칩 안에 있어 가깝고, 지역성 덕에 자주 맞는다</li>
+</ul>
+</div>
+
+<footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 7 학습 정리</footer>
+</main>
+
+<script>
+const D={"regv": "가장 빠르고 가장 작음", "l1v": "L1 · 코어마다 있음", "l2v": "L1보다 크고 느림", "l3v": "여러 코어가 함께 쓰는 경우가 많음", "ramv": "CPU 칩 밖 · 캐시보다 느림", "diskv": "가장 크고 느림 · 전원을 꺼도 유지", "rqv": "데이터가 필요해요"};
+const S=[
+{
+"t": "0. 전체 그림",
+"d": "레지스터부터 보조기억장치까지의 메모리 계층(왼쪽)과, CPU가 데이터를 찾는 과정 · 캐시가 잘 맞는 이유(오른쪽)를 모았습니다.",
+"on": null
+},
+{
+"t": "1. 왜 계층으로 나누나",
+"d": "빠른 저장장치일수록 비싸고 용량이 작습니다. 그래서 가장 빠르고 작은 레지스터부터 가장 크고 느린 보조기억장치까지 층을 나누고, 자주 쓰는 데이터를 위쪽에 둡니다. 위로 갈수록 속도 ↑ · 용량 ↓ · 용량당 가격 ↑입니다.",
+"on": [
+"cpu",
+"reg",
+"l1",
+"l2",
+"l3",
+"ram",
+"disk",
+"lcr",
+"lrd"
+]
+},
+{
+"t": "2. CPU 안과 밖",
+"d": "레지스터와 캐시는 CPU 칩 안에 있어서 빠릅니다. 메인 메모리(RAM)는 칩 밖에 있어 거리가 멀고 느립니다. 보조기억장치는 RAM보다 훨씬 느리지만 전원을 꺼도 데이터가 남습니다.",
+"on": [
+"cpu",
+"reg",
+"l1",
+"l2",
+"l3",
+"ram",
+"lcr"
+]
+},
+{
+"t": "3. 캐시 히트",
+"d": "CPU가 데이터를 요청하면 먼저 캐시를 확인합니다. 캐시에 있으면(히트) RAM까지 가지 않고 바로 가져옵니다.",
+"on": [
+"rq",
+"hit",
+"cpu",
+"l1",
+"l2",
+"l3"
+],
+"v": {
+"rqv": "주소 X의 데이터 주세요"
+}
+},
+{
+"t": "4. 캐시 미스",
+"d": "캐시에 없으면(미스) RAM에서 데이터를 가져오고, 다음에 또 쓰도록 캐시에 복사해 둡니다. 미스는 히트보다 훨씬 느립니다.",
+"on": [
+"rq",
+"miss",
+"cpu",
+"l1",
+"l2",
+"l3",
+"ram",
+"lcr"
+],
+"v": {
+"rqv": "캐시에 없네요"
+}
+},
+{
+"t": "5. 참조 지역성: 캐시가 잘 맞는 이유",
+"d": "프로그램은 방금 쓴 데이터를 또 쓰고(시간 지역성), 쓴 데이터 근처의 데이터를 곧 쓰는(공간 지역성) 경향이 있습니다. 그래서 작은 캐시에도 곧 쓸 데이터가 들어 있을 확률(적중률)이 높습니다. 캐시는 CPU 가까이 있어 빠르고, 지역성 덕분에 자주 맞아서 효과적입니다.",
+"on": [
+"loc",
+"hit",
+"l1",
+"l2",
+"l3"
+]
+},
+{
+"t": "6. L1 · L2 · L3",
+"d": "캐시도 여러 단계입니다. CPU는 L1부터 찾고, 없으면 L2 → L3 → RAM 순으로 내려갑니다. L1이 가장 작고 빠르며, L3는 가장 크고 느리고 여러 코어가 함께 쓰는 경우가 많습니다.",
+"on": [
+"cpu",
+"l1",
+"l2",
+"l3"
+],
+"v": {
+"l1v": "가장 작고 빠름 · 코어마다",
+"l2v": "L1보다 크고 느림",
+"l3v": "가장 크고 느림 · 여러 코어 공유"
+}
+},
+{
+"t": "7. 서버에서 확인",
+"d": "lscpu | grep cache로 서버 CPU의 캐시 크기를 볼 수 있습니다. L1은 데이터용(L1d)과 명령어용(L1i)으로 나뉘어 보입니다. 위쪽 단계일수록 크기가 작은 것을 확인해 보세요.",
+"on": [
+"cmd",
+"l1",
+"l2",
+"l3"
+]
+}
+];
+const $=id=>document.getElementById(id);
+const fig=$('fig'),prev=$('prev'),next=$('next'),dotsEl=$('dots');
+let cur=0;
+const dots=S.map((s,j)=>{const b=document.createElement('button');b.className='dot';b.setAttribute('aria-label',s.t);b.addEventListener('click',()=>show(j));dotsEl.appendChild(b);return b;});
+function show(n){
+  cur=n;const s=S[n];
+  $('stitle').textContent=s.t;$('sdesc').textContent=s.d;
+  fig.classList.toggle('dim',!!s.on);
+  fig.querySelectorAll('.el').forEach(e=>e.classList.toggle('on',!s.on||s.on.indexOf(e.id)>-1));
+  Object.keys(D).forEach(k=>{const e=$(k);if(e)e.textContent=(s.v&&s.v[k])||D[k];});
+  prev.disabled=n===0;next.disabled=n===S.length-1;
+  dots.forEach((d,j)=>d.classList.toggle('on',j===n));
+}
+prev.addEventListener('click',()=>show(Math.max(0,cur-1)));
+next.addEventListener('click',()=>show(Math.min(S.length-1,cur+1)));
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(Math.min(S.length-1,cur+1));if(e.key==='ArrowLeft')show(Math.max(0,cur-1));});
+show(0);
+</script>
+</body>
+</html>

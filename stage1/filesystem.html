@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>파일 시스템과 inode 한 장 그림</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--pk-f:#FBEAF0;--pk-s:#993556;--pk-t:#72243E;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--pk-f:#72243E;--pk-s:#ED93B1;--pk-t:#FBEAF0;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:96px}
+.ptitle{font-size:17px;font-weight:500;margin:0 0 6px}
+.sum{margin:0;padding-left:20px;font-size:15px}.sum li{margin:3px 0}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-pink>rect{fill:var(--pk-f);stroke:var(--pk-s)}.c-pink>.th{fill:var(--pk-t)}.c-pink>.ts{fill:var(--pk-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts{fill:var(--am-s)}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+</style>
+</head>
+<body>
+<main>
+<h1>파일 시스템과 inode 한 장 그림</h1>
+<p class="sub">파일 시스템이 하는 일, 리눅스 디렉터리 계층, 디렉터리 항목 · inode · 데이터 블록, 인덱스 할당 · STAGE 1 운영체제</p>
+
+<div class="panel">
+  <div class="ctrl">
+    <button id="prev" disabled>이전</button><button id="next">다음</button>
+    <div class="dots" id="dots"></div>
+  </div>
+  <div id="stitle"></div>
+  <div id="sdesc"></div>
+</div>
+
+<div class="panel">
+<svg id="fig" viewBox="0 0 680 456" width="100%" role="img" aria-labelledby="ft fd">
+<title id="ft">파일 시스템과 inode 한 장 그림</title>
+<desc id="fd">경로를 따라 디렉터리에서 inode 번호를 찾고, inode가 가리키는 데이터 블록을 읽는 과정</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="el c-purple" id="tree"><rect x="20" y="20" width="200" height="332" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="36" y="42" dominant-baseline="central">디렉터리 계층</text></g>
+<g class="el c-gray" id="d_root"><rect x="40" y="52" width="160" height="36" rx="8" stroke-width="0.5"/><text class="th" x="120" y="70" text-anchor="middle" dominant-baseline="central">/ (루트)</text></g>
+<g class="el c-purple" id="d_etc"><rect x="60" y="98" width="140" height="40" rx="8" stroke-width="0.5"/><text class="th" x="130" y="110" text-anchor="middle" dominant-baseline="central">/etc</text><text class="ts" x="130" y="127" text-anchor="middle" dominant-baseline="central">설정 파일</text></g>
+<g class="el c-purple" id="d_var"><rect x="60" y="146" width="140" height="40" rx="8" stroke-width="0.5"/><text class="th" x="130" y="158" text-anchor="middle" dominant-baseline="central">/var/log</text><text class="ts" x="130" y="175" text-anchor="middle" dominant-baseline="central">로그</text></g>
+<g class="el c-purple" id="d_home"><rect x="60" y="194" width="140" height="40" rx="8" stroke-width="0.5"/><text class="th" x="130" y="206" text-anchor="middle" dominant-baseline="central">/home</text><text class="ts" x="130" y="223" text-anchor="middle" dominant-baseline="central">사용자 홈</text></g>
+<g class="el c-purple" id="d_dev"><rect x="60" y="242" width="140" height="40" rx="8" stroke-width="0.5"/><text class="th" x="130" y="254" text-anchor="middle" dominant-baseline="central">/dev</text><text class="ts" x="130" y="271" text-anchor="middle" dominant-baseline="central">장치 파일</text></g>
+<g class="el c-purple" id="d_usr"><rect x="60" y="290" width="140" height="40" rx="8" stroke-width="0.5"/><text class="th" x="130" y="302" text-anchor="middle" dominant-baseline="central">/usr</text><text class="ts" x="130" y="319" text-anchor="middle" dominant-baseline="central">프로그램 파일</text></g>
+<g class="el c-amber" id="dirent"><rect x="250" y="52" width="190" height="112" rx="8" stroke-width="0.5"/><text class="th" x="345" y="84" text-anchor="middle" dominant-baseline="central">/etc 디렉터리의 내용</text><text class="ts" x="345" y="101" text-anchor="middle" dominant-baseline="central">hostname → inode 1234</text><text class="ts" x="345" y="117" text-anchor="middle" dominant-baseline="central">passwd → inode 5678</text><text class="ts" x="345" y="133" text-anchor="middle" dominant-baseline="central">(번호는 예시)</text></g>
+<g class="el c-pink" id="inode"><rect x="250" y="196" width="190" height="156" rx="8" stroke-width="0.5"/><text class="th" x="345" y="250" text-anchor="middle" dominant-baseline="central">inode 1234</text><text class="ts" x="345" y="267" text-anchor="middle" dominant-baseline="central">권한 · 소유자 · 크기</text><text class="ts" x="345" y="283" text-anchor="middle" dominant-baseline="central">시간 · 데이터 블록 위치</text><text class="ts" x="345" y="299" text-anchor="middle" dominant-baseline="central">파일 이름은 없음</text></g>
+<g class="el c-gray" id="blocks"><rect x="470" y="52" width="190" height="252" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="486" y="74" dominant-baseline="central">디스크의 데이터 블록</text></g>
+<g class="el c-gray" id="b1"><rect x="490" y="92" width="150" height="48" rx="8" stroke-width="0.5"/><text class="th" x="565" y="108" text-anchor="middle" dominant-baseline="central">블록 87</text><text class="ts" x="565" y="125" text-anchor="middle" dominant-baseline="central">내용 앞부분</text></g>
+<g class="el c-gray" id="b2"><rect x="490" y="160" width="150" height="48" rx="8" stroke-width="0.5"/><text class="th" x="565" y="176" text-anchor="middle" dominant-baseline="central">블록 91</text><text class="ts" x="565" y="193" text-anchor="middle" dominant-baseline="central">내용 중간</text></g>
+<g class="el c-gray" id="b3"><rect x="490" y="228" width="150" height="48" rx="8" stroke-width="0.5"/><text class="th" x="565" y="244" text-anchor="middle" dominant-baseline="central">블록 204</text><text class="ts" x="565" y="261" text-anchor="middle" dominant-baseline="central">내용 끝부분</text></g>
+<line class="el arr" id="a1" x1="200" y1="118" x2="248" y2="118" marker-end="url(#arrow)"/>
+<line class="el arr" id="a2" x1="345" y1="164" x2="345" y2="194" marker-end="url(#arrow)"/>
+<line class="el arr" id="a3" x1="440" y1="230" x2="488" y2="116" marker-end="url(#arrow)"/>
+<line class="el arr" id="a4" x1="440" y1="274" x2="488" y2="184" marker-end="url(#arrow)"/>
+<line class="el arr" id="a5" x1="440" y1="318" x2="488" y2="252" marker-end="url(#arrow)"/>
+<g class="el c-teal" id="cmd"><rect x="20" y="372" width="640" height="64" rx="8" stroke-width="0.5"/><text class="th" x="340" y="388" text-anchor="middle" dominant-baseline="central">서버 확인</text><text class="ts" x="340" y="405" text-anchor="middle" dominant-baseline="central">ls -li /etc/hostname → 맨 앞 숫자가 inode 번호</text><text class="ts" x="340" y="421" text-anchor="middle" dominant-baseline="central">df -h → 파일 시스템별 크기와 사용량</text></g>
+</svg>
+</div>
+
+<div class="panel">
+<p class="ptitle">핵심 정리</p>
+<ul class="sum">
+<li>파일 시스템은 디스크 블록을 파일 · 디렉터리 단위로 관리한다</li>
+<li>리눅스는 / 아래 하나의 트리: /etc 설정, /var/log 로그, /home 사용자, /dev 장치</li>
+<li>디렉터리 = (이름 → inode 번호) 목록, inode = 권한 · 소유자 · 크기 · 블록 위치 (이름은 없음)</li>
+<li>읽기 순서: 디렉터리에서 inode 번호 → inode에서 블록 위치 → 데이터 블록</li>
+</ul>
+</div>
+
+<footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 16 학습 정리</footer>
+</main>
+
+<script>
+const D={};
+const S=[
+{
+"t": "0. 전체 그림",
+"d": "디렉터리 계층(왼쪽), 디렉터리 안의 이름과 inode(가운데), 실제 내용이 있는 데이터 블록(오른쪽)이 어떻게 이어지는지 모았습니다.",
+"on": null
+},
+{
+"t": "1. 파일 시스템이 하는 일",
+"d": "디스크는 같은 크기의 블록이 늘어선 저장 공간일 뿐입니다. 파일 시스템은 이 블록들을 파일과 디렉터리 단위로 관리해서, 블록 번호를 몰라도 경로(/etc/hostname)만으로 파일을 찾게 해 줍니다.",
+"on": [
+"tree",
+"dirent",
+"inode",
+"blocks"
+]
+},
+{
+"t": "2. 리눅스 디렉터리 계층",
+"d": "리눅스는 모든 파일을 루트(/)에서 시작하는 하나의 트리로 관리합니다. 설정은 /etc, 로그는 /var/log, 사용자 파일은 /home, 장치는 /dev(장치도 파일로 다룸), 프로그램은 /usr 아래에 둡니다.",
+"on": [
+"tree",
+"d_root",
+"d_etc",
+"d_var",
+"d_home",
+"d_dev",
+"d_usr"
+]
+},
+{
+"t": "3. 디렉터리 = 이름과 inode 번호의 목록",
+"d": "디렉터리도 파일의 일종이고, 안에는 (파일 이름 → inode 번호) 목록이 들어 있습니다. /etc/hostname을 열려면 /etc 디렉터리에서 hostname이라는 이름에 적힌 inode 번호를 찾습니다.",
+"on": [
+"tree",
+"d_etc",
+"a1",
+"dirent"
+]
+},
+{
+"t": "4. inode = 파일의 정보 카드",
+"d": "inode에는 권한, 소유자, 크기, 시간 같은 메타데이터와 데이터가 들어 있는 블록의 위치가 기록됩니다. 파일 이름은 inode가 아니라 디렉터리에 있습니다.",
+"on": [
+"dirent",
+"a2",
+"inode"
+]
+},
+{
+"t": "5. 데이터 블록과 인덱스 할당",
+"d": "실제 내용은 디스크의 데이터 블록에 나뉘어 저장되고, inode가 그 블록들의 위치 목록을 가지고 있습니다. 이렇게 위치 목록(색인)으로 블록을 찾는 방식을 인덱스(색인) 할당이라고 하며, 유닉스 계열 파일 시스템이 이 방식을 씁니다. 블록이 흩어져 있어도 읽을 수 있습니다.",
+"on": [
+"inode",
+"a3",
+"a4",
+"a5",
+"blocks",
+"b1",
+"b2",
+"b3"
+]
+},
+{
+"t": "6. 파일을 읽는 순서",
+"d": "/etc/hostname을 읽으면 ① 경로를 따라 /etc 디렉터리에서 이름으로 inode 번호를 찾고 ② inode에서 권한을 확인하고 블록 위치를 얻은 뒤 ③ 그 블록들을 읽습니다.",
+"on": [
+"tree",
+"d_etc",
+"a1",
+"dirent",
+"a2",
+"inode",
+"a3",
+"a4",
+"a5",
+"blocks",
+"b1",
+"b2",
+"b3"
+]
+},
+{
+"t": "7. 서버에서 확인",
+"d": "ls -li /etc/hostname의 맨 앞 숫자가 inode 번호입니다. df -h는 파일 시스템별 크기와 사용량을, mount는 어떤 장치가 어느 디렉터리에 연결됐는지 보여 줍니다.",
+"on": [
+"cmd",
+"inode"
+]
+}
+];
+const $=id=>document.getElementById(id);
+const fig=$('fig'),prev=$('prev'),next=$('next'),dotsEl=$('dots');
+let cur=0;
+const dots=S.map((s,j)=>{const b=document.createElement('button');b.className='dot';b.setAttribute('aria-label',s.t);b.addEventListener('click',()=>show(j));dotsEl.appendChild(b);return b;});
+function show(n){
+  cur=n;const s=S[n];
+  $('stitle').textContent=s.t;$('sdesc').textContent=s.d;
+  fig.classList.toggle('dim',!!s.on);
+  fig.querySelectorAll('.el').forEach(e=>e.classList.toggle('on',!s.on||s.on.indexOf(e.id)>-1));
+  Object.keys(D).forEach(k=>{const e=$(k);if(e)e.textContent=(s.v&&s.v[k])||D[k];});
+  prev.disabled=n===0;next.disabled=n===S.length-1;
+  dots.forEach((d,j)=>d.classList.toggle('on',j===n));
+}
+prev.addEventListener('click',()=>show(Math.max(0,cur-1)));
+next.addEventListener('click',()=>show(Math.min(S.length-1,cur+1)));
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(Math.min(S.length-1,cur+1));if(e.key==='ArrowLeft')show(Math.max(0,cur-1));});
+show(0);
+</script>
+</body>
+</html>
