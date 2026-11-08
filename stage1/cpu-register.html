@@ -4,9 +4,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
 <style>
 :root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
---pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--pk-f:#FBEAF0;--pk-s:#993556;--pk-t:#72243E;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
 @media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
---pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--pk-f:#72243E;--pk-s:#ED93B1;--pk-t:#FBEAF0;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
 main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
@@ -27,7 +27,8 @@ svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
 .arr{stroke:var(--line);stroke-width:1.5;fill:none}
 .c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
 .c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
-.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}
+.c-pink>rect{fill:var(--pk-f);stroke:var(--pk-s)}.c-pink>.ts{fill:var(--pk-t)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
 .c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
 .c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts,.c-amber>.tm{fill:var(--am-s)}
 .tm{font-size:11px;font-weight:500}
@@ -36,7 +37,7 @@ svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
 footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 </style></head><body><main>
 <h1>CPU 레지스터 한 장 그림</h1>
-<p class="sub">if 한 줄(CMP R1, R2 → JE 2000)과 인터럽트(벡터 · 서비스 루틴), MMU가 CPU 안에서 처리되는 순서 · STAGE 1 컴퓨터 시스템</p>
+<p class="sub">if 한 줄(CMP R1, R2 → JE 2000)과 인터럽트(벡터 · 서비스 루틴), MMU, 메모리 맵 입출력이 CPU 안에서 처리되는 순서 · STAGE 1 컴퓨터 시스템</p>
 <div class="panel"><div class="ctrl"><button id="prev">이전</button><button id="next">다음</button><div class="dots" id="dots"></div></div>
 <div id="stitle"></div><div id="sdesc"></div></div>
 <div class="panel"><svg id="fig" width="100%" role="img" aria-label="CPU 레지스터, 메모리, 인터럽트 요청까지 포함한 전체 구조도" viewBox="0 0 830 820" xmlns="http://www.w3.org/2000/svg">
@@ -45,7 +46,7 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <rect x="20" y="30" width="434" height="730" rx="20" fill="none" stroke="var(--b)" stroke-width="0.5" stroke-dasharray="4 4"/>
 <text class="th" x="36" y="48" dominant-baseline="central">CPU</text>
 <rect x="460" y="30" width="190" height="736" rx="16" fill="none" stroke="var(--b)" stroke-width="0.5" stroke-dasharray="4 4"/>
-<text class="th" x="555" y="48" text-anchor="middle" dominant-baseline="central">메모리</text>
+<text class="th" x="555" y="48" text-anchor="middle" dominant-baseline="central">메모리 · 주소 지도</text>
 <text class="ts" x="475" y="72" dominant-baseline="central">코드 영역</text>
 <g class="el c-amber" id="mmu"><rect x="418" y="56" width="30" height="696" rx="6" stroke-width="0.5" opacity="0.85"/><text class="tm" x="433" y="72" text-anchor="middle" dominant-baseline="central">MMU</text></g>
 <g class="el c-gray" id="m1000"><rect x="475" y="84" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="100" text-anchor="middle" dominant-baseline="central">1000 · CMP R1, R2</text></g>
@@ -55,6 +56,9 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <g class="el c-gray" id="mvec"><rect x="475" y="226" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="242" text-anchor="middle" dominant-baseline="central">벡터 테이블 · 키보드 → 8000</text></g>
 <g class="el c-gray" id="misr"><rect x="475" y="258" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="274" text-anchor="middle" dominant-baseline="central">8000 · 키보드 ISR</text></g>
 <g class="el c-gray" id="miret"><rect x="475" y="290" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="306" text-anchor="middle" dominant-baseline="central">ISR 끝 · IRET (복귀)</text></g>
+<g class="el" id="mioz"><rect x="468" y="336" width="174" height="120" rx="8" fill="none" stroke="#D4537E" stroke-width="1" stroke-dasharray="4 3"/><text class="ts" x="475" y="352" dominant-baseline="central">장치 영역 (RAM 아님)</text><text class="ts" x="475" y="442" dominant-baseline="central">장치 컨트롤러의 레지스터</text></g>
+<g class="el c-pink" id="mio0"><rect x="475" y="364" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="380" text-anchor="middle" dominant-baseline="central">F000 · 키보드 상태</text></g>
+<g class="el c-pink" id="mio4"><rect x="475" y="396" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="412" text-anchor="middle" dominant-baseline="central">F004 · 키보드 데이터</text></g>
 <text class="ts" x="475" y="488" dominant-baseline="central">스택 영역</text>
 <g class="el c-gray" id="m3000"><rect x="475" y="500" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="516" text-anchor="middle" dominant-baseline="central">3000 · 지역 변수 b</text></g>
 <g class="el c-gray" id="m3004"><rect x="475" y="532" width="160" height="32" rx="4" stroke-width="0.5"/><text class="ts" x="555" y="548" text-anchor="middle" dominant-baseline="central">3004 · 지역 변수 a</text></g>
@@ -102,6 +106,8 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <g class="el" id="a2v"><line x1="400" y1="94" x2="471" y2="238" class="arr" marker-end="url(#arrow)"/></g>
 <g class="el" id="a3v"><line x1="475" y1="246" x2="404" y2="186" class="arr" marker-end="url(#arrow)"/></g>
 <g class="el" id="a2i"><line x1="400" y1="98" x2="471" y2="270" class="arr" marker-end="url(#arrow)"/></g>
+<g class="el" id="a2o"><line x1="400" y1="102" x2="471" y2="408" class="arr" marker-end="url(#arrow)"/></g>
+<g class="el" id="a3o"><line x1="475" y1="416" x2="404" y2="194" class="arr" marker-end="url(#arrow)"/></g>
 <g class="el" id="a3i"><line x1="475" y1="278" x2="404" y2="190" class="arr" marker-end="url(#arrow)"/></g>
 </g>
 <g class="el c-gray" id="dev"><rect x="10" y="258" width="130" height="52" rx="8" stroke-width="0.5"/><text class="th" x="75" y="276" text-anchor="middle" dominant-baseline="central">장치</text><text class="ts" x="75" y="294" text-anchor="middle" dominant-baseline="central">키보드 · 네트워크</text></g>
@@ -126,7 +132,26 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <text class="ts" x="340" y="266" text-anchor="middle" dominant-baseline="central">한계를 넘으면(예: 논리 주소 1200) → 예외(인터럽트) → 다른 프로그램 침범 차단</text>
 <text class="ts" x="340" y="286" text-anchor="middle" dominant-baseline="central">운영체제가 프로그램을 올릴 때 베이스 · 한계 값을 정해 줌 · 실무의 Segmentation fault가 이런 차단의 결과</text>
 </svg></div>
-<footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 4–7 학습 정리 (인터럽트 · MMU 포함)</footer>
+<div class="panel"><div style="font-size:15px;font-weight:500;margin-bottom:4px">메모리 맵 입출력 · 내가 이해한 것과 고칠 것 (섹션 9 입출력장치)</div>
+<div style="font-size:14px;color:var(--muted);margin-bottom:8px">CPU 레지스터 그림의 연장입니다. MAR → 주소 버스의 끝에는 RAM만 있는 게 아니라 장치 컨트롤러의 레지스터도 같은 주소 지도 위에 있습니다 (18 · 19단계).</div>
+<svg width="100%" viewBox="0 20 680 452" role="img" aria-label="메모리 맵 입출력에 대해 맞게 이해한 6가지와 고쳐서 이해할 6가지">
+<text class="th" x="20" y="40" dominant-baseline="central">맞게 이해한 것</text>
+<text class="th" x="350" y="40" dominant-baseline="central">고쳐서 이해할 것</text>
+<g class="c-teal"><rect x="20" y="60" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="36" y="78" dominant-baseline="central">드라이버 = 통역사</text><text class="ts" x="36" y="97" dominant-baseline="central">OS 공통 명령 ↔ 장치 제어 신호</text></g>
+<g class="c-teal"><rect x="20" y="122" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="36" y="140" dominant-baseline="central">메모리 맵 = 주소 지도 나눠 쓰기</text><text class="ts" x="36" y="159" dominant-baseline="central">RAM과 장치 레지스터가 번지를 나눔</text></g>
+<g class="c-teal"><rect x="20" y="184" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="36" y="202" dominant-baseline="central">MAR이 장치 주소도 실어 나름</text><text class="ts" x="36" y="221" dominant-baseline="central">같은 명령어 · 같은 주소 버스</text></g>
+<g class="c-teal"><rect x="20" y="246" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="36" y="264" dominant-baseline="central">지도 = 회로 + 관리 정보</text><text class="ts" x="36" y="283" dominant-baseline="central">주소 디코더 · BIOS/UEFI · OS</text></g>
+<g class="c-teal"><rect x="20" y="308" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="36" y="326" dominant-baseline="central">BIOS가 만들고 OS가 관리</text><text class="ts" x="36" y="345" dominant-baseline="central">드라이버는 배정받은 주소를 사용</text></g>
+<g class="c-teal"><rect x="20" y="370" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="36" y="388" dominant-baseline="central">베이스 + 오프셋 직감</text><text class="ts" x="36" y="407" dominant-baseline="central">장치 BAR + 오프셋으로 실제 사용</text></g>
+<g class="c-coral"><rect x="350" y="60" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="366" y="78" dominant-baseline="central">RAID처럼 통합한다</text><text class="ts" x="366" y="97" dominant-baseline="central">→ 용량은 안 합쳐짐 · 번호만 나눔</text></g>
+<g class="c-coral"><rect x="350" y="122" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="366" y="140" dominant-baseline="central">매핑 표 = CPU 레지스터</text><text class="ts" x="366" y="159" dominant-baseline="central">→ BAR · 칩셋 · 펌웨어 · OS에 분산</text></g>
+<g class="c-coral"><rect x="350" y="184" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="366" y="202" dominant-baseline="central">MAR이 지도를 들고 있다</text><text class="ts" x="366" y="221" dominant-baseline="central">→ 지금 접근할 주소 1개만 잠깐</text></g>
+<g class="c-coral"><rect x="350" y="246" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="366" y="264" dominant-baseline="central">그 베이스 = CPU 베이스 레지스터</text><text class="ts" x="366" y="283" dominant-baseline="central">→ BAR는 장치 쪽 레지스터</text></g>
+<g class="c-coral"><rect x="350" y="308" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="366" y="326" dominant-baseline="central">입출력 방식은 CPU가 정한다</text><text class="ts" x="366" y="345" dominant-baseline="central">→ CPU는 지원 · 선택은 장치 설계</text></g>
+<g class="c-coral"><rect x="350" y="370" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="366" y="388" dominant-baseline="central">장치관리자</text><text class="ts" x="366" y="407" dominant-baseline="central">→ 장치 컨트롤러 (하드웨어 칩)</text></g>
+<text class="ts" x="340" y="448" text-anchor="middle" dominant-baseline="central">예: 32비트 PC에 RAM 4GB를 꽂아도 약 3.25GB만 보였던 이유 = 장치가 4GB 주소 지도의 일부를 차지</text>
+</svg></div>
+<footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 4–7 · 9 학습 정리 (인터럽트 · MMU · 메모리 맵 입출력 포함)</footer>
 </main>
 <script>
 const S=[
@@ -148,7 +173,9 @@ const S=[
 {t:'15. 인터럽트 서비스 루틴(ISR) 실행',d:'ISR(인터럽트 서비스 루틴, 인터럽트 핸들러)은 인터럽트를 처리하는 프로그램으로, 운영체제가 메모리에 미리 올려 둡니다. 특별한 것이 아니라 평소처럼 PC → MAR → 메모리 → MBR → IR로 명령어를 하나씩 인출해 실행합니다. 예: 눌린 키 값을 읽어 버퍼에 저장. 범용 레지스터를 써야 하면 ISR이 먼저 스택에 백업합니다.',on:['pc','a1','mar','a2i','misr','a3i','mbr','a4','ir','a5','cu'],v:{marv:'8000',mbrv:'ISR 명령어',irv:'ISR 명령어',pcv:'8004 (+1)'}},
 {t:'16. 복귀 (IRET → 스택에서 pop)',d:'ISR의 마지막 명령어 IRET이 실행되면, 13단계에서 백업한 PC와 플래그를 스택에서 pop해 되돌립니다. SP도 원래 자리로 돌아옵니다. CPU는 인터럽트가 오기 전 하던 명령어의 다음부터 아무 일 없었다는 듯 이어서 실행합니다.',on:['miret','cu','a8','agu','a13','sp','a14','m3000','pc','flag'],v:{irv:'IRET',pcv:'하던 다음 주소 (복구)',spv:'3000 (꼭대기, 복구)',flagv:'Z = 1 · 인터럽트 허용 1'}},
 {t:'17. MMU와 베이스 · 한계 레지스터 (섹션 7)',d:'메모리로 가는 모든 주소는 CPU 칩 안의 MMU를 지나갑니다. 섹션 7에서 베이스 레지스터는 프로그램이 메모리에 올라간 시작 주소를 담고, 짝이 되는 한계 레지스터(리밋 레지스터)는 프로그램 크기를 담습니다. MMU는 먼저 논리 주소가 한계보다 작은지 검사하고, 통과하면 베이스를 더해 물리 주소로 바꿉니다. 섹션 5의 "기준 + 오프셋"과 같은 원리입니다. 아래 확대 그림을 보세요.',on:['br','lr','abm','mmu','a2','mar'],v:{brv:'15000 (프로그램 시작)',lrv:'1000 (프로그램 크기)'}},
-{t:'18. 반복',d:'명령어 하나가 끝나면 PC가 가리키는 주소로 2단계(인출)부터 다시 시작합니다. 제어장치는 클럭, IR의 명령어, 플래그, 제어 버스 신호(인터럽트 포함) 네 가지를 받아 매번 무엇을 할지 정합니다. 이 사이클이 1초에 수십억 번 반복됩니다.',on:null,v:{pcv:'다음 주소',marv:'—',mbrv:'—',irv:'—',spv:'3000 (꼭대기)',flagv:'Z = 1 · 인터럽트 허용 1',brv:'5000 (기준 주소)',lrv:'(섹션 7) 프로그램 크기'}}];
+{t:'18. 메모리 맵 입출력 · 장치도 같은 주소 지도 위에',d:'MAR이 내보내는 주소는 RAM만 가리키지 않습니다. 주소 지도의 일부 구간(여기서는 F000번지대)은 RAM이 아니라 키보드 같은 장치 컨트롤러의 레지스터에 배정되어 있습니다. CPU는 메모리를 읽을 때와 똑같은 명령어(MOV)와 똑같은 MAR · 주소 버스로 장치를 읽고 씁니다. 주소를 보고 RAM으로 보낼지 장치로 보낼지는 메인보드 · 칩셋의 주소 디코더(회로)가 정합니다. 장치 전용 명령어(x86의 IN · OUT)와 별도 주소를 쓰는 방식은 고립형 입출력입니다.',on:['mar','a2o','mmu','mioz','mio0','mio4','a3o','mbr','dev'],v:{marv:'F004 (장치 주소)',mbrv:'눌린 키 값'}},
+{t:'19. 베이스 + 오프셋으로 장치 레지스터 찾기 (BAR)',d:'장치가 쓸 주소 구간은 부팅 때 BIOS · UEFI가 정해서 장치 안의 BAR(Base Address Register)에 적고, OS가 이를 관리하며 드라이버에게 알려 줍니다. 드라이버는 그 시작 주소(F000)를 레지스터에 올려 두고 "시작 주소 + 오프셋"으로 원하는 장치 레지스터를 고릅니다. 섹션 5의 베이스 + 오프셋과 같은 방식입니다. 주의: 주소 지도(매핑 정보)는 CPU 레지스터 하나에 있지 않고 장치의 BAR · 칩셋 설정 · 펌웨어 표 · OS 커널에 나뉘어 있습니다. MAR은 그중 지금 접근할 주소 하나만 잠깐 담습니다.',on:['br','a15','agu','mar','a2o','mioz','mio4','dev'],v:{brv:'F000 (장치 시작 · BAR)',marv:'F000 + 4 = F004'}},
+{t:'20. 반복',d:'명령어 하나가 끝나면 PC가 가리키는 주소로 2단계(인출)부터 다시 시작합니다. 제어장치는 클럭, IR의 명령어, 플래그, 제어 버스 신호(인터럽트 포함) 네 가지를 받아 매번 무엇을 할지 정합니다. 이 사이클이 1초에 수십억 번 반복됩니다.',on:null,v:{pcv:'다음 주소',marv:'—',mbrv:'—',irv:'—',spv:'3000 (꼭대기)',flagv:'Z = 1 · 인터럽트 허용 1',brv:'5000 (기준 주소)',lrv:'(섹션 7) 프로그램 크기'}}];
 let i=0;const cur={};const fig=document.getElementById('fig');const dots=document.getElementById('dots');
 S.forEach((s,k)=>{const d=document.createElement('button');d.className='dot';d.setAttribute('aria-label',s.t);d.onclick=()=>{i=k;rebuild();};dots.append(d);});
 const init={};S.forEach(x=>Object.keys(x.v).forEach(k=>{const e=document.getElementById(k);if(e&&!(k in init))init[k]=e.textContent;}));
