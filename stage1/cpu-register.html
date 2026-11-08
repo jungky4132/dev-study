@@ -37,7 +37,7 @@ svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
 footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 </style></head><body><main>
 <h1>CPU 레지스터 한 장 그림</h1>
-<p class="sub">if 한 줄(CMP R1, R2 → JE 2000)과 인터럽트(벡터 · 서비스 루틴), MMU, 메모리 맵 입출력이 CPU 안에서 처리되는 순서 · STAGE 1 컴퓨터 시스템</p>
+<p class="sub">if 한 줄(CMP R1, R2 → JE 2000)과 인터럽트(벡터 · 서비스 루틴), <a href="mmu.html">MMU</a>, 메모리 맵 입출력이 CPU 안에서 처리되는 순서 · STAGE 1 컴퓨터 시스템</p>
 <div class="panel"><div class="ctrl"><button id="prev">이전</button><button id="next">다음</button><div class="dots" id="dots"></div></div>
 <div id="stitle"></div><div id="sdesc"></div></div>
 <div class="panel"><svg id="fig" width="100%" role="img" aria-label="CPU 레지스터, 메모리, 인터럽트 요청까지 포함한 전체 구조도" viewBox="0 0 830 820" xmlns="http://www.w3.org/2000/svg">
@@ -48,7 +48,7 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <rect x="460" y="30" width="190" height="736" rx="16" fill="none" stroke="var(--b)" stroke-width="0.5" stroke-dasharray="4 4"/>
 <text class="th" x="555" y="48" text-anchor="middle" dominant-baseline="central">메모리 · 주소 지도</text>
 <text class="ts" x="475" y="72" dominant-baseline="central">코드 영역</text>
-<g class="el c-amber" id="mmu"><rect x="418" y="56" width="30" height="696" rx="6" stroke-width="0.5" opacity="0.85"/><text class="tm" x="433" y="72" text-anchor="middle" dominant-baseline="central">MMU</text></g>
+<g class="el c-amber" id="mmu"><rect x="418" y="56" width="30" height="696" rx="6" stroke-width="0.5" opacity="0.85"/><a href="mmu.html"><text class="tm" x="433" y="72" text-anchor="middle" dominant-baseline="central" style="fill:var(--am-s);text-decoration:underline">MMU</text></a></g>
 <g class="el c-gray" id="m1000"><rect x="475" y="84" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="100" text-anchor="middle" dominant-baseline="central">1000 · CMP R1, R2</text></g>
 <g class="el c-gray" id="m1004"><rect x="475" y="116" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="132" text-anchor="middle" dominant-baseline="central">1004 · JE 2000</text></g>
 <g class="el c-gray" id="m2000"><rect x="475" y="148" width="160" height="32" rx="4" stroke-width="1"/><text class="ts" x="555" y="164" text-anchor="middle" dominant-baseline="central">2000 · 같을 때 할 일</text></g>
@@ -113,13 +113,13 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <g class="el c-gray" id="dev"><rect x="10" y="258" width="130" height="52" rx="8" stroke-width="0.5"/><text class="th" x="75" y="276" text-anchor="middle" dominant-baseline="central">장치</text><text class="ts" x="75" y="294" text-anchor="middle" dominant-baseline="central">키보드 · 네트워크</text></g>
 <g class="el" id="aint"><line x1="140" y1="284" x2="381" y2="284" stroke="#BA7517" stroke-width="2" marker-end="url(#arrow)"/><text class="ts" x="205" y="302" dominant-baseline="central">인터럽트 요청 + 벡터 (버스)</text></g>
 </svg></div>
-<div class="panel"><div style="font-size:15px;font-weight:500;margin-bottom:4px">MMU 확대 · 베이스 레지스터와 한계 레지스터 (섹션 7)</div>
-<div style="font-size:14px;color:var(--muted);margin-bottom:8px">프로그램은 자기 안에서의 위치(논리 주소)만 압니다. MMU가 한계를 검사하고 베이스 레지스터(프로그램 시작 주소)를 더해 메모리의 진짜 위치(물리 주소)로 바꿉니다.</div>
+<div class="panel"><div style="font-size:15px;font-weight:500;margin-bottom:4px"><a href="mmu.html">MMU</a> 확대 · 베이스 레지스터와 한계 레지스터 (섹션 7)</div>
+<div style="font-size:14px;color:var(--muted);margin-bottom:8px">프로그램은 자기 안에서의 위치(논리 주소)만 압니다. <a href="mmu.html">MMU</a>가 한계를 검사하고 베이스 레지스터(프로그램 시작 주소)를 더해 메모리의 진짜 위치(물리 주소)로 바꿉니다.</div>
 <svg width="100%" viewBox="0 0 680 300" role="img" aria-label="논리 주소 100이 MMU의 한계 검사와 베이스 레지스터 덧셈을 거쳐 물리 주소 15100이 되는 과정">
 <defs><marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
 <g class="c-purple"><rect x="20" y="104" width="150" height="62" rx="8" stroke-width="0.5"/><text class="th" x="95" y="124" text-anchor="middle" dominant-baseline="central">CPU 코어</text><text class="ts" x="95" y="146" text-anchor="middle" dominant-baseline="central">논리 주소 100</text></g>
 <line x1="170" y1="135" x2="198" y2="135" class="arr" marker-end="url(#arrow2)"/>
-<g class="c-amber"><rect x="200" y="36" width="260" height="206" rx="14" stroke-width="0.5"/><text class="th" x="330" y="58" text-anchor="middle" dominant-baseline="central">MMU (CPU 칩 안)</text></g>
+<g class="c-amber"><rect x="200" y="36" width="260" height="206" rx="14" stroke-width="0.5"/><a href="mmu.html"><text class="th" x="330" y="58" text-anchor="middle" dominant-baseline="central" style="fill:var(--am-t);text-decoration:underline">MMU (CPU 칩 안)</text></a></g>
 <g class="c-coral"><rect x="216" y="80" width="228" height="54" rx="8" stroke-width="0.5"/><text class="th" x="330" y="99" text-anchor="middle" dominant-baseline="central">① 한계 레지스터 = 1000</text><text class="ts" x="330" y="118" text-anchor="middle" dominant-baseline="central">100 &lt; 1000 → 통과 (프로그램 크기)</text></g>
 <line x1="330" y1="134" x2="330" y2="160" class="arr" marker-end="url(#arrow2)"/>
 <g class="c-coral"><rect x="216" y="164" width="228" height="54" rx="8" stroke-width="1.5"/><text class="th" x="330" y="183" text-anchor="middle" dominant-baseline="central">② 베이스 레지스터 = 15000</text><text class="ts" x="330" y="202" text-anchor="middle" dominant-baseline="central">15000 + 100 = 15100 (시작 주소)</text></g>
@@ -151,7 +151,7 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <g class="c-coral"><rect x="350" y="370" width="310" height="52" rx="8" stroke-width="0.5"/><text class="th" x="366" y="388" dominant-baseline="central">장치관리자</text><text class="ts" x="366" y="407" dominant-baseline="central">→ 장치 컨트롤러 (하드웨어 칩)</text></g>
 <text class="ts" x="340" y="448" text-anchor="middle" dominant-baseline="central">예: 32비트 PC에 RAM 4GB를 꽂아도 약 3.25GB만 보였던 이유 = 장치가 4GB 주소 지도의 일부를 차지</text>
 </svg></div>
-<footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 4–7 · 9 학습 정리 (인터럽트 · MMU · 메모리 맵 입출력 포함)</footer>
+<footer><a href="../">← dev-study 목차</a> · 출처: 혼자 공부하는 컴퓨터구조+운영체제 섹션 4–7 · 9 학습 정리 (인터럽트 · <a href="mmu.html">MMU</a> · 메모리 맵 입출력 포함)</footer>
 </main>
 <script>
 const S=[
@@ -182,7 +182,7 @@ const init={};S.forEach(x=>Object.keys(x.v).forEach(k=>{const e=document.getElem
 function rebuild(){Object.keys(cur).forEach(k=>delete cur[k]);Object.assign(cur,init);for(let k=0;k<=i;k++)Object.assign(cur,S[k].v);draw();}
 function draw(){const s=S[i];Object.keys(cur).forEach(k=>{const e=document.getElementById(k);if(e)e.textContent=cur[k];});
 if(s.on){fig.classList.add('dim');fig.querySelectorAll('.el').forEach(e=>e.classList.toggle('on',s.on.includes(e.id)));}else fig.classList.remove('dim');
-document.getElementById('stitle').textContent=s.t;document.getElementById('sdesc').textContent=s.d;
+const _e=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),_l=t=>_e(t).replace(/MMU/g,'<a href="mmu.html">MMU</a>');document.getElementById('stitle').innerHTML=_l(s.t);document.getElementById('sdesc').innerHTML=_l(s.d);
 document.getElementById('prev').disabled=i===0;document.getElementById('next').textContent=i===S.length-1?'처음으로':'다음';
 [...dots.children].forEach((d,k)=>d.className='dot'+(k===i?' on':''));}
 document.getElementById('next').onclick=()=>{i=i===S.length-1?0:i+1;rebuild();};

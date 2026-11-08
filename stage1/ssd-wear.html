@@ -143,7 +143,7 @@ Object.keys(c).forEach(k=>{const el=document.getElementById(k);if(!el)return;el.
 [1,2,3].forEach(n=>document.getElementById('t'+n).setAttribute('opacity',n<=tr?1:0));
 document.getElementById('gfill').setAttribute('width',Math.max(0,240*g));
 if(s.on){const on=ex(s.on);fig.classList.add('dim');fig.querySelectorAll('.el').forEach(el=>el.classList.toggle('on',on.includes(el.id)));}else{fig.classList.remove('dim');fig.querySelectorAll('.el').forEach(el=>el.classList.remove('on'));}
-document.getElementById('stitle').textContent=s.t;document.getElementById('sdesc').textContent=s.d;
+const _e=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),_l=t=>_e(t).replace(/MMU/g,'<a href="mmu.html">MMU</a>');document.getElementById('stitle').innerHTML=_l(s.t);document.getElementById('sdesc').innerHTML=_l(s.d);
 document.getElementById('prev').disabled=i===0;document.getElementById('next').textContent=i===S.length-1?'처음으로':'다음';
 [...dots.children].forEach((d,k)=>d.className='dot'+(k===i?' on':''));}
 document.getElementById('next').onclick=()=>{i=i===S.length-1?0:i+1;draw();};
