@@ -184,6 +184,54 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <g class="c-pink" id="fb_lim"><rect x="20" y="420" width="640" height="66" rx="8" stroke-width="0.5"/><text class="th" x="340" y="437" text-anchor="middle" dominant-baseline="central">비유의 한계</text><text class="ts" x="340" y="454" text-anchor="middle" dominant-baseline="central">진짜 하청과 달리 CPU는 컨트롤러의 레지스터(작업대 · 현황판)를 직접 읽고 쓴다</text><text class="ts" x="340" y="470" text-anchor="middle" dominant-baseline="central">CPU는 지시만 하는 관리자가 아니라 계산도 하는 실무자라, 입출력에 묶이면 본업이 밀린다</text></g></svg>
 </div>
 <!--ana-end-->
+<!--today-start-->
+<div class="panel">
+<p class="ptitle">입출력 명령어는 누구 것인가 · 폴링의 반대편</p>
+<p class="pdesc">고립형 입출력의 in, out은 장치 드라이버가 아니라 CPU가 제공하는 명령어입니다. 드라이버는 그 명령어를 가져다 장치 사용법대로 쓰는 쪽입니다. 메모리 맵 입출력이면 드라이버가 메모리 명령어(mov)를 가져다 쓸 뿐입니다.</p>
+<svg width="100%" viewBox="0 0 680 330" role="img" style="margin-top:8px"><title>입출력 명령어는 CPU가 제공하고 드라이버가 사용한다</title><desc>드라이버가 outb를 호출하면 CPU의 out 명령어가 실행되어 포트 0x64의 장치 컨트롤러에 값을 쓴다. in out은 특권 명령어라 커널 모드에서만 실행된다</desc><g class="c-pink" id="io_dr"><rect x="20" y="20" width="640" height="52" rx="8" stroke-width="0.5"/><text class="th" x="340" y="38" text-anchor="middle" dominant-baseline="central">장치 드라이버 (커널 안의 소프트웨어) = 전화번호와 할 말을 앎</text><text class="ts" x="340" y="55" text-anchor="middle" dominant-baseline="central">어느 포트에 · 어떤 값을 · 어떤 순서로 보낼지 아는 코드</text></g>
+<line class="arr" id="io_a1" x1="340" y1="74" x2="340" y2="112" marker-end="url(#arrow)"/>
+<g class="" id="io_t1"><text class="ts" x="348" y="93" text-anchor="start" dominant-baseline="central">outb(0xAE, 0x64) → out 명령어로 번역</text></g>
+<g class="c-purple" id="io_cpu"><rect x="20" y="114" width="640" height="52" rx="8" stroke-width="0.5"/><text class="th" x="340" y="132" text-anchor="middle" dominant-baseline="central">CPU (하드웨어) = 전화기를 가짐</text><text class="ts" x="340" y="149" text-anchor="middle" dominant-baseline="central">in · out 명령어 회로가 명령어 집합(ISA)에 있음 · 실행하면 입출력 읽기 · 쓰기 선을 켬</text></g>
+<line class="arr" id="io_a2" x1="340" y1="168" x2="340" y2="206" marker-end="url(#arrow)"/>
+<g class="" id="io_t2"><text class="ts" x="348" y="187" text-anchor="start" dominant-baseline="central">포트 0x64로</text></g>
+<g class="c-teal" id="io_dc"><rect x="20" y="208" width="640" height="40" rx="8" stroke-width="0.5"/><text class="th" x="340" y="228" text-anchor="middle" dominant-baseline="central">장치 컨트롤러 (PS/2 키보드 · 포트 0x60 · 0x64)</text></g>
+<g class="c-gray" id="io_pv"><rect x="20" y="266" width="640" height="52" rx="8" stroke-width="0.5"/><text class="th" x="340" y="284" text-anchor="middle" dominant-baseline="central">in · out은 특권 명령어</text><text class="ts" x="340" y="301" text-anchor="middle" dominant-baseline="central">커널 모드에서만 실행 → 일반 프로그램이 쓰면 예외 → 결과적으로 드라이버만 쓰게 됨</text></g></svg>
+<svg width="100%" viewBox="0 0 680 226" role="img" style="margin-top:8px"><title>폴링과 인터럽트 · 콜백</title><desc>확인하는 쪽이 계속 묻는 폴링과, 준비되면 알려 주는 인터럽트(하드웨어) 콜백 웹훅(소프트웨어)의 비교</desc><g class="" id="pc_h1"><text class="th" x="275" y="20" text-anchor="middle" dominant-baseline="central">계속 물어봄 (폴링)</text></g>
+<g class="" id="pc_h2"><text class="th" x="535" y="20" text-anchor="middle" dominant-baseline="central">준비되면 알려 줌</text></g>
+<g class="c-gray" id="pc_l0"><rect x="20" y="40" width="120" height="44" rx="8" stroke-width="0.5"/><text class="th" x="80" y="62" text-anchor="middle" dominant-baseline="central">하드웨어</text></g>
+<g class="c-gray" id="pc_a0"><rect x="150" y="40" width="250" height="44" rx="8" stroke-width="0.5"/><text class="th" x="275" y="62" text-anchor="middle" dominant-baseline="central">프로그램 입출력</text></g>
+<g class="c-teal" id="pc_b0"><rect x="410" y="40" width="250" height="44" rx="8" stroke-width="0.5"/><text class="th" x="535" y="62" text-anchor="middle" dominant-baseline="central">인터럽트 → ISR</text></g>
+<g class="c-gray" id="pc_l1"><rect x="20" y="92" width="120" height="44" rx="8" stroke-width="0.5"/><text class="th" x="80" y="114" text-anchor="middle" dominant-baseline="central">소프트웨어</text></g>
+<g class="c-gray" id="pc_a1"><rect x="150" y="92" width="250" height="44" rx="8" stroke-width="0.5"/><text class="th" x="275" y="114" text-anchor="middle" dominant-baseline="central">상태를 주기적으로 조회</text></g>
+<g class="c-teal" id="pc_b1"><rect x="410" y="92" width="250" height="44" rx="8" stroke-width="0.5"/><text class="th" x="535" y="114" text-anchor="middle" dominant-baseline="central">콜백 · 웹훅 · 이벤트</text></g>
+<g class="c-gray" id="pc_l2"><rect x="20" y="144" width="120" height="44" rx="8" stroke-width="0.5"/><text class="th" x="80" y="166" text-anchor="middle" dominant-baseline="central">STT API 예</text></g>
+<g class="c-gray" id="pc_a2"><rect x="150" y="144" width="250" height="44" rx="8" stroke-width="0.5"/><text class="th" x="275" y="166" text-anchor="middle" dominant-baseline="central">GET /jobs/123/status 반복</text></g>
+<g class="c-teal" id="pc_b2"><rect x="410" y="144" width="250" height="44" rx="8" stroke-width="0.5"/><text class="th" x="535" y="166" text-anchor="middle" dominant-baseline="central">callback_url로 결과 받음</text></g>
+<g class="" id="pc_n"><text class="ts" x="20" y="210" text-anchor="start" dominant-baseline="central">인터셉터는 다른 개념: 알림이 아니라 모든 요청 · 응답이 지나갈 때마다 끼어드는 검문소 (axios · Spring 인터셉터)</text></g></svg>
+</div>
+<!--today-end-->
+<!--addr-start-->
+<div class="panel">
+<p class="ptitle">주소는 몇 개까지 셀 수 있나 · 비트 수와 주소 개수</p>
+<p class="pdesc">비트 하나는 0 또는 1, 두 가지라서 주소가 N비트면 2를 N번 곱한 2<sup>N</sup>개의 번호를 만들 수 있습니다. 위 그림 4단계(메모리 맵 입출력)의 "1024개 주소"는 이해하기 쉽게 10비트로 줄인 가상 예시이고, 같은 원리가 32비트에서 실제로 나타난 것이 4GB RAM 문제입니다.</p>
+<svg width="100%" viewBox="0 0 680 324" role="img" style="margin-top:8px"><title>주소 비트 수와 주소 개수</title><desc>주소가 N비트면 2의 N제곱 개. 10비트는 1024개(설명용 예시), 32비트는 약 43억 개(4GB), 64비트는 약 1600경 개. CPU 이름의 비트 수와 주소 폭은 다를 수 있다</desc><g class="" id="ab_l0"><text class="th" x="20" y="36" text-anchor="start" dominant-baseline="central">1비트</text></g>
+<g class="c-gray" id="ab_b0"><rect x="100" y="20" width="120" height="32" rx="8" stroke-width="0.5"/><text class="th" x="160" y="36" text-anchor="middle" dominant-baseline="central">2개 (0, 1)</text></g>
+<g class="" id="ab_l1"><text class="th" x="20" y="76" text-anchor="start" dominant-baseline="central">2비트</text></g>
+<g class="c-gray" id="ab_b1"><rect x="100" y="60" width="120" height="32" rx="8" stroke-width="0.5"/><text class="th" x="160" y="76" text-anchor="middle" dominant-baseline="central">4개</text></g>
+<g class="" id="ab_l2"><text class="th" x="20" y="116" text-anchor="start" dominant-baseline="central">10비트</text></g>
+<g class="c-gray" id="ab_b2"><rect x="100" y="100" width="190" height="32" rx="8" stroke-width="0.5"/><text class="th" x="195" y="116" text-anchor="middle" dominant-baseline="central">1,024개 · 설명용 예시</text></g>
+<g class="" id="ab_l3"><text class="th" x="20" y="156" text-anchor="start" dominant-baseline="central">32비트</text></g>
+<g class="c-teal" id="ab_b3"><rect x="100" y="140" width="300" height="32" rx="8" stroke-width="0.5"/><text class="th" x="250" y="156" text-anchor="middle" dominant-baseline="central">약 43억 개 = 4GB</text></g>
+<g class="" id="ab_l4"><text class="th" x="20" y="196" text-anchor="start" dominant-baseline="central">64비트</text></g>
+<g class="c-gray" id="ab_b4"><rect x="100" y="180" width="520" height="32" rx="8" stroke-width="0.5"/><text class="th" x="360" y="196" text-anchor="middle" dominant-baseline="central">약 1,600경 개 = 16EB</text></g>
+<g class="c-amber" id="ab_n"><rect x="20" y="228" width="640" height="84" rx="8" stroke-width="0.5"/><text class="th" x="340" y="246" text-anchor="middle" dominant-baseline="central">&quot;N비트 CPU&quot;의 N ≠ 주소 비트 수</text><text class="ts" x="340" y="263" text-anchor="middle" dominant-baseline="central">이름의 N은 보통 레지스터 크기이고 주소 폭은 따로 정해진다 (32비트 시절엔 우연히 같았음)</text><text class="ts" x="340" y="279" text-anchor="middle" dominant-baseline="central">8086: 16비트 CPU · 주소 20비트(1MB) · x86-64: 64비트 CPU · 실제 주소 48비트(256TB)</text><text class="ts" x="340" y="295" text-anchor="middle" dominant-baseline="central">32비트 PC: RAM은 3~3.5GB만(장치 창구 몫 제외) · 프로그램 하나는 2~3GB(커널 몫 제외)</text></g></svg>
+<p class="pdesc" style="margin-top:12px">64비트 주소도 모자라면 CPU(레지스터 · MMU)부터 바꾸고 OS가 뒤따라야 합니다. 다만 지금은 64비트 중 48~57비트만 써도 충분해서 128비트 주소는 먼 이야기입니다. SSE · AVX의 128비트, IPv6의 128비트는 메모리 주소가 아닌 다른 것의 폭입니다.</p>
+</div>
+<!--addr-end-->
+
+
+
+
 
 <footer><a href="../">← dev-study 목차</a> · 참고: 혼자 공부하는 컴퓨터구조+운영체제 입출력 강의(다양한 입출력방법) · 배경지식은 별도 자료로 보충해 직접 정리</footer>
 </main>
@@ -206,7 +254,7 @@ const S=[
 {t:'1. 장치 컨트롤러 (복습)',d:'CPU는 입출력 장치를 직접 다루지 않고, 장치에 연결된 장치 컨트롤러의 레지스터를 읽고 씁니다. 상태 레지스터는 장치가 준비됐는지를, 데이터 레지스터는 주고받을 데이터를 담습니다.',on:['dc','sreg','dreg','dev','l_dev'],v:{}},
 {t:'2. 프로그램 입출력 ① 상태 확인 (폴링)',d:'CPU가 프로그램 속 입출력 명령어를 실행해서 장치 컨트롤러의 상태 레지스터를 읽고, 장치가 준비됐는지 확인합니다. 준비가 안 됐으면 준비될 때까지 이 확인을 계속 반복합니다. 이런 방식을 폴링이라고도 합니다.',on:['cpu','cu','l_cpu','sysbus','bridge','iobus','l_dc','dc','sreg'],v:{cuv:'입출력 명령어',sregv:'준비됐나? 계속 확인'}},
 {t:'3. 프로그램 입출력 ② 데이터 쓰기',d:'준비되면 CPU가 백업할 데이터(메모리 값)를 읽어 장치 컨트롤러의 데이터 레지스터에 씁니다. 백업이 끝날 때까지 2~3단계를 반복합니다. 옮겨지는 데이터가 반드시 CPU를 거치고, 그동안 CPU는 입출력에 묶입니다.',on:['cpu','reg','cu','l_cpu','sysbus','l_mem','mem','amem','bridge','iobus','l_dc','dc','dreg'],v:{regv:'메모리에서 읽은 값',dregv:'CPU가 써 넣은 값',cuv:'입출력 명령어',busyv:'입출력에 묶임'}},
-{t:'4. 레지스터 지정 ① 메모리 맵 입출력',d:'CPU가 장치 컨트롤러의 레지스터를 알아내는 첫 번째 방법입니다. 메모리 주소 공간과 입출력 장치 주소 공간을 하나의 주소 공간으로 간주합니다. 예를 들어 1024개의 주소 중 0~511은 메모리, 512~1023은 장치 레지스터에 씁니다. 메모리 명령어를 그대로 써서 장치에 접근하지만, 메모리가 쓸 수 있는 주소는 줄어듭니다.',on:['cpu','cu','mem','amem','aio'],v:{amemv:'주소 0 ~ 511 · 메모리',aiov:'512 ~ 1023 · 장치 레지스터',cuv:'메모리 명령어 사용'}},
+{t:'4. 레지스터 지정 ① 메모리 맵 입출력',d:'CPU가 장치 컨트롤러의 레지스터를 알아내는 첫 번째 방법입니다. 메모리 주소 공간과 입출력 장치 주소 공간을 하나의 주소 공간으로 간주합니다. 예를 들어 주소가 1024개(설명을 위해 10비트로 줄인 예시)라고 하면, 그중 0~511은 메모리, 512~1023은 장치 레지스터에 씁니다. 메모리 명령어를 그대로 써서 장치에 접근하지만, 메모리가 쓸 수 있는 주소는 줄어듭니다.',on:['cpu','cu','mem','amem','aio'],v:{amemv:'주소 0 ~ 511 · 메모리',aiov:'512 ~ 1023 · 장치 레지스터',cuv:'메모리 명령어 사용'}},
 {t:'5. 레지스터 지정 ② 고립형 입출력',d:'두 번째 방법은 메모리용 주소 공간과 입출력 장치용 주소 공간을 분리하는 것입니다. 제어 버스에는 메모리 읽기·쓰기선과 별도로 입출력 장치 읽기·쓰기선이 있어서, 입출력 전용 명령어(x86은 in, out)를 실행하면 장치에 접근합니다. 메모리 주소 공간은 줄지 않지만 전용 명령어가 필요합니다.',on:['cpu','cu','mem','amem','aio'],v:{amemv:'0 ~ 1023 · 메모리',aiov:'0 ~ 1023 · 입출력 장치',cuv:'in / out 명령어'}},
 {t:'6. 인터럽트 기반 ① 요청 신호',d:'장치가 준비되면 장치 컨트롤러가 CPU에 인터럽트 요청 신호를 보냅니다(일종의 알람). CPU는 그 전까지 기다리지 않고 다른 일을 합니다. CPU는 플래그 레지스터의 인터럽트 비트가 활성화돼 있을 때 이 요청을 받아들입니다.',on:['dev','l_dev','dc','sreg','aint','flag','cpu','busy'],v:{sregv:'준비 완료 → 알림',busyv:'다른 프로그램 실행 중'}},
 {t:'7. 인터럽트 기반 ② 서비스 루틴 실행',d:'요청을 받아들이면 CPU는 하던 작업을 잠시 멈추고 인터럽트 서비스 루틴(인터럽트를 처리하는 특별한 프로그램)을 실행하고, 끝나면 하던 작업으로 돌아갑니다. 데이터를 옮기는 일은 여전히 CPU가 합니다.',on:['isr','cpu','reg','l_cpu','sysbus','bridge','iobus','l_dc','dc','dreg','busy'],v:{isrv:'데이터 이동 코드 실행',busyv:'잠시 중단',regv:'장치에서 읽은 값',dregv:'읽어 갈 데이터'}},

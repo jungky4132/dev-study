@@ -174,6 +174,57 @@ lsblk -o NAME,TYPE,SIZE,MOUNTPOINT   # md 장치와 디스크 관계 확인</pre
 <tr><td>write hole</td><td>데이터와 패리티 쓰기 사이에 정전되어 둘이 어긋나는 문제</td></tr>
 <tr><td>이레이저 코딩</td><td>데이터를 조각과 패리티로 나눠 여러 서버에 흩어 저장. 클라우드 스토리지 방식</td></tr>
 </table></div>
+
+<!--today-start-->
+<div class="panel">
+<p class="ptitle">패리티는 어떻게 복원하나 · RAID 5와 RAID 6</p>
+<p class="pdesc">나머지 값과 합계를 알면 빠진 하나를 역산할 수 있다는 것이 패리티의 원리입니다. 실제로는 덧셈 대신 XOR를 쓰고, 식이 몇 개냐에 따라 견딜 수 있는 고장 대수가 정해집니다.</p>
+<svg width="100%" viewBox="0 0 680 246" role="img" style="margin-top:8px"><title>XOR 패리티로 고장 난 디스크 복원</title><desc>디스크1 1010, 디스크2 0110, 디스크3 1100의 XOR 패리티는 0000이고, 디스크1이 고장 나면 나머지를 XOR해 1010을 복원한다</desc><g class="" id="xp_t"><text class="th" x="120" y="20" text-anchor="middle" dominant-baseline="central">XOR = 비트마다 서로 다르면 1</text></g>
+<g class="c-coral" id="xp_0"><rect x="20" y="40" width="200" height="36" rx="8" stroke-width="0.5"/><text class="th" x="120" y="58" text-anchor="middle" dominant-baseline="central">디스크1 · 1010 (고장)</text></g>
+<g class="c-gray" id="xp_1"><rect x="20" y="84" width="200" height="36" rx="8" stroke-width="0.5"/><text class="th" x="120" y="102" text-anchor="middle" dominant-baseline="central">디스크2 · 0110</text></g>
+<g class="c-gray" id="xp_2"><rect x="20" y="128" width="200" height="36" rx="8" stroke-width="0.5"/><text class="th" x="120" y="146" text-anchor="middle" dominant-baseline="central">디스크3 · 1100</text></g>
+<g class="c-amber" id="xp_3"><rect x="20" y="172" width="200" height="36" rx="8" stroke-width="0.5"/><text class="th" x="120" y="190" text-anchor="middle" dominant-baseline="central">패리티 · 0000</text></g>
+<line class="arr" id="xp_a1" x1="222" y1="102" x2="298" y2="116" marker-end="url(#arrow)"/>
+<line class="arr" id="xp_a2" x1="222" y1="146" x2="298" y2="132" marker-end="url(#arrow)"/>
+<line class="arr" id="xp_a3" x1="222" y1="190" x2="298" y2="148" marker-end="url(#arrow)"/>
+<g class="c-teal" id="xp_c"><rect x="300" y="92" width="360" height="80" rx="8" stroke-width="0.5"/><text class="th" x="480" y="116" text-anchor="middle" dominant-baseline="central">복원: 남은 것을 전부 XOR</text><text class="ts" x="480" y="133" text-anchor="middle" dominant-baseline="central">0110 XOR 1100 XOR 0000</text><text class="ts" x="480" y="149" text-anchor="middle" dominant-baseline="central">= 1010 → 디스크1 내용 그대로</text></g>
+<g class="" id="xp_n"><text class="ts" x="20" y="230" text-anchor="start" dominant-baseline="central">덧셈(1+2+3=6) 대신 XOR를 쓰는 이유: 받아올림이 없어 크기가 안 늘고, 같은 연산으로 되돌릴 수 있다</text></g></svg>
+<svg width="100%" viewBox="0 0 680 216" role="img" style="margin-top:8px"><title>RAID 5 분산 패리티와 RAID 6</title><desc>RAID 5는 패리티를 줄마다 다른 디스크에 둔다. 식이 1개면 1대, 2개(RAID 6)면 2대, 3개(RAIDZ3)면 3대까지 견딘다</desc><g class="" id="r5_h0"><text class="th" x="112" y="24" text-anchor="middle" dominant-baseline="central">디스크A</text></g>
+<g class="" id="r5_h1"><text class="th" x="227" y="24" text-anchor="middle" dominant-baseline="central">디스크B</text></g>
+<g class="" id="r5_h2"><text class="th" x="342" y="24" text-anchor="middle" dominant-baseline="central">디스크C</text></g>
+<g class="" id="r5_r0"><text class="ts" x="20" y="56" text-anchor="start" dominant-baseline="central">1줄</text></g>
+<g class="c-gray" id="r5_00"><rect x="60" y="40" width="105" height="32" rx="8" stroke-width="0.5"/><text class="th" x="112.5" y="56" text-anchor="middle" dominant-baseline="central">데이터</text></g>
+<g class="c-gray" id="r5_01"><rect x="175" y="40" width="105" height="32" rx="8" stroke-width="0.5"/><text class="th" x="227.5" y="56" text-anchor="middle" dominant-baseline="central">데이터</text></g>
+<g class="c-amber" id="r5_02"><rect x="290" y="40" width="105" height="32" rx="8" stroke-width="0.5"/><text class="th" x="342.5" y="56" text-anchor="middle" dominant-baseline="central">패리티</text></g>
+<g class="" id="r5_r1"><text class="ts" x="20" y="96" text-anchor="start" dominant-baseline="central">2줄</text></g>
+<g class="c-gray" id="r5_10"><rect x="60" y="80" width="105" height="32" rx="8" stroke-width="0.5"/><text class="th" x="112.5" y="96" text-anchor="middle" dominant-baseline="central">데이터</text></g>
+<g class="c-amber" id="r5_11"><rect x="175" y="80" width="105" height="32" rx="8" stroke-width="0.5"/><text class="th" x="227.5" y="96" text-anchor="middle" dominant-baseline="central">패리티</text></g>
+<g class="c-gray" id="r5_12"><rect x="290" y="80" width="105" height="32" rx="8" stroke-width="0.5"/><text class="th" x="342.5" y="96" text-anchor="middle" dominant-baseline="central">데이터</text></g>
+<g class="" id="r5_r2"><text class="ts" x="20" y="136" text-anchor="start" dominant-baseline="central">3줄</text></g>
+<g class="c-amber" id="r5_20"><rect x="60" y="120" width="105" height="32" rx="8" stroke-width="0.5"/><text class="th" x="112.5" y="136" text-anchor="middle" dominant-baseline="central">패리티</text></g>
+<g class="c-gray" id="r5_21"><rect x="175" y="120" width="105" height="32" rx="8" stroke-width="0.5"/><text class="th" x="227.5" y="136" text-anchor="middle" dominant-baseline="central">데이터</text></g>
+<g class="c-gray" id="r5_22"><rect x="290" y="120" width="105" height="32" rx="8" stroke-width="0.5"/><text class="th" x="342.5" y="136" text-anchor="middle" dominant-baseline="central">데이터</text></g>
+<g class="c-gray" id="r5_5"><rect x="420" y="40" width="240" height="32" rx="8" stroke-width="0.5"/><text class="th" x="540" y="56" text-anchor="middle" dominant-baseline="central">RAID 5 · 식 1개 → 1대까지</text></g>
+<g class="c-teal" id="r5_6"><rect x="420" y="80" width="240" height="32" rx="8" stroke-width="0.5"/><text class="th" x="540" y="96" text-anchor="middle" dominant-baseline="central">RAID 6 · 식 2개 → 2대까지</text></g>
+<g class="c-gray" id="r5_z"><rect x="420" y="120" width="240" height="32" rx="8" stroke-width="0.5"/><text class="th" x="540" y="136" text-anchor="middle" dominant-baseline="central">RAIDZ3 · 식 3개 → 3대까지</text></g>
+<g class="" id="r5_n"><text class="ts" x="20" y="178" text-anchor="start" dominant-baseline="central">패리티를 줄마다 다른 디스크에 돌려 둔다(RAID 4는 한 디스크에 몰아서 그 디스크만 바빠짐)</text></g>
+<g class="" id="r5_n2"><text class="ts" x="20" y="200" text-anchor="start" dominant-baseline="central">&quot;동시에&quot;가 핵심: 리빌드는 남은 디스크를 전부 읽어 오래 걸리고, 그사이 한 대 더 죽으면 끝 → 큰 디스크는 RAID 6</text></g></svg>
+</div>
+<div class="panel">
+<p class="ptitle">RAID는 백업이 아니다 · 화재까지 대비하려면</p>
+<p class="pdesc">같은 건물 안의 이중화(RAID, 미러링 포함)는 화재 앞에서 하나나 다름없습니다. 화재에 필요한 것은 방식이 아니라 물리적으로 떨어진 장소이고, 실수 삭제 · 랜섬웨어까지 막으려면 과거 시점으로 되돌릴 수 있는 백업이 있어야 합니다.</p>
+<svg width="100%" viewBox="0 0 680 286" role="img" style="margin-top:8px"><title>RAID가 막는 것과 못 막는 것, 그리고 백업</title><desc>RAID는 디스크 고장만 막는다. 원격 복제는 화재를, 원격 백업은 화재와 삭제 랜섬웨어까지 막는다. 3-2-1 규칙과 국정자원 화재 사례</desc><g class="c-teal" id="bk_t0"><rect x="20" y="20" width="151" height="70" rx="8" stroke-width="0.5"/><text class="th" x="95.5" y="47" text-anchor="middle" dominant-baseline="central">디스크 고장</text><text class="ts" x="95.5" y="64" text-anchor="middle" dominant-baseline="central">RAID: 막음</text></g>
+<g class="c-coral" id="bk_t1"><rect x="183" y="20" width="151" height="70" rx="8" stroke-width="0.5"/><text class="th" x="258.5" y="39" text-anchor="middle" dominant-baseline="central">실수로 삭제</text><text class="ts" x="258.5" y="56" text-anchor="middle" dominant-baseline="central">RAID: 못 막음</text><text class="ts" x="258.5" y="72" text-anchor="middle" dominant-baseline="central">모든 디스크에서 지워짐</text></g>
+<g class="c-coral" id="bk_t2"><rect x="346" y="20" width="151" height="70" rx="8" stroke-width="0.5"/><text class="th" x="421.5" y="39" text-anchor="middle" dominant-baseline="central">랜섬웨어</text><text class="ts" x="421.5" y="56" text-anchor="middle" dominant-baseline="central">RAID: 못 막음</text><text class="ts" x="421.5" y="72" text-anchor="middle" dominant-baseline="central">암호화도 똑같이 기록</text></g>
+<g class="c-coral" id="bk_t3"><rect x="509" y="20" width="151" height="70" rx="8" stroke-width="0.5"/><text class="th" x="584.5" y="39" text-anchor="middle" dominant-baseline="central">화재 · 도난</text><text class="ts" x="584.5" y="56" text-anchor="middle" dominant-baseline="central">RAID: 못 막음</text><text class="ts" x="584.5" y="72" text-anchor="middle" dominant-baseline="central">디스크가 한곳에 있음</text></g>
+<g class="c-gray" id="bk_rr"><rect x="20" y="110" width="310" height="70" rx="8" stroke-width="0.5"/><text class="th" x="175" y="129" text-anchor="middle" dominant-baseline="central">원격 복제 (다른 지역에 실시간 복사)</text><text class="ts" x="175" y="146" text-anchor="middle" dominant-baseline="central">화재 · 재해: 막음</text><text class="ts" x="175" y="162" text-anchor="middle" dominant-baseline="central">삭제 · 랜섬웨어: 못 막음 (그대로 복사됨)</text></g>
+<g class="c-teal" id="bk_rb"><rect x="350" y="110" width="310" height="70" rx="8" stroke-width="0.5"/><text class="th" x="505" y="129" text-anchor="middle" dominant-baseline="central">원격 백업 (시점별 사본 보관)</text><text class="ts" x="505" y="146" text-anchor="middle" dominant-baseline="central">화재 · 재해: 막음</text><text class="ts" x="505" y="162" text-anchor="middle" dominant-baseline="central">삭제 · 랜섬웨어: 막음 (어제로 되돌림)</text></g>
+<g class="c-amber" id="bk_321"><rect x="20" y="200" width="310" height="70" rx="8" stroke-width="0.5"/><text class="th" x="175" y="219" text-anchor="middle" dominant-baseline="central">3-2-1 규칙</text><text class="ts" x="175" y="236" text-anchor="middle" dominant-baseline="central">사본 3개 · 매체 2종류</text><text class="ts" x="175" y="252" text-anchor="middle" dominant-baseline="central">그중 1개는 다른 장소 ← 화재 대비</text></g>
+<g class="c-coral" id="bk_case"><rect x="350" y="200" width="310" height="70" rx="8" stroke-width="0.5"/><text class="th" x="505" y="219" text-anchor="middle" dominant-baseline="central">2025.9 국정자원 대전 화재</text><text class="ts" x="505" y="236" text-anchor="middle" dominant-baseline="central">UPS 리튬이온 배터리에서 발화</text><text class="ts" x="505" y="252" text-anchor="middle" dominant-baseline="central">G드라이브는 외부 백업이 없어 영구 소실</text></g></svg>
+<p class="pdesc" style="margin-top:12px">그래서 금융권은 원격 복제와 백업을 함께 쓰는 재해복구(DR) 센터를 따로 둡니다. "이중화했다"와 "다른 장소에 있다"는 다른 말입니다.</p>
+</div>
+<!--today-end-->
+
 <footer><a href="../">← dev-study 목차</a> · 관련: <a href="storage-notes.html">보조기억장치 정리</a> · <a href="ssd-wear.html">SSD 셀 · 페이지 · 블록과 수명</a> · 참고: 혼자 공부하는 컴퓨터구조+운영체제 섹션 8, Patterson · Gibson · Katz "A Case for Redundant Arrays of Inexpensive Disks (RAID)" (1987) · 배경지식은 별도 자료로 보충해 직접 정리</footer>
 </main>
 <script>
