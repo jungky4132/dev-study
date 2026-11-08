@@ -5,6 +5,7 @@
 - 사이트: https://jungky4132.github.io/dev-study/
 
 ## STAGE 1 · 컴퓨터 시스템 + 리눅스 기초
+- [STAGE 1 용어 사전](https://jungky4132.github.io/dev-study/stage1/glossary.html) — 그림에 나오는 용어 77개의 시대적 배경 · 그때의 문제 · 개념 · 지금
 - [CPU 레지스터 한 장 그림](https://jungky4132.github.io/dev-study/stage1/cpu-register.html) — 명령어 사이클, PC 갱신 조건, 인터럽트(벡터 · ISR), 스택 포인터, 베이스 레지스터, [MMU](https://jungky4132.github.io/dev-study/stage1/mmu.html)
 - [SSD 셀 · 페이지 · 블록과 수명](https://jungky4132.github.io/dev-study/stage1/ssd-wear.html) — 덮어쓰기가 안 되는 이유, 블록 단위 지우기, 가비지 컬렉션, 쓰기 증폭, 산화막 마모, 배드 블록 (단계별)
 - [보조기억장치 정리](https://jungky4132.github.io/dev-study/stage1/storage-notes.html) — SLC · MLC · TLC · QLC 비교와 용도, SLC 캐시, HDD 역사 연표, 용어 정리
