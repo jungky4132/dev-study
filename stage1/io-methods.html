@@ -95,14 +95,14 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <g class="el c-gray" id="dreg"><rect x="240" y="574" width="190" height="52" rx="8" stroke-width="0.5"/><text class="th" x="335" y="592" text-anchor="middle" dominant-baseline="central">데이터 레지스터</text><text class="ts" id="dregv" x="335" y="611" text-anchor="middle" dominant-baseline="central"></text></g>
 <g class="el c-teal" id="dev"><rect x="490" y="556" width="210" height="80" rx="8" stroke-width="0.5"/><text class="th" x="595" y="586" text-anchor="middle" dominant-baseline="central">입출력 장치</text><text class="ts" x="595" y="608" text-anchor="middle" dominant-baseline="central">키보드 · 디스크 등</text></g>
 
-<g class="el" id="aint"><path class="arr" d="M250 540 L250 304" marker-end="url(#arrow)" style="stroke:var(--am-s);stroke-dasharray:5 4"/><text class="ts" x="258" y="462" dominant-baseline="central">인터럽트 요청</text></g>
-<g class="el" id="aint2"><path class="arr" d="M240 400 L250 400 L250 304" marker-end="url(#arrow)" style="stroke:var(--am-s);stroke-dasharray:5 4"/><text class="ts" x="242" y="458" text-anchor="end" dominant-baseline="central">완료 인터럽트</text></g>
+<g class="el" id="aint"><path class="arr" d="M250 540 L250 304" marker-end="url(#arrow)" style="stroke:#E8A800;stroke-width:2;stroke-dasharray:5 4"/><text class="ts" x="258" y="462" dominant-baseline="central">인터럽트 요청</text></g>
+<g class="el" id="aint2"><path class="arr" d="M240 400 L250 400 L250 304" marker-end="url(#arrow)" style="stroke:#E8A800;stroke-width:2;stroke-dasharray:5 4"/><text class="ts" x="242" y="458" text-anchor="end" dominant-baseline="central">완료 인터럽트</text></g>
 </svg>
 </div>
 
 <div class="panel">
 <p class="ptitle">세 방식 한눈에 비교</p>
-<p class="pdesc">노란 점선은 인터럽트입니다. 오른쪽으로 갈수록 CPU의 부담이 줄어듭니다.</p>
+<p class="pdesc">세 방식 모두 장치와 메모리 사이에서 데이터를 옮기는 방법입니다. 1번에서 3번으로 내려갈수록 CPU가 직접 하는 일이 줄어듭니다. 노란 점선 화살표는 인터럽트(장치나 DMA 컨트롤러가 CPU에 보내는 알림)입니다.</p>
 <svg viewBox="0 0 680 570" width="100%" role="img" aria-labelledby="ct cd">
 <title id="ct">입출력 3가지 방식 비교</title>
 <desc id="cd">프로그램 입출력, 인터럽트 기반 입출력, DMA 입출력에서 CPU와 데이터의 이동 경로를 비교한 그림</desc>
@@ -124,7 +124,7 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <g class="c-gray"><rect x="490" y="228" width="150" height="44" rx="8" stroke-width="0.5"/><text class="th" x="565" y="250" text-anchor="middle" dominant-baseline="central">메모리</text></g>
 <line x1="192" y1="250" x2="263" y2="250" class="arr" marker-end="url(#arrow)"/>
 <line x1="417" y1="250" x2="488" y2="250" class="arr" marker-end="url(#arrow)"/>
-<path d="M115 274 L115 296 L340 296 L340 276" class="arr" style="stroke:var(--am-s);stroke-dasharray:4 3" marker-end="url(#arrow)"/>
+<path d="M115 274 L115 296 L340 296 L340 276" class="arr" style="stroke:#E8A800;stroke-width:2;stroke-dasharray:4 3" marker-end="url(#arrow)"/>
 <text class="ts" x="228" y="314" text-anchor="middle">인터럽트 요청 (준비되면 알림)</text>
 <text class="ts" x="40" y="340">CPU는 다른 일을 하다가 알림이 오면 처리, 데이터 이동은 여전히 CPU</text>
 <line x1="40" y1="358" x2="640" y2="358" stroke="var(--b)" stroke-width="0.5"/>
@@ -138,7 +138,7 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <g class="c-purple"><rect x="265" y="492" width="150" height="40" rx="8" stroke-width="0.5"/><text class="th" x="340" y="512" text-anchor="middle" dominant-baseline="central">CPU</text></g>
 <line x1="310" y1="490" x2="310" y2="450" class="arr" marker-end="url(#arrow)"/>
 <text class="ts" x="300" y="472" text-anchor="end">시작 지시</text>
-<line x1="370" y1="450" x2="370" y2="490" class="arr" style="stroke:var(--am-s);stroke-dasharray:4 3" marker-end="url(#arrow)"/>
+<line x1="370" y1="450" x2="370" y2="490" class="arr" style="stroke:#E8A800;stroke-width:2;stroke-dasharray:4 3" marker-end="url(#arrow)"/>
 <text class="ts" x="380" y="472">완료 인터럽트</text>
 <text class="ts" x="40" y="556">데이터는 CPU를 거치지 않고 직접 이동 (시스템 버스 공유 시 사이클 스틸링)</text>
 </svg>
