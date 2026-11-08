@@ -46,6 +46,29 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <main>
 <h1>데이터와 문자 인코딩 한 장 그림</h1>
 <p class="sub">컴퓨터가 숫자를 0과 1로 나타내는 방법(음수 포함)과 글자를 바이트로 저장하는 규칙, 그리고 한글이 깨지는 이유 · STAGE 1 컴퓨터 시스템</p>
+<div class="panel">
+<p class="ptitle">먼저 단어 뜻부터 · 인코딩과 디코딩</p>
+<p class="pdesc"><b>인코딩(encoding)</b> = en(안으로) + code(약속된 규칙 · 부호). <b>정보를 정해진 규칙(코드)에 맞는 형태로 바꾸는 것</b>입니다.<br>
+<b>디코딩(decoding)</b> = de(되돌리다) + code. <b>같은 규칙을 거꾸로 적용해 원래 형태로 되돌리는 것</b>입니다.</p>
+<svg width="100%" viewBox="0 0 680 196" role="img"><title>인코딩과 디코딩</title><desc>글자 한을 UTF-8 규칙으로 인코딩하면 바이트 ED 95 9C가 되고, 같은 규칙으로 디코딩하면 다시 한이 된다. 다른 규칙으로 디코딩하면 글자가 깨진다.</desc><g class="c-gray" id="ep_a"><rect x="20" y="44" width="130" height="60" rx="8" stroke-width="0.5"/><text class="th" x="85" y="66" text-anchor="middle" dominant-baseline="central">원래 형태</text><text class="ts" x="85" y="83" text-anchor="middle" dominant-baseline="central">글자 &quot;한&quot;</text></g>
+<g class="c-teal" id="ep_b"><rect x="275" y="44" width="130" height="60" rx="8" stroke-width="0.5"/><text class="th" x="340" y="66" text-anchor="middle" dominant-baseline="central">규칙에 맞춘 형태</text><text class="ts" x="340" y="83" text-anchor="middle" dominant-baseline="central">바이트 ED 95 9C</text></g>
+<g class="c-gray" id="ep_c"><rect x="530" y="44" width="130" height="60" rx="8" stroke-width="0.5"/><text class="th" x="595" y="66" text-anchor="middle" dominant-baseline="central">원래 형태</text><text class="ts" x="595" y="83" text-anchor="middle" dominant-baseline="central">글자 &quot;한&quot;</text></g>
+<g class="" id="ep_t1"><text class="th" x="212" y="26" text-anchor="middle" dominant-baseline="central">인코딩 (encode)</text></g>
+<line class="arr" id="ep_l1" x1="152" y1="74" x2="273" y2="74" marker-end="url(#arrow)"/>
+<g class="" id="ep_s1"><text class="ts" x="212" y="92" text-anchor="middle" dominant-baseline="central">UTF-8 규칙으로</text></g>
+<g class="" id="ep_t2"><text class="th" x="467" y="26" text-anchor="middle" dominant-baseline="central">디코딩 (decode)</text></g>
+<line class="arr" id="ep_l2" x1="407" y1="74" x2="528" y2="74" marker-end="url(#arrow)"/>
+<g class="" id="ep_s2"><text class="ts" x="467" y="92" text-anchor="middle" dominant-baseline="central">같은 규칙으로 되돌림</text></g>
+<g class="c-coral" id="ep_w"><rect x="20" y="128" width="640" height="52" rx="8" stroke-width="0.5"/><text class="th" x="340" y="146" text-anchor="middle" dominant-baseline="central">규칙이 다르면 깨진다</text><text class="ts" x="340" y="163" text-anchor="middle" dominant-baseline="central">ED 95 9C를 EUC-KR 규칙으로 디코딩하면 &quot;한&quot;이 아닌 엉뚱한 글자가 나온다</text></g></svg>
+<p class="pdesc" style="margin-top:12px">문자 인코딩에서는 "사람이 읽는 글자 → 컴퓨터가 저장하는 바이트"가 인코딩, 그 반대가 디코딩이라 <b>"컴퓨터용으로 바꾸기 / 사람용으로 되돌리기"</b>로 이해해도 맞습니다. 하지만 원래 뜻은 더 넓습니다. 사람 · 컴퓨터와 상관없이 <b>한 형태를 규칙에 따라 다른 형태로 바꾸는 것</b>이면 모두 인코딩입니다.</p>
+<ul class="sum" style="margin-top:0">
+<li style="margin:4px 0"><b>문자 인코딩</b>: 글자 → 바이트 (UTF-8, EUC-KR) · 이 페이지의 주제</li>
+<li style="margin:4px 0"><b>오디오 · 영상 코덱</b>: 녹음한 원본(PCM, WAV) → MP3 · Opus처럼 작게 줄인 형태. <b>코덱(codec)</b> = 코더(coder) + 디코더(decoder)</li>
+<li style="margin:4px 0"><b>Base64</b>: 아무 바이트 → 영문자 · 숫자 64종 (이메일 · JSON에 파일을 실어 보낼 때)</li>
+<li style="margin:4px 0"><b>URL 인코딩</b>: 한 → %ED%95%9C (주소창에 그대로 쓸 수 없는 글자를 바꿈)</li>
+</ul>
+<p class="pdesc" style="margin-top:8px">헷갈리기 쉬운 점: <b>인코딩은 암호화가 아닙니다.</b> 규칙이 공개돼 있어 누구나 디코딩할 수 있습니다. 암호화는 열쇠(키)가 있어야만 되돌릴 수 있습니다.</p>
+</div>
 
 <div class="panel">
   <div class="ctrl">
