@@ -45,7 +45,7 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 <body>
 <main>
 <h1>프로세스와 스레드 한 장 그림</h1>
-<p class="sub">실행 중인 프로그램(프로세스)이 메모리를 어떻게 나눠 쓰고 운영체제가 어떻게 관리하는지, 한 프로세스 안에서 일을 나누는 스레드는 무엇을 함께 쓰는지 · STAGE 1 운영체제</p>
+<p class="sub">실행 중인 프로그램(프로세스)이 메모리를 어떻게 나눠 쓰고 운영체제가 어떻게 관리하는지, 프로세스가 어떤 상태를 오가고 어떻게 태어나는지(fork · exec), 한 프로세스 안에서 일을 나누는 스레드는 무엇을 함께 쓰는지 · STAGE 1 운영체제</p>
 
 <div class="panel">
   <div class="ctrl">
@@ -57,133 +57,107 @@ footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
 </div>
 
 <div class="panel">
-<svg id="fig" viewBox="0 0 680 638" width="100%" role="img" aria-labelledby="ft fd">
+<svg id="fig" viewBox="0 0 680 1012" width="100%" role="img" aria-labelledby="ft fd">
 <title id="ft">프로세스와 스레드 한 장 그림</title>
-<desc id="fd">프로세스의 네 메모리 영역과 PCB, 생성 · 준비 · 실행 · 대기 · 종료 상태, 한 프로세스 안의 두 스레드가 공유하는 자원</desc>
+<desc id="fd">프로세스의 네 메모리 영역과 PCB, 문맥 교환, 생성 · 준비 · 실행 · 대기 · 종료 상태와 전이 이유, 프로세스 계층 구조와 fork · exec, 한 프로세스 안의 두 스레드가 공유하는 자원</desc>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+<!-- 1행: 프로세스 메모리 · PCB · 문맥 교환 -->
 <g class="el c-purple" id="proc"><rect x="20" y="20" width="330" height="260" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="36" y="42" dominant-baseline="central">프로세스 (실행 중인 프로그램)</text></g>
 <g class="el c-gray" id="code"><rect x="40" y="56" width="290" height="44" rx="8" stroke-width="0.5"/><text class="th" x="185" y="70" text-anchor="middle" dominant-baseline="central">코드 영역</text><text class="ts" id="codev" x="185" y="87" text-anchor="middle" dominant-baseline="central"></text></g>
 <g class="el c-gray" id="data"><rect x="40" y="108" width="290" height="44" rx="8" stroke-width="0.5"/><text class="th" x="185" y="122" text-anchor="middle" dominant-baseline="central">데이터 영역</text><text class="ts" id="datav" x="185" y="139" text-anchor="middle" dominant-baseline="central"></text></g>
-<g class="el c-teal" id="heap"><rect x="40" y="160" width="290" height="44" rx="8" stroke-width="0.5"/><text class="th" x="185" y="174" text-anchor="middle" dominant-baseline="central">힙 영역</text><text class="ts" id="heapv" x="185" y="191" text-anchor="middle" dominant-baseline="central"></text></g>
-<g class="el c-coral" id="stack"><rect x="40" y="212" width="290" height="44" rx="8" stroke-width="0.5"/><text class="th" x="185" y="226" text-anchor="middle" dominant-baseline="central">스택 영역</text><text class="ts" id="stackv" x="185" y="243" text-anchor="middle" dominant-baseline="central"></text></g>
-<g class="el c-pink" id="pcb"><rect x="380" y="20" width="280" height="110" rx="8" stroke-width="0.5"/><text class="th" x="520" y="51" text-anchor="middle" dominant-baseline="central">PCB (프로세스 제어 블록)</text><text class="ts" x="520" y="68" text-anchor="middle" dominant-baseline="central">PID · 프로세스 상태</text><text class="ts" x="520" y="84" text-anchor="middle" dominant-baseline="central">PC · 레지스터 값</text><text class="ts" x="520" y="100" text-anchor="middle" dominant-baseline="central">메모리 · 열린 파일 정보</text></g>
-<g class="el" id="stl"><text class="ts" x="380" y="174" text-anchor="start" dominant-baseline="central">프로세스 상태</text></g>
-<g class="el c-gray" id="sNew"><rect x="380" y="196" width="52" height="36" rx="8" stroke-width="0.5"/><text class="th" x="406" y="214" text-anchor="middle" dominant-baseline="central">생성</text></g>
-<g class="el c-amber" id="sReady"><rect x="454" y="196" width="52" height="36" rx="8" stroke-width="0.5"/><text class="th" x="480" y="214" text-anchor="middle" dominant-baseline="central">준비</text></g>
-<g class="el c-teal" id="sRun"><rect x="528" y="196" width="52" height="36" rx="8" stroke-width="0.5"/><text class="th" x="554" y="214" text-anchor="middle" dominant-baseline="central">실행</text></g>
-<g class="el c-gray" id="sEnd"><rect x="602" y="196" width="52" height="36" rx="8" stroke-width="0.5"/><text class="th" x="628" y="214" text-anchor="middle" dominant-baseline="central">종료</text></g>
-<g class="el c-coral" id="sWait"><rect x="491" y="252" width="52" height="36" rx="8" stroke-width="0.5"/><text class="th" x="517" y="270" text-anchor="middle" dominant-baseline="central">대기</text></g>
-<line class="el arr" id="s1" x1="434" y1="214" x2="452" y2="214" marker-end="url(#arrow)"/>
-<line class="el arr" id="s2" x1="508" y1="214" x2="526" y2="214" marker-end="url(#arrow)"/>
-<line class="el arr" id="s3" x1="582" y1="214" x2="600" y2="214" marker-end="url(#arrow)"/>
-<path class="el arr" id="s4" d="M554 232 L554 270 L545 270" marker-end="url(#arrow)"/>
-<path class="el arr" id="s5" d="M491 270 L480 270 L480 234" marker-end="url(#arrow)"/>
-<g class="el c-teal" id="thr"><rect x="20" y="310" width="640" height="230" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="36" y="332" dominant-baseline="central">스레드 (한 프로세스 안의 실행 흐름)</text></g>
-<g class="el c-gray" id="shared"><rect x="36" y="346" width="290" height="172" rx="8" stroke-width="0.5"/><text class="th" x="181" y="408" text-anchor="middle" dominant-baseline="central">스레드끼리 공유</text><text class="ts" x="181" y="425" text-anchor="middle" dominant-baseline="central">코드 영역 · 데이터 영역</text><text class="ts" x="181" y="441" text-anchor="middle" dominant-baseline="central">힙 영역</text><text class="ts" x="181" y="457" text-anchor="middle" dominant-baseline="central">열린 파일</text></g>
-<g class="el c-purple" id="th1"><rect x="350" y="346" width="130" height="84" rx="8" stroke-width="0.5"/><text class="th" x="415" y="372" text-anchor="middle" dominant-baseline="central">스레드 1</text><text class="ts" x="415" y="389" text-anchor="middle" dominant-baseline="central">PC · 레지스터</text><text class="ts" x="415" y="405" text-anchor="middle" dominant-baseline="central">자기 스택</text></g>
-<g class="el c-purple" id="th2"><rect x="500" y="346" width="130" height="84" rx="8" stroke-width="0.5"/><text class="th" x="565" y="372" text-anchor="middle" dominant-baseline="central">스레드 2</text><text class="ts" x="565" y="389" text-anchor="middle" dominant-baseline="central">PC · 레지스터</text><text class="ts" x="565" y="405" text-anchor="middle" dominant-baseline="central">자기 스택</text></g>
-<line class="el arr" id="l1" x1="328" y1="388" x2="348" y2="388"/>
-<line class="el arr" id="l2" x1="482" y1="388" x2="498" y2="388"/>
-<g class="el c-amber" id="cmp"><rect x="350" y="444" width="280" height="74" rx="8" stroke-width="0.5"/><text class="th" x="490" y="465" text-anchor="middle" dominant-baseline="central">프로세스 vs 스레드</text><text class="ts" x="490" y="482" text-anchor="middle" dominant-baseline="central">프로세스끼리: 메모리 독립</text><text class="ts" x="490" y="498" text-anchor="middle" dominant-baseline="central">스레드끼리: 메모리 공유</text></g>
-<g class="el c-amber" id="cmd"><rect x="20" y="560" width="640" height="64" rx="8" stroke-width="0.5"/><text class="th" x="340" y="576" text-anchor="middle" dominant-baseline="central">서버 확인</text><text class="ts" x="340" y="593" text-anchor="middle" dominant-baseline="central">ps -eLf | grep sshd → LWP 열이 스레드 번호</text><text class="ts" x="340" y="609" text-anchor="middle" dominant-baseline="central">cat /proc/$$/maps → 코드 · 힙 · 스택 영역이 보임</text></g>
+<g class="el c-teal" id="heap"><rect x="40" y="160" width="290" height="44" rx="8" stroke-width="0.5"/><text class="th" x="185" y="174" text-anchor="middle" dominant-baseline="central">힙 영역 ↓</text><text class="ts" id="heapv" x="185" y="191" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-coral" id="stack"><rect x="40" y="212" width="290" height="44" rx="8" stroke-width="0.5"/><text class="th" x="185" y="226" text-anchor="middle" dominant-baseline="central">스택 영역 ↑</text><text class="ts" id="stackv" x="185" y="243" text-anchor="middle" dominant-baseline="central"></text></g>
+<g class="el c-pink" id="pcb"><rect x="380" y="20" width="280" height="110" rx="8" stroke-width="0.5"/><text class="th" x="520" y="40" text-anchor="middle" dominant-baseline="central">PCB (프로세스 제어 블록)</text><text class="ts" x="520" y="60" text-anchor="middle" dominant-baseline="central">PID · 프로세스 상태</text><text class="ts" x="520" y="76" text-anchor="middle" dominant-baseline="central">PC · 레지스터 값</text><text class="ts" x="520" y="92" text-anchor="middle" dominant-baseline="central">CPU 스케줄링 정보</text><text class="ts" x="520" y="108" text-anchor="middle" dominant-baseline="central">메모리 · 열린 파일 정보</text></g>
+<g class="el c-amber" id="ctx"><rect x="380" y="146" width="280" height="134" rx="8" stroke-width="0.5"/><text class="th" x="520" y="166" text-anchor="middle" dominant-baseline="central">문맥 교환</text><text class="ts" x="474" y="250" text-anchor="middle" dominant-baseline="central">① 백업</text><text class="ts" x="566" y="250" text-anchor="middle" dominant-baseline="central">② 복구</text><text class="ts" x="520" y="268" text-anchor="middle" dominant-baseline="central">타이머 인터럽트 → 다음 프로세스로</text></g>
+<g class="el c-pink" id="pA"><rect x="396" y="196" width="64" height="36" rx="8" stroke-width="0.5"/><text class="th" x="428" y="214" text-anchor="middle" dominant-baseline="central">PCB A</text></g>
+<g class="el c-teal" id="cpu"><rect x="488" y="196" width="64" height="36" rx="8" stroke-width="0.5"/><text class="th" x="520" y="214" text-anchor="middle" dominant-baseline="central">CPU</text></g>
+<g class="el c-pink" id="pB"><rect x="580" y="196" width="64" height="36" rx="8" stroke-width="0.5"/><text class="th" x="612" y="214" text-anchor="middle" dominant-baseline="central">PCB B</text></g>
+<line class="el arr" id="c1" x1="486" y1="214" x2="463" y2="214" marker-end="url(#arrow)"/>
+<line class="el arr" id="c2" x1="578" y1="214" x2="555" y2="214" marker-end="url(#arrow)"/>
+
+<!-- 2행: 프로세스 상태 -->
+<g class="el" id="stl"><text class="th" x="20" y="312" text-anchor="start" dominant-baseline="central">프로세스 상태</text></g>
+<g class="el c-gray" id="sNew"><rect x="20" y="330" width="90" height="40" rx="8" stroke-width="0.5"/><text class="th" x="65" y="350" text-anchor="middle" dominant-baseline="central">생성</text></g>
+<g class="el c-amber" id="sReady"><rect x="200" y="330" width="90" height="40" rx="8" stroke-width="0.5"/><text class="th" x="245" y="350" text-anchor="middle" dominant-baseline="central">준비</text></g>
+<g class="el c-teal" id="sRun"><rect x="400" y="330" width="90" height="40" rx="8" stroke-width="0.5"/><text class="th" x="445" y="350" text-anchor="middle" dominant-baseline="central">실행</text></g>
+<g class="el c-gray" id="sEnd"><rect x="570" y="330" width="90" height="40" rx="8" stroke-width="0.5"/><text class="th" x="615" y="350" text-anchor="middle" dominant-baseline="central">종료</text></g>
+<g class="el c-coral" id="sWait"><rect x="300" y="400" width="90" height="40" rx="8" stroke-width="0.5"/><text class="th" x="345" y="420" text-anchor="middle" dominant-baseline="central">대기</text></g>
+<g class="el" id="s1"><line class="arr" x1="112" y1="350" x2="197" y2="350" marker-end="url(#arrow)"/><text class="ts" x="155" y="339" text-anchor="middle" dominant-baseline="central">PCB 생성</text></g>
+<g class="el" id="s2"><line class="arr" x1="292" y1="342" x2="397" y2="342" marker-end="url(#arrow)"/><text class="ts" x="345" y="331" text-anchor="middle" dominant-baseline="central">디스패치</text></g>
+<g class="el" id="s6"><line class="arr" x1="398" y1="360" x2="293" y2="360" marker-end="url(#arrow)"/><text class="ts" x="345" y="375" text-anchor="middle" dominant-baseline="central">타이머 인터럽트</text></g>
+<g class="el" id="s3"><line class="arr" x1="492" y1="350" x2="567" y2="350" marker-end="url(#arrow)"/><text class="ts" x="530" y="339" text-anchor="middle" dominant-baseline="central">종료</text></g>
+<g class="el" id="s4"><path class="arr" d="M445 372 L445 420 L393 420" marker-end="url(#arrow)"/><text class="ts" x="453" y="398" text-anchor="start" dominant-baseline="central">입출력 요청</text></g>
+<g class="el" id="s5"><path class="arr" d="M298 420 L245 420 L245 373" marker-end="url(#arrow)"/><text class="ts" x="237" y="398" text-anchor="end" dominant-baseline="central">입출력 완료</text></g>
+
+<!-- 3행: 계층 구조 · fork · exec -->
+<g class="el c-gray" id="tree"><rect x="20" y="460" width="640" height="186" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="36" y="482" dominant-baseline="central">프로세스 계층 구조 · fork와 exec</text></g>
+<g class="el c-purple" id="tSys"><rect x="40" y="498" width="140" height="32" rx="8" stroke-width="0.5"/><text class="th" x="110" y="514" text-anchor="middle" dominant-baseline="central">systemd (PID 1)</text></g>
+<g class="el c-gray" id="tSshd"><rect x="70" y="546" width="140" height="32" rx="8" stroke-width="0.5"/><text class="th" x="140" y="562" text-anchor="middle" dominant-baseline="central">sshd (PID 812)</text></g>
+<g class="el c-gray" id="tBash"><rect x="100" y="594" width="140" height="32" rx="8" stroke-width="0.5"/><text class="th" x="170" y="610" text-anchor="middle" dominant-baseline="central">bash (PID 2301)</text></g>
+<g class="el" id="tl1"><path class="arr" d="M56 530 L56 562 L67 562" marker-end="url(#arrow)"/><text class="ts" x="218" y="562" text-anchor="start" dominant-baseline="central">PPID 1</text></g>
+<g class="el" id="tl2"><path class="arr" d="M86 578 L86 610 L97 610" marker-end="url(#arrow)"/><text class="ts" x="248" y="610" text-anchor="start" dominant-baseline="central">PPID 812</text></g>
+<g class="el c-gray" id="fP"><rect x="330" y="498" width="140" height="40" rx="8" stroke-width="0.5"/><text class="th" x="400" y="511" text-anchor="middle" dominant-baseline="central">부모 bash</text><text class="ts" x="400" y="527" text-anchor="middle" dominant-baseline="central">PID 2301</text></g>
+<g class="el c-teal" id="fC"><rect x="510" y="498" width="140" height="40" rx="8" stroke-width="0.5"/><text class="th" x="580" y="511" text-anchor="middle" dominant-baseline="central">자식 bash (복사본)</text><text class="ts" x="580" y="527" text-anchor="middle" dominant-baseline="central">PID 2350</text></g>
+<g class="el c-coral" id="fV"><rect x="510" y="590" width="140" height="40" rx="8" stroke-width="0.5"/><text class="th" x="580" y="603" text-anchor="middle" dominant-baseline="central">자식 vim</text><text class="ts" x="580" y="619" text-anchor="middle" dominant-baseline="central">PID 2350 그대로</text></g>
+<g class="el" id="fa1"><line class="arr" x1="472" y1="518" x2="507" y2="518" marker-end="url(#arrow)"/><text class="ts" x="490" y="506" text-anchor="middle" dominant-baseline="central">fork</text></g>
+<g class="el" id="fa2"><line class="arr" x1="580" y1="540" x2="580" y2="587" marker-end="url(#arrow)"/><text class="ts" x="588" y="564" text-anchor="start" dominant-baseline="central">exec</text></g>
+<g class="el" id="fd2"><text class="ts" x="330" y="566" text-anchor="start" dominant-baseline="central">fork: 자기를 복제 (PID만 다름)</text><text class="ts" x="330" y="584" text-anchor="start" dominant-baseline="central">exec: 메모리를 새 프로그램으로</text><text class="ts" x="330" y="602" text-anchor="start" dominant-baseline="central">덮어씀 (PID는 그대로)</text></g>
+
+<!-- 4행: 스레드 -->
+<g class="el c-teal" id="thr"><rect x="20" y="666" width="640" height="214" rx="12" stroke-width="0.5" style="fill:none;stroke-dasharray:5 4"/><text class="th" x="36" y="688" dominant-baseline="central">스레드 (한 프로세스 안의 실행 흐름)</text></g>
+<g class="el c-gray" id="shared"><rect x="36" y="702" width="290" height="162" rx="8" stroke-width="0.5"/><text class="th" x="181" y="758" text-anchor="middle" dominant-baseline="central">스레드끼리 공유</text><text class="ts" x="181" y="775" text-anchor="middle" dominant-baseline="central">코드 영역 · 데이터 영역</text><text class="ts" x="181" y="791" text-anchor="middle" dominant-baseline="central">힙 영역</text><text class="ts" x="181" y="807" text-anchor="middle" dominant-baseline="central">열린 파일</text></g>
+<g class="el c-purple" id="th1"><rect x="350" y="702" width="130" height="70" rx="8" stroke-width="0.5"/><text class="th" x="415" y="722" text-anchor="middle" dominant-baseline="central">스레드 1</text><text class="ts" x="415" y="739" text-anchor="middle" dominant-baseline="central">PC · 레지스터</text><text class="ts" x="415" y="755" text-anchor="middle" dominant-baseline="central">자기 스택</text></g>
+<g class="el c-purple" id="th2"><rect x="500" y="702" width="130" height="70" rx="8" stroke-width="0.5"/><text class="th" x="565" y="722" text-anchor="middle" dominant-baseline="central">스레드 2</text><text class="ts" x="565" y="739" text-anchor="middle" dominant-baseline="central">PC · 레지스터</text><text class="ts" x="565" y="755" text-anchor="middle" dominant-baseline="central">자기 스택</text></g>
+<line class="el arr" id="l1" x1="328" y1="737" x2="348" y2="737"/>
+<line class="el arr" id="l2" x1="482" y1="737" x2="498" y2="737"/>
+<g class="el c-amber" id="cmp"><rect x="350" y="784" width="280" height="80" rx="8" stroke-width="0.5"/><text class="th" x="490" y="802" text-anchor="middle" dominant-baseline="central">프로세스 vs 스레드</text><text class="ts" x="490" y="820" text-anchor="middle" dominant-baseline="central">프로세스끼리: 메모리 독립 · IPC로 통신</text><text class="ts" x="490" y="836" text-anchor="middle" dominant-baseline="central">스레드끼리: 메모리 공유 · 동기화 필요</text><text class="ts" x="490" y="852" text-anchor="middle" dominant-baseline="central">리눅스 커널: 둘 다 task로 스케줄링</text></g>
+
+<!-- 5행: 서버 확인 -->
+<g class="el c-amber" id="cmd"><rect x="20" y="900" width="640" height="98" rx="8" stroke-width="0.5"/><text class="th" x="340" y="916" text-anchor="middle" dominant-baseline="central">서버 확인</text><text class="ts" x="340" y="934" text-anchor="middle" dominant-baseline="central">ps -ef → PID · PPID 열 · pstree -p → 프로세스 계층 구조</text><text class="ts" x="340" y="950" text-anchor="middle" dominant-baseline="central">ps -eLf | grep sshd → LWP 열이 스레드 번호, NLWP가 스레드 수</text><text class="ts" x="340" y="966" text-anchor="middle" dominant-baseline="central">top → Tasks는 프로세스 수 · H를 누르면 Threads(스레드 수)</text><text class="ts" x="340" y="982" text-anchor="middle" dominant-baseline="central">cat /proc/$$/maps → 코드 · 힙 · 스택 영역 · ls /proc/PID/task → 스레드 목록</text></g>
 </svg>
 </div>
 
 <div class="panel">
 <p class="ptitle">핵심 정리</p>
 <ul class="sum">
-<li>프로세스 = 메모리에 올라가 실행 중인 프로그램 (코드 · 데이터 · 힙 · 스택)</li>
-<li>운영체제는 PCB로 프로세스의 상태와 PC · 레지스터 값을 관리한다</li>
-<li>스레드는 프로세스 안의 실행 흐름: PC · 레지스터 · 스택은 따로, 코드 · 데이터 · 힙은 공유</li>
-<li>프로세스끼리는 메모리 독립, 스레드끼리는 메모리 공유</li>
+<li>프로세스 = 메모리에 올라가 실행 중인 프로그램 (코드 · 데이터 · 힙 · 스택). 코드 · 데이터는 크기가 고정된 정적 할당 영역, 힙 · 스택은 실행 중 크기가 변하는 동적 할당 영역</li>
+<li>운영체제는 PCB로 프로세스의 상태와 PC · 레지스터 값을 관리하고, 타이머 인터럽트가 오면 문맥 교환으로 다음 프로세스에 CPU를 넘긴다</li>
+<li>프로세스는 생성 → 준비 ⇄ 실행 → 종료를 오가고, 입출력을 기다리면 대기했다가 준비로 돌아간다</li>
+<li>프로세스는 부모가 fork로 자기를 복제하고, 자식이 exec로 새 프로그램이 되어 태어난다. 모든 프로세스의 조상은 PID 1(systemd)</li>
+<li>스레드는 프로세스 안의 실행 흐름: PC · 레지스터 · 스택은 따로, 코드 · 데이터 · 힙은 공유. 프로세스에는 최소 1개(메인 스레드)가 있다</li>
+<li>프로세스끼리는 메모리 독립(IPC로 통신), 스레드끼리는 메모리 공유(동기화 필요)</li>
 </ul>
 </div>
 
-<footer><a href="../">← dev-study 목차</a> · 참고: 혼자 공부하는 컴퓨터구조+운영체제 섹션 11 · 배경지식은 별도 자료로 보충해 직접 정리</footer>
+<div class="panel">
+<p class="ptitle">비유로 기억하기</p>
+<ul class="sum">
+<li>프로세스 = 방, 스레드 = 그 방의 일꾼(룸메이트). 방에는 일꾼이 최소 1명 있어야 일이 진행된다</li>
+<li>룸메이트는 방의 공용 물건(코드 · 데이터 · 힙 · 열린 파일)을 같이 쓰고, 자기 메모장(스택)과 책갈피(PC · 레지스터)는 따로 가진다</li>
+<li>냉장고를 동시에 열어 우유 개수가 꼬이는 것 = 경쟁 상태(문제), 한 명씩만 들어가는 화장실과 문 잠금 = 임계 구역과 뮤텍스(해결) · 섹션 13 동기화로 이어짐</li>
+<li>다른 방의 물건은 직접 못 쓰고 파이프 · 소켓 같은 통로(IPC)로 주고받는다</li>
+</ul>
+</div>
+
+<footer><a href="../">← dev-study 목차</a> · 참고: 혼자 공부하는 컴퓨터구조+운영체제 섹션 11 (27 프로세스 개요 · 28 프로세스 상태와 계층 구조 · 29 스레드) · 배경지식은 별도 자료로 보충해 직접 정리</footer>
 </main>
 
 <script>
-const D={"codev": "실행할 명령어", "datav": "전역 변수 · 정적 변수", "heapv": "실행 중 동적으로 할당한 메모리", "stackv": "함수 호출 정보 · 지역 변수"};
+const D={"codev": "실행할 명령어 · 읽기 전용", "datav": "전역 변수 · 정적 변수", "heapv": "malloc · new로 직접 할당 · 직접 반환", "stackv": "함수 호출 정보 · 지역 변수 · 매개변수"};
 const S=[
-{
-"t": "0. 전체 그림",
-"d": "프로세스의 메모리 구조와 PCB · 프로세스 상태(위), 한 프로세스 안의 스레드(아래)를 모았습니다.",
-"on": null
-},
-{
-"t": "1. 프로그램과 프로세스",
-"d": "프로그램은 디스크에 저장된 실행 파일이고, 실행하면 메모리에 올라가 프로세스가 됩니다. 같은 프로그램을 두 번 실행하면 프로세스가 두 개 생깁니다.",
-"on": [
-"proc"
-]
-},
-{
-"t": "2. 프로세스의 메모리 구조",
-"d": "프로세스는 네 영역을 가집니다. 코드 영역은 실행할 명령어, 데이터 영역은 전역 · 정적 변수, 힙은 실행 중 동적으로 할당하는 메모리, 스택은 함수 호출 정보와 지역 변수가 쌓였다가 함수가 끝나면 사라지는 곳입니다.",
-"on": [
-"proc",
-"code",
-"data",
-"heap",
-"stack"
-]
-},
-{
-"t": "3. PCB",
-"d": "운영체제는 프로세스마다 PCB(프로세스 제어 블록)를 만들어 관리합니다. PID, 현재 상태, 다음에 실행할 위치(PC)와 레지스터 값, 메모리 · 열린 파일 정보가 들어 있어서, 프로세스를 멈췄다가 이어서 실행할 수 있습니다.",
-"on": [
-"pcb",
-"proc"
-]
-},
-{
-"t": "4. 프로세스 상태",
-"d": "프로세스는 생성 → 준비(CPU 차례를 기다림) → 실행 → 종료로 흘러갑니다. 실행 중 입출력을 기다리면 대기 상태가 되고, 입출력이 끝나면 다시 준비 상태로 갑니다. 정해진 실행 시간을 다 쓰면 실행에서 준비로 돌아가기도 합니다.",
-"on": [
-"stl",
-"sNew",
-"sReady",
-"sRun",
-"sEnd",
-"sWait",
-"s1",
-"s2",
-"s3",
-"s4",
-"s5"
-]
-},
-{
-"t": "5. 스레드",
-"d": "스레드는 한 프로세스 안의 실행 흐름 단위입니다. 스레드마다 자기 PC · 레지스터 · 스택을 따로 가지고, 코드 · 데이터 · 힙 영역과 열린 파일은 같은 프로세스의 스레드끼리 공유합니다.",
-"on": [
-"thr",
-"shared",
-"th1",
-"th2",
-"l1",
-"l2"
-]
-},
-{
-"t": "6. 프로세스와 스레드의 차이",
-"d": "프로세스끼리는 메모리를 공유하지 않아 서로 독립적이고, 하나가 죽어도 다른 프로세스는 영향을 덜 받습니다. 스레드끼리는 메모리를 공유해서 만들기 가볍고 데이터를 주고받기 쉽지만, 한 스레드의 문제가 같은 프로세스 전체에 영향을 줄 수 있습니다.",
-"on": [
-"cmp",
-"thr",
-"shared",
-"proc"
-]
-},
-{
-"t": "7. 서버에서 보기",
-"d": "ps -eLf | grep sshd에서 LWP 열이 스레드 번호이고, NLWP는 그 프로세스의 스레드 수입니다. cat /proc/$$/maps를 보면 지금 쉘 프로세스의 코드 · 힙 · 스택 영역이 주소와 함께 보입니다.",
-"on": [
-"cmd",
-"proc",
-"thr"
-]
-}
+{"t":"0. 전체 그림","d":"프로세스의 메모리 구조와 PCB · 문맥 교환(1행), 프로세스 상태(2행), 계층 구조와 fork · exec(3행), 한 프로세스 안의 스레드(4행)를 모았습니다.","on":null},
+{"t":"1. 프로그램과 프로세스","d":"프로그램은 디스크에 저장된 실행 파일이고, 실행하면 메모리에 올라가 프로세스가 됩니다. 같은 프로그램을 두 번 실행하면 프로세스가 두 개 생깁니다. 사용자가 보는 앞에서 실행되면 포그라운드 프로세스, 뒤에서 실행되면 백그라운드 프로세스이고, 사용자와 상호작용 없이 정해진 일만 하는 백그라운드 프로세스를 유닉스에서는 데몬(sshd · httpd), 윈도우에서는 서비스라고 부릅니다.","on":["proc"]},
+{"t":"2. 프로세스의 메모리 구조","d":"코드 영역은 실행할 명령어(읽기 전용), 데이터 영역은 프로그램 내내 유지되는 전역 · 정적 변수입니다. 이 둘은 크기가 변하지 않는 정적 할당 영역입니다. 힙은 프로그래머가 직접 할당하는 메모리로, 반환하지 않으면 메모리 누수가 생깁니다. 스택은 지역 변수 · 매개변수가 쌓였다가 함수가 끝나면 사라집니다. 힙과 스택은 실행 중 크기가 변하는 동적 할당 영역이라, 힙은 낮은 주소 → 높은 주소로, 스택은 높은 주소 → 낮은 주소로 자라 서로 겹치지 않게 합니다.","on":["proc","code","data","heap","stack"],"v":{"heapv":"낮은 주소 → 높은 주소로 자람 · 반환 안 하면 메모리 누수","stackv":"높은 주소 → 낮은 주소로 자람 · 함수 끝나면 정리"}},
+{"t":"3. PCB","d":"운영체제는 프로세스마다 PCB(프로세스 제어 블록)를 커널 영역에 만들어 관리합니다. PID, 현재 상태, 다음에 실행할 위치(PC)와 레지스터 값, CPU 스케줄링 정보, 메모리 정보(베이스 · 한계 레지스터, 페이지 테이블), 열린 파일 · 입출력장치 목록이 들어 있어서, 프로세스를 멈췄다가 이어서 실행할 수 있습니다. 프로세스가 끝나면 PCB도 폐기됩니다.","on":["pcb","proc"]},
+{"t":"4. 문맥 교환","d":"프로세스는 정해진 시간(타임 슬라이스)만큼만 CPU를 씁니다. 시간이 다 되면 타이머 인터럽트가 발생하고, 운영체제는 ① 실행하던 A의 문맥(PC · 레지스터 값 등)을 PCB A에 백업하고 ② PCB B에서 B의 문맥을 복구해 B를 이어서 실행합니다. 이것이 문맥 교환이고, 빠르게 반복되기 때문에 여러 프로세스가 동시에 실행되는 것처럼 보입니다. 너무 자주 일어나면 백업 · 복구 비용(오버헤드)이 커집니다.","on":["ctx","pA","cpu","pB","c1","c2","pcb"]},
+{"t":"5. 프로세스 상태","d":"생성(PCB를 받음) → 준비(CPU만 받으면 실행 가능) → 실행 → 종료로 흘러갑니다. 준비에서 CPU를 받는 것을 디스패치라고 합니다. 타임 슬라이스를 다 쓰면 타이머 인터럽트로 준비로 돌아가고, 입출력을 요청하면 대기 상태가 됩니다. 입출력이 끝나도 바로 실행으로 가지 않고 준비로 돌아가 차례를 기다립니다. 상태 값은 PCB에 기록됩니다.","on":["stl","sNew","sReady","sRun","sEnd","sWait","s1","s2","s3","s4","s5","s6"]},
+{"t":"6. 프로세스 계층 구조","d":"프로세스는 실행 중에 시스템 콜로 다른 프로세스를 만들 수 있습니다. 만든 쪽이 부모 프로세스, 만들어진 쪽이 자식 프로세스이고, 자식은 부모의 PID를 PPID로 기록합니다. 이 관계가 이어져 트리 모양이 되고, 맨 위에는 부팅 때 처음 만들어지는 프로세스(systemd, 예전에는 init · PID 1)가 있습니다. pstree -p로 직접 볼 수 있습니다.","on":["tree","tSys","tSshd","tBash","tl1","tl2"]},
+{"t":"7. fork와 exec","d":"셸에서 vim을 실행하면, 부모 bash가 fork 시스템 콜로 자기 복사본(자식)을 만듭니다. 메모리 내용은 같고 PID만 다릅니다. 그다음 자식이 exec 시스템 콜로 자기 메모리를 vim 프로그램으로 덮어씁니다. 코드 · 데이터가 새 프로그램으로 바뀌지만 PID는 그대로입니다. 복제와 교체를 나눠 둔 덕분에, 셸은 둘 사이에서 입출력 방향(리다이렉션)을 바꿔 줄 수 있습니다.","on":["tree","fP","fC","fV","fa1","fa2","fd2"]},
+{"t":"8. 스레드","d":"스레드는 한 프로세스 안의 실행 흐름 단위입니다. 스레드마다 자기 스레드 ID · PC · 레지스터 · 스택을 따로 가지고, 코드 · 데이터 · 힙 영역과 열린 파일은 같은 프로세스의 스레드끼리 공유합니다. 프로세스가 만들어질 때 메인 스레드 1개가 함께 생기므로, 프로세스에는 스레드가 최소 1개 있습니다.","on":["thr","shared","th1","th2","l1","l2"]},
+{"t":"9. 멀티프로세스와 멀티스레드","d":"멀티프로세스는 fork로 자원을 통째로 복제해 메모리를 더 쓰지만, 하나가 죽어도 다른 프로세스는 영향이 없습니다. 대신 서로 통신하려면 IPC(파이프 · 공유 메모리 · 소켓 등)가 필요합니다. 멀티스레드는 자원을 공유해 가볍고 데이터를 나누기 쉽지만, 한 스레드의 문제가 같은 프로세스 전체에 영향을 주고, 같은 데이터를 동시에 고치면 충돌하므로 동기화가 필요합니다(섹션 13).","on":["cmp","thr","shared","th1","th2","proc"]},
+{"t":"10. 리눅스에서는 task","d":"리눅스 커널은 프로세스와 스레드를 구분하지 않고 둘 다 task(task_struct)로 다룹니다. 스케줄러가 CPU를 나눠 주는 단위가 스레드이므로 커널 기준 task 수는 스레드 수와 같습니다. 단, top의 기본 화면에 나오는 Tasks는 프로세스 수이고, H를 누르면 Threads(스레드 수)로 바뀝니다. 사용자에게 보이는 PID는 커널의 TGID(스레드 그룹 ID)입니다.","on":["cmp","thr","th1","th2","cmd"]},
+{"t":"11. 서버에서 보기","d":"ps -ef의 PPID 열과 pstree -p로 부모 · 자식 관계를 봅니다. ps -eLf | grep sshd에서 LWP 열이 스레드 번호이고, NLWP는 그 프로세스의 스레드 수입니다. cat /proc/$$/maps를 보면 지금 쉘 프로세스의 코드 · 힙 · 스택 영역이 주소와 함께 보이고, ls /proc/PID/task에는 그 프로세스의 스레드가 하나씩 나옵니다.","on":["cmd","proc","tree","thr"]}
 ];
 const $=id=>document.getElementById(id);
 const fig=$('fig'),prev=$('prev'),next=$('next'),dotsEl=$('dots');
