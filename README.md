@@ -22,3 +22,4 @@
 - [파일 시스템과 inode 한 장 그림](https://jungky4132.github.io/dev-study/stage1/filesystem.html) — 경로(/etc/hostname)만으로 디스크 여기저기 흩어진 파일 내용을 찾아가는 과정: 디렉터리 → inode(파일 정보 카드) → 데이터 블록
 - [리눅스 권한 (755) 한 장 그림](https://jungky4132.github.io/dev-study/stage1/linux-permission.html) — ls -l에 보이는 -rwxr-xr-x가 무슨 뜻인지, 755 같은 숫자로 바꾸는 법, 누가 어떤 파일을 읽고 고치고 실행할 수 있는지
 - [systemd와 패키지 관리 한 장 그림](https://jungky4132.github.io/dev-study/stage1/systemd-dnf.html) — 리눅스에서 서비스(sshd 등)를 켜고 끄고 부팅 때 자동으로 띄우는 방법(systemd)과, 프로그램을 설치하는 방법(rpm · dnf)
+- [STAGE 1 관문 정리 · 핵심 6문항과 꼬리 질문](https://jungky4132.github.io/dev-study/stage1/gate-review.html) — 관문 점검에서 나온 6문항의 최종 답과, 답하다 막혔던 꼬리 질문(크롬 탭 · Apache 403 · printf → write · 2차원 배열과 캐시 등) 정리

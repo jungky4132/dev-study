@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%237A5230'/%3E%3Cpath d='M7 12 L8.5 4.5 L13 9 Z M25 12 L23.5 4.5 L19 9 Z' fill='%23F3E6D3'/%3E%3Cellipse cx='16' cy='19' rx='9.5' ry='10' fill='%23F3E6D3'/%3E%3Cellipse cx='16' cy='25' rx='5' ry='3.6' fill='%23DDBF97'/%3E%3Ccircle cx='11.8' cy='15.5' r='4.2' fill='%23fff' stroke='%234A3220' stroke-width='1.2'/%3E%3Ccircle cx='20.2' cy='15.5' r='4.2' fill='%23fff' stroke='%234A3220' stroke-width='1.2'/%3E%3Ccircle cx='12.4' cy='15.9' r='2' fill='%232B1D12'/%3E%3Ccircle cx='20.8' cy='15.9' r='2' fill='%232B1D12'/%3E%3Cpath d='M14.6 19.2 L17.4 19.2 L16 21.8 Z' fill='%23EF9F27'/%3E%3C/svg%3E">
+<title>STAGE 1 관문 정리 · 핵심 6문항과 꼬리 질문</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--pk-f:#FBEAF0;--pk-s:#993556;--pk-t:#72243E;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--pk-f:#72243E;--pk-s:#ED93B1;--pk-t:#FBEAF0;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:96px}
+.ptitle{font-size:17px;font-weight:500;margin:0 0 6px}
+.sum{margin:0;padding-left:20px;font-size:15px}.sum li{margin:3px 0}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-pink>rect{fill:var(--pk-f);stroke:var(--pk-s)}.c-pink>.th{fill:var(--pk-t)}.c-pink>.ts{fill:var(--pk-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts{fill:var(--am-s)}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+.qa{margin:0 0 6px;font-size:16px;font-weight:500}
+.qa span{color:var(--pu-s);margin-right:6px}
+.ans{font-size:15px;margin:0}
+.ans p{margin:6px 0}
+.ans ul{margin:6px 0;padding-left:20px}.ans li{margin:3px 0}
+pre{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;overflow-x:auto;margin:8px 0}
+code{font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.figcap{font-size:13px;color:var(--muted);margin:8px 0 0}
+.terms{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0;padding:0;list-style:none}
+.terms a{display:inline-block;font-size:13px;padding:3px 10px;border:1px solid var(--border);border-radius:999px;text-decoration:none;color:var(--fg)}
+.terms a:hover{border-color:var(--pu-s);color:var(--pu-s)}
+</style>
+<style>.verdict{display:inline-block;font-size:12px;padding:1px 8px;border-radius:999px;background:var(--te-f);color:var(--te-t);margin-left:6px;vertical-align:middle}.tail{border-left:3px solid var(--pu-s);padding:2px 0 2px 12px;margin:10px 0}.tail b{color:var(--pu-t)}.warn{background:var(--am-f);color:var(--am-t);border-radius:8px;padding:8px 12px;font-size:14px;margin:8px 0}</style>
+</head>
+<body>
+<main>
+<h1>STAGE 1 관문 정리 · 핵심 6문항과 꼬리 질문</h1>
+<p class="sub">관문 점검(글로 답안 작성 → 채점 → 꼬리 질문)에서 나온 6문항의 최종 답과, 답하다 막혔던 꼬리 질문까지 정리 · STAGE 1 관문 · 2026-11-21~22</p>
+
+<div class="panel"><p class="ptitle">점검 결과</p><ul class="sum">
+<li>11/21(토) 1차: 6문항 중 통과 0 · 부분 2 · 미흡 4 → 하루 동안 질문과 꼬리 질문, 홈서버 실습으로 보강</li>
+<li>11/22(일) 재점검: 노트 없이 다시 작성 → 4문항 통과, 2문항 재작성 후 통과 → <b>STAGE 1 관문 통과</b></li>
+<li>배운 점: 하루 만에 이해한 것도 다시 꺼내 보지 않으면 다음 날 흐려진다(권한 문항). 강의를 다시 듣는 것보다 질문 하나를 꼬리 질문으로 끝까지 파고드는 쪽이 훨씬 오래 남는다.</li>
+</ul></div>
+
+<div class="panel"><p class="qa"><span>Q1.</span>프로세스와 스레드의 차이는? 메모리를 어떻게 나눠 쓰나?</p><div class="ans">
+<p>프로세스는 OS로부터 자원을 할당받은 <b>작업실</b>, 스레드는 그 안에서 일하는 <b>작업자</b>다. 프로세스에는 스레드가 최소 1개 있다.</p>
+<ul><li>스레드끼리 <b>공유</b>: 코드 · 데이터(전역 변수) · 힙 · 열린 파일</li>
+<li>스레드마다 <b>따로</b>: 스택 · 레지스터(PC 포함)</li>
+<li>프로세스끼리는 OS가 주소 공간을 분리(MMU · 페이지 테이블)하므로 통신하려면 <b>IPC</b>(파이프 · 공유 메모리 · 소켓)가 필요하다</li>
+<li>스레드는 메모리를 공유하기 때문에 동시에 같은 값을 건드리면 꼬인다(경쟁 조건) → <b>동기화</b>가 반드시 필요하다</li></ul>
+<div class="tail"><b>꼬리 1.</b> 스레드 하나가 잘못된 메모리에 접근하면? → CPU가 감지하고 OS가 <b>프로세스</b>에 SIGSEGV를 보내 그 안의 스레드가 모두 종료된다. (죽지 않고 틀린 값으로 계속 도는 "데이터 오염"은 별개 문제)</div>
+<div class="tail"><b>꼬리 2.</b> 크롬은 왜 탭마다 프로세스를 쓰나? → 스레드끼리의 메모리 접근은 <b>합법</b>이라 CPU가 막지 못한다. 프로세스로 나누면 한 탭의 장애와 악성 코드를 그 탭 안에 가둘 수 있다. 대가는 메모리 · 생성 · 전환 비용과 IPC.</div>
+</div></div>
+
+<div class="panel"><p class="qa"><span>Q2.</span>권한 755는 누구에게 무엇을 허용하나? 디렉터리에 x 권한이 없으면?</p><div class="ans">
+<p>7 = 소유자 rwx, 5 = 소유 그룹 r-x, 5 = 기타 사용자 r-x. 같은 r · w · x라도 <b>파일과 디렉터리에서 뜻이 다르다</b>.</p>
+<ul><li>파일: r 내용 읽기 · w 내용 수정 · x 실행</li>
+<li>디렉터리: r <b>목록 보기</b> · w 안에서 파일 만들기 · 지우기 · 이름 바꾸기 · x <b>진입(이름으로 찾아 들어가기)</b></li>
+<li>x 없이 r만: 목록(이름)만 보이고 <code>cd</code> · <code>cat 디렉터리/파일</code> 불가</li>
+<li>r 없이 x만: 목록은 안 보이지만 이름을 알면 <code>cd</code> · <code>cat</code> 가능</li></ul>
+<div class="warn">자주 틀리는 점: 파일을 <b>지울 수 있는지</b>는 파일 권한이 아니라 그 파일이 든 <b>디렉터리의 w(+x)</b>로 정해진다. 그래서 755 디렉터리 안의 666 파일은 남이 내용은 고칠 수 있어도 지우지는 못한다.</div>
+<pre><code>chmod 644 ~/permtest   # x 없음: ls 됨 / cd · cat 안 됨
+chmod 100 ~/permtest   # x만:   ls 안 됨 / cd · cat 됨 (이름을 알 때)</code></pre>
+<p class="figcap">실습 메모: 처음엔 711로 실험했는데 소유자 자리가 7(rwx)이라 소유자로는 차이가 안 보였다. 소유자 자리를 1로 바꿔야 한다.</p>
+<div class="tail"><b>꼬리 1.</b> Apache로 <code>/home/user/public_html/index.html</code>(644)을 서비스하는데 403이 난다면? → ① <code>error_log</code> 확인 ② <code>namei -l</code>로 <b>경로 전체</b>에 others의 x가 있는지(흔한 원인: <code>/home/user</code>가 700) ③ SELinux(<code>httpd_enable_homedirs</code>, 보안 컨텍스트) ④ <code>UserDir</code> · <code>Require</code> 설정</div>
+<div class="tail"><b>꼬리 2.</b> 파일이 711이면 다른 사용자가 실행할 수 있나? → 컴파일된 바이너리는 커널이 올려 실행하므로 x만으로 된다. 스크립트는 인터프리터가 파일을 <b>읽어야</b> 하므로 r도 필요하다.</div>
+</div></div>
+
+<div class="panel"><p class="qa"><span>Q3.</span>시스템 콜이 왜 필요한가? 사용자 모드와 커널 모드의 차이는?</p><div class="ans">
+<p>사용자 모드와 커널 모드는 <b>CPU의 권한 수준</b>(실행할 수 있는 명령의 범위)이다. "사용자와 상호작용하는 모드"가 아니다 — 화면 없는 데몬도 사용자 모드로 돈다.</p>
+<ul><li><b>CPU</b>: 커널 모드에서만 특권 명령(입출력 제어 · 페이지 테이블 교체 · 인터럽트 끄기 등)을 허용하고, 명령마다 검사한다</li>
+<li><b>OS</b>: 커널 모드로는 커널 코드만 실행되도록 배치한다(부팅 때 진입 주소를 등록하고, 나머지는 사용자 모드로 내려서 실행)</li>
+<li>그래서 사용자 프로그램은 하드웨어 · 자원이 필요하면 <b>시스템 콜로 커널에 서비스를 요청</b>할 수밖에 없다. 커널은 요청을 검사(권한 등)한 뒤 처리하거나 거절한다 — <code>Permission denied</code>가 바로 거절이다</li></ul>
+<pre><code>printf("%d개\n", 3)
+ → glibc: 포맷 변환 + 버퍼링       (사용자 모드)
+ → write(1, "3개\n", 5) → syscall  (커널 모드로 전환)
+ → 커널 → 터미널 드라이버 → 화면</code></pre>
+<div class="tail"><b>꼬리 1.</b> 시스템 콜과 인터럽트는 누가 발생시키나? → 시스템 콜은 프로그램이 스스로 필요한 시점에(동기), 하드웨어 인터럽트는 장치가 아무 때나(비동기). 둘 다 CPU를 커널 모드로 전환한다. 위반 명령 같은 CPU 내부의 <b>예외</b>까지 셋이 커널로 들어가는 길이다.</div>
+<div class="tail"><b>꼬리 2.</b> 사용자 프로그램이 직접 커널 모드로 바꿀 수 없는 이유 두 가지? → ① 모드를 바꾸는 명령 자체가 특권 명령이다(커널 모드가 되려면 이미 커널 모드여야 하는 모순) ② 정식 경로로 들어가도 CPU는 OS가 등록한 주소로만 점프하므로 실행되는 건 항상 커널 코드다.</div>
+<div class="tail"><b>꼬리 3.</b> 위반하면 누가 무엇을 하나? → CPU가 예외로 감지해 커널의 처리 루틴으로 넘기고, OS가 판단해 시그널(SIGILL · SIGSEGV)로 종료시킨다. 페이지 폴트처럼 정상 상황이면 해결하고 계속 실행시키기도 한다.</div>
+</div></div>
+
+<div class="panel"><p class="qa"><span>Q4.</span>캐시가 빠른 이유와 메모리 계층 순서</p><div class="ans">
+<p>계층(빠른 순): 레지스터 &gt; L1 &gt; L2 &gt; L3(SRAM) &gt; RAM(DRAM) &gt; SSD &gt; HDD. 위로 갈수록 빠르고 작고 비싸다. 단계마다 속도가 자릿수로 달라진다(L1 약 1ns · RAM 약 100ns · SSD 약 100µs · HDD 약 10ms).</p>
+<ul><li><b>빠른 이유(하드웨어)</b>: CPU와 물리적으로 가깝고, 리프레시가 필요 없는 SRAM을 쓴다</li>
+<li><b>작아도 효과가 좋은 이유(지역성)</b>: 최근 쓴 데이터를 곧 다시 쓰고(시간 지역성), 근처 데이터를 곧 쓴다(공간 지역성). 그래서 캐시 라인(보통 64B) 단위로 한꺼번에 가져온다</li></ul>
+<div class="tail"><b>꼬리 1.</b> 왜 RAM만큼 크게 안 만드나? → 비싸고 전력 · 발열이 크며, 무엇보다 <b>크게 만들면 느려진다</b>. 그래서 작고 빠른 L1부터 크고 느린 L3까지 나눈다.</div>
+<div class="tail"><b>꼬리 2.</b> <code>int a[1000][1000]</code>은 행 순서와 열 순서 중 어느 쪽이 빠른가? → C 배열은 행 단위로 연속 저장된다. 행 순서는 64B(int 16개)를 한 번 가져오면 15번 히트하고, 열 순서는 4000B씩 건너뛰어 거의 매번 미스 → RAM까지 간다.</div>
+</div></div>
+
+<div class="panel"><p class="qa"><span>Q5.</span>UTF-8과 EUC-KR이 섞이면 왜 한글이 깨지나?</p><div class="ans">
+<p>문자 집합은 글자에 번호를 붙이는 규칙, 인코딩은 그 번호를 바이트로 바꾸는 규칙이다. 한글은 EUC-KR에서 <b>2바이트</b>, UTF-8에서 <b>3바이트</b>다. 저장한 규칙과 다른 규칙으로 읽으면 바이트를 끊는 위치와 해석이 어긋난다.</p>
+<pre><code>'가'  UTF-8 : EA B0 80    EUC-KR : B0 A1
+UTF-8 → EUC-KR로 읽음 : EA B0 를 한 글자로 → '媛' 같은 한자가 섞임
+EUC-KR → UTF-8로 읽음 : B0 는 첫 바이트가 될 수 없음 → '�'</code></pre>
+<ul><li>영문은 안 깨진다: 두 인코딩이 ASCII 영역을 <b>같은 1바이트 값</b>으로 저장하기 때문</li></ul>
+<div class="tail"><b>꼬리.</b> DB는 utf8mb4인데 화면 한글이 깨진다면? → ① <code>SELECT HEX(col)</code>로 저장된 바이트부터 확인('가'가 <code>EAB080</code>이면 저장은 정상) ② PHP 연결 문자셋(<code>mysqli_set_charset($conn,'utf8mb4')</code>) ③ HTTP 헤더 <code>Content-Type</code>과 <code>&lt;meta charset&gt;</code> — 둘이 다르면 헤더가 우선</div>
+</div></div>
+
+<div class="panel"><p class="qa"><span>Q6.</span>서비스가 부팅 때 자동으로 안 뜨면 무엇을 확인하나?</p><div class="ans">
+<ol class="sum"><li><code>systemctl is-enabled 서비스명</code> — 부팅 등록 여부. 없으면 <code>systemctl enable --now</code></li>
+<li><code>systemctl status 서비스명</code> — 현재 상태와 마지막 에러</li>
+<li><code>journalctl -u 서비스명 -b</code> — 이번 부팅에서 실패한 실제 원인</li>
+<li>의존성(순서) — 네트워크 · DB · 마운트보다 먼저 떠서 실패하지 않았나 (<code>After=</code>, <code>Wants=network-online.target</code>)</li>
+<li>SELinux 차단(<code>ausearch -m avc -ts boot</code>) · 설정 파일 오류 · 포트 충돌</li></ol>
+<pre><code>systemctl disable chronyd
+Removed "/etc/systemd/system/multi-user.target.wants/chronyd.service".
+systemctl is-enabled chronyd   # disabled  ← 다음 부팅
+systemctl is-active chronyd    # active    ← 지금 (disable은 실행 중인 것을 안 건드림)
+systemctl enable chronyd
+Created symlink .../multi-user.target.wants/chronyd.service → /usr/lib/systemd/system/chronyd.service.</code></pre>
+<p class="figcap">enable의 실체 = <code>WantedBy=</code>에 적힌 target의 <code>.wants/</code> 디렉터리에 심볼릭 링크 만들기. 원본 유닛은 <code>/usr/lib/systemd/system/</code>(패키지), 관리자 설정은 <code>/etc/systemd/system/</code>(우선 적용).</p>
+<div class="tail"><b>꼬리 1.</b> start와 enable의 차이는? → start는 <b>지금</b> 실행, enable은 <b>다음 부팅</b>을 위한 링크. <code>enable --now</code>는 둘을 한 번에. 설치 후 start만 하면 재부팅 때 안 뜬다.</div>
+<div class="tail"><b>꼬리 2.</b> enable돼 있는데 재부팅하면 안 뜬다면? → 시작은 시도했지만 실패한 것. 의존성 순서, SELinux, 설정 오류를 <code>journalctl</code>로 확인한다. 방화벽은 "떴는데 접속이 안 되는" 다른 증상이다.</div>
+</div></div>
+
+<div class="panel"><p class="ptitle">핵심 정리</p><ul class="sum">
+<li>세 문항(프로세스 격리 · 권한 검사 · 시스템 콜)은 한 원리로 이어진다: <b>CPU가 규칙을 강제하고, 커널이 모든 자원 접근을 한곳에서 검사한다</b></li>
+<li>디렉터리의 x는 실행이 아니라 진입, 파일 삭제는 디렉터리의 w</li>
+<li>캐시는 하드웨어 덕분에 빠르고, 지역성 덕분에 작아도 효과가 있다</li>
+<li>깨진 모양(한자 vs �)으로 어느 방향으로 잘못 읽었는지 알 수 있다</li>
+<li>enabled = 다음 부팅, active = 지금</li></ul></div>
+
+<footer><a href="../">← dev-study 목차</a> · 참고: 혼자 공부하는 컴퓨터구조+운영체제 · 생활코딩 Linux · 홈서버(Rocky Linux 9) 실습 · 배경지식은 별도 자료로 보충해 직접 정리</footer>
+</main>
+<script src="glossary-link.js"></script>
+</body>
+</html>
