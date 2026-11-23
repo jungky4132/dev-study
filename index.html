@@ -12,10 +12,20 @@ h1{font-size:24px;font-weight:500;margin:0 0 4px}h2{font-size:17px;font-weight:5
 p{color:var(--muted);margin:0 0 12px}ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
 a.card{display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--fg);text-decoration:none}
 a.card:hover{border-color:var(--ac)}a.card span{display:block;font-size:13px;color:var(--muted)}
+details.stage{margin:12px 0;border:1px solid var(--border);border-radius:12px;background:var(--card)}
+details.stage>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:17px;font-weight:500}
+details.stage>summary::-webkit-details-marker{display:none}
+details.stage>summary::before{content:"▸";color:var(--muted);transition:transform .15s;display:inline-block}
+details.stage[open]>summary::before{transform:rotate(90deg)}
+details.stage>summary .st{flex:1}details.stage>summary .cnt{font-size:13px;font-weight:400;color:var(--muted)}
+details.stage>ul{padding:0 12px 12px}
+.tools{display:flex;gap:8px;margin:8px 0 4px}.tools button{font:inherit;font-size:13px;padding:4px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--fg);cursor:pointer}
+.tools button:hover{border-color:var(--ac)}
 </style></head><body><main>
 <h1>dev-study</h1>
 <p>2026–2027 개발자 기본기 학습 기록 · STAGE별 정리와 그림</p>
-<h2>STAGE 1 · 컴퓨터 시스템 + 리눅스 기초</h2>
+<div class="tools"><button type="button" id="openAll">모두 펼치기</button><button type="button" id="closeAll">모두 접기</button></div>
+<details class="stage" id="s1"><summary><span class="st">STAGE 1 · 컴퓨터 시스템 + 리눅스 기초</span><span class="cnt">18개</span></summary>
 <ul><li><a class="card" href="stage1/glossary.html">STAGE 1 용어 사전<span>STAGE 1 그림에 나오는 용어 166개(핵심 104 + 설명 속 기초 62)를, 그 개념이 왜 생길 수밖에 없었는지(시대 → 문제 → 개념) 순서로 정리</span></a></li>
 <li><a class="card" href="stage1/cpu-register.html">CPU 레지스터 한 장 그림<span>if 문 한 줄이 CPU 안에서 어떻게 실행되는지(비교 → 결과 표시 → 건너뛰기), 장치가 끼어들 때(인터럽트) 무슨 일이 일어나는지, 프로그램이 쓰는 주소가 실제 메모리 위치로 어떻게 바뀌는지(MMU)를 레지스터 하나하나까지 따라가기</span></a></li>
 <li><a class="card" href="stage1/ssd-wear.html">SSD 셀 · 페이지 · 블록과 수명<span>SSD는 왜 덮어쓰지 못하고 블록 단위로만 지우는지, 그리고 지울 때마다 수명이 줄어드는 과정</span></a></li>
@@ -34,12 +44,23 @@ a.card:hover{border-color:var(--ac)}a.card span{display:block;font-size:13px;col
 <li><a class="card" href="stage1/linux-permission.html">리눅스 권한 (755) 한 장 그림<span>ls -l에 보이는 -rwxr-xr-x가 무슨 뜻인지, 755 같은 숫자로 바꾸는 법, 누가 어떤 파일을 읽고 고치고 실행할 수 있는지</span></a></li>
 <li><a class="card" href="stage1/systemd-dnf.html">systemd와 패키지 관리 한 장 그림<span>리눅스에서 서비스(sshd 등)를 켜고 끄고 부팅 때 자동으로 띄우는 방법(systemd)과, 프로그램을 설치하는 방법(rpm · dnf)</span></a></li>
 <li><a class="card" href="stage1/gate-review.html">STAGE 1 관문 정리 · 핵심 6문항과 꼬리 질문<span>관문 점검에서 나온 6문항(프로세스와 스레드 · 권한 755 · 시스템 콜 · 캐시 · 한글 깨짐 · 서비스 자동 시작)의 최종 답과, 답하다 막혔던 꼬리 질문(크롬 탭 · Apache 403 · printf → write · 2차원 배열과 캐시 등) 정리</span></a></li></ul>
-<h2>STAGE 2 · 네트워크 기초</h2>
+</details>
+<details class="stage" id="s2" open><summary><span class="st">STAGE 2 · 네트워크 기초</span><span class="cnt">6개</span></summary>
 <ul><li><a class="card" href="stage2/why-network.html">왜 개발자가 네트워크를 공부해야 하나<span>요청 하나가 브라우저에서 DB까지 지나가는 길과 구간별 장애 증상(timed out vs refused), 성능 · 보안 · 고객사 방화벽 신청 · 녹취 업무와의 연결</span></a></li>
 <li><a class="card" href="stage2/network-basics.html">네트워크의 구조와 분류<span>호스트 · 장비 · 매체, 그래프 자료구조(인접 리스트 · 행렬 · 최단 경로)와 토폴로지, LAN · MAN · WAN과 회선 · 메시지 · 패킷 교환으로 나눈 이유와 역사</span></a></li>
 <li><a class="card" href="stage2/packet.html">패킷: 개념 · 구조 · 보는 법 · 음성 패킷<span>데이터를 쪼개는 이유, 캡슐화 구조, tcpdump · Wireshark로 보는 법, 전화 음성이 RTP 패킷으로 흐르고 녹취되는 과정</span></a></li>
 <li><a class="card" href="stage2/devices.html">네트워크 장비 종류와 역할<span>계층별로 장비가 무엇을 보고 판단하는지, 허브와 스위치의 차이, 집 공유기에 들어 있는 기능들</span></a></li>
 <li><a class="card" href="stage2/architecture.html">실무 네트워크 아키텍처와 금융권 구성<span>DMZ · 내부망 · 관리망 기본 구성, 은행의 채널계 · 계정계 · 정보계 · 대외계와 망분리(2013~2026), STT · 녹취 서버의 자리</span></a></li>
-<li><a class="card" href="stage2/glossary.html">STAGE 2 용어 사전 · 네트워크<span>네트워크 용어 33개를 시대 → 문제(그림) → 개념 · 역할 → 실무 순서로 정리</span></a></li>
-</ul>
-</main></body></html>
+<li><a class="card" href="stage2/glossary.html">STAGE 2 용어 사전 · 네트워크<span>네트워크 용어 33개를 시대 → 문제(그림) → 개념 · 역할 → 실무 순서로 정리</span></a></li></ul>
+</details>
+</main><script>
+(function(){var ds=[].slice.call(document.querySelectorAll('details.stage'));
+var K='devstudy-open';var saved=null;try{saved=JSON.parse(localStorage.getItem(K));}catch(e){}
+if(saved&&saved.length!==undefined)ds.forEach(function(d){d.open=saved.indexOf(d.id)>=0;});
+if(location.hash){var t=document.querySelector(location.hash);if(t&&t.tagName==='DETAILS')t.open=true;}
+function save(){try{localStorage.setItem(K,JSON.stringify(ds.filter(function(d){return d.open;}).map(function(d){return d.id;})));}catch(e){}}
+ds.forEach(function(d){d.addEventListener('toggle',save);});
+document.getElementById('openAll').onclick=function(){ds.forEach(function(d){d.open=true;});save();};
+document.getElementById('closeAll').onclick=function(){ds.forEach(function(d){d.open=false;});save();};})();
+</script>
+</body></html>
