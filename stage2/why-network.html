@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%237A5230'/%3E%3Cpath d='M7 12 L8.5 4.5 L13 9 Z M25 12 L23.5 4.5 L19 9 Z' fill='%23F3E6D3'/%3E%3Cellipse cx='16' cy='19' rx='9.5' ry='10' fill='%23F3E6D3'/%3E%3Cellipse cx='16' cy='25' rx='5' ry='3.6' fill='%23DDBF97'/%3E%3Ccircle cx='11.8' cy='15.5' r='4.2' fill='%23fff' stroke='%234A3220' stroke-width='1.2'/%3E%3Ccircle cx='20.2' cy='15.5' r='4.2' fill='%23fff' stroke='%234A3220' stroke-width='1.2'/%3E%3Ccircle cx='12.4' cy='15.9' r='2' fill='%232B1D12'/%3E%3Ccircle cx='20.8' cy='15.9' r='2' fill='%232B1D12'/%3E%3Cpath d='M14.6 19.2 L17.4 19.2 L16 21.8 Z' fill='%23EF9F27'/%3E%3C/svg%3E">
+<title>왜 개발자가 네트워크를 공부해야 하나</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--pk-f:#FBEAF0;--pk-s:#993556;--pk-t:#72243E;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--pk-f:#72243E;--pk-s:#ED93B1;--pk-t:#FBEAF0;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:96px}
+.ptitle{font-size:17px;font-weight:500;margin:0 0 6px}
+.sum{margin:0;padding-left:20px;font-size:15px}.sum li{margin:3px 0}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-pink>rect{fill:var(--pk-f);stroke:var(--pk-s)}.c-pink>.th{fill:var(--pk-t)}.c-pink>.ts{fill:var(--pk-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts{fill:var(--am-s)}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+.qa{margin:0 0 6px;font-size:16px;font-weight:500}
+.qa span{color:var(--pu-s);margin-right:6px}
+.ans{font-size:15px;margin:0}
+.ans p{margin:6px 0}
+.ans ul{margin:6px 0;padding-left:20px}.ans li{margin:3px 0}
+pre{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;overflow-x:auto;margin:8px 0}
+code{font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.figcap{font-size:13px;color:var(--muted);margin:8px 0 0}
+.terms{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0;padding:0;list-style:none}
+.terms a{display:inline-block;font-size:13px;padding:3px 10px;border:1px solid var(--border);border-radius:999px;text-decoration:none;color:var(--fg)}
+.terms a:hover{border-color:var(--pu-s);color:var(--pu-s)}
+
+.c-blue>rect,rect.c-blue{fill:var(--pu-f);stroke:var(--pu-s)}.c-blue>.th{fill:var(--pu-t)}.c-blue>.ts{fill:var(--pu-s)}
+.fig{margin:6px 0 4px}.fig svg{width:100%;height:auto;display:block}
+.lbl{font-size:12px;fill:var(--muted)}
+.dash{stroke-dasharray:5 4}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px;padding:0;list-style:none}
+.toc a{display:inline-block;font-size:13px;padding:3px 10px;border:1px solid var(--border);border-radius:999px;text-decoration:none;color:var(--fg)}
+.toc a:hover{border-color:var(--pu-s);color:var(--pu-s)}
+h2{font-size:19px;font-weight:500;margin:28px 0 10px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
+.tbl th,.tbl td{border-top:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+.tbl th{font-weight:500;color:var(--muted);font-size:13px}
+.hist{border-left:3px solid var(--am-s);padding:2px 0 2px 12px;margin:10px 0;font-size:15px}
+.hist b{color:var(--am-t)}
+.warn{background:var(--am-f);color:var(--am-t);border-radius:8px;padding:8px 12px;font-size:14px;margin:8px 0}
+.tail{border-left:3px solid var(--pu-s);padding:2px 0 2px 12px;margin:10px 0;font-size:15px}
+.tail b{color:var(--pu-t)}
+</style>
+</head>
+<body>
+<main>
+<h1>왜 개발자가 네트워크를 공부해야 하나</h1>
+<p class="sub">요청 하나가 브라우저에서 DB까지 지나가는 길과, 그 길 위에서 생기는 장애 · 성능 · 보안 문제 · STAGE 2 네트워크 · 2026-11-23</p>
+<ul class="toc"><li><a href="#path">요청이 지나가는 길</a></li><li><a href="#why">이유 다섯 가지</a></li><li><a href="#depth">어디까지 알아야 하나</a></li></ul>
+<div class="panel"><p class="ptitle">한 줄 답</p><ul class="sum"><li>요즘 프로그램은 거의 다 <b>여러 컴퓨터가 주고받으며</b> 동작한다. 그 주고받는 길이 네트워크다.</li><li>그래서 장애 · 성능 · 보안 문제의 상당수가 <b>코드 밖, 길 위</b>에서 생긴다. 길을 모르면 원인을 찾지 못하고 "서버가 이상해요"에서 멈춘다.</li><li>개발자에게 필요한 건 장비 설정 능력이 아니라 <b>"어디서 막혔는지" 가설을 세우고 확인하는 능력</b>이다.</li></ul></div><h2 id="path">1. 요청 하나가 지나가는 길</h2><div class="panel"><div class="fig"><svg viewBox="0 0 680 488" role="img" aria-label="요청 하나가 브라우저에서 DB까지 가는 길과 각 지점의 장애 증상"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs><text class="ts" x="30" y="18" text-anchor="start" dominant-baseline="central" style="fill:var(--pu-s);font-weight:500">요청이 지나가는 길</text><text class="ts" x="300" y="18" text-anchor="start" dominant-baseline="central" style="fill:var(--co-s);font-weight:500">여기서 막히면 보이는 증상</text><g class="c-teal"><rect x="30" y="40" width="230" height="48" rx="8" stroke-width="0.5"/><text class="th" x="145.0" y="55.0" text-anchor="middle" dominant-baseline="central">브라우저 · 앱</text><text class="ts" x="145.0" y="74.0" text-anchor="middle" dominant-baseline="central">내 PC에서 요청 시작</text></g><g class="c-coral"><rect x="300" y="46" width="350" height="36" rx="8" stroke-width="0.5"/><text class="th" x="475.0" y="64.0" text-anchor="middle" dominant-baseline="central">인증서 오류 · 요청 자체 실패</text></g><line class="arr dash" x1="264" y1="64.0" x2="296" y2="64.0" marker-end="url(#ar)"/><line class="arr" x1="145.0" y1="91" x2="145.0" y2="111" marker-end="url(#ar)"/><g class="c-gray"><rect x="30" y="114" width="230" height="48" rx="8" stroke-width="0.5"/><text class="th" x="145.0" y="129.0" text-anchor="middle" dominant-baseline="central">DNS</text><text class="ts" x="145.0" y="148.0" text-anchor="middle" dominant-baseline="central">도메인 이름 → IP 주소</text></g><g class="c-coral"><rect x="300" y="120" width="350" height="36" rx="8" stroke-width="0.5"/><text class="th" x="475.0" y="138.0" text-anchor="middle" dominant-baseline="central">Name or service not known</text></g><line class="arr dash" x1="264" y1="138.0" x2="296" y2="138.0" marker-end="url(#ar)"/><line class="arr" x1="145.0" y1="165" x2="145.0" y2="185" marker-end="url(#ar)"/><g class="c-gray"><rect x="30" y="188" width="230" height="48" rx="8" stroke-width="0.5"/><text class="th" x="145.0" y="203.0" text-anchor="middle" dominant-baseline="central">공유기 · 방화벽</text><text class="ts" x="145.0" y="222.0" text-anchor="middle" dominant-baseline="central">나가는 길과 들어오는 문</text></g><g class="c-coral"><rect x="300" y="194" width="350" height="36" rx="8" stroke-width="0.5"/><text class="th" x="475.0" y="212.0" text-anchor="middle" dominant-baseline="central">Connection timed out (조용히 버림)</text></g><line class="arr dash" x1="264" y1="212.0" x2="296" y2="212.0" marker-end="url(#ar)"/><line class="arr" x1="145.0" y1="239" x2="145.0" y2="259" marker-end="url(#ar)"/><g class="c-gray"><rect x="30" y="262" width="230" height="48" rx="8" stroke-width="0.5"/><text class="th" x="145.0" y="277.0" text-anchor="middle" dominant-baseline="central">인터넷 · 통신사 회선</text><text class="ts" x="145.0" y="296.0" text-anchor="middle" dominant-baseline="central">라우터 여러 대를 거침</text></g><g class="c-coral"><rect x="300" y="268" width="350" height="36" rx="8" stroke-width="0.5"/><text class="th" x="475.0" y="286.0" text-anchor="middle" dominant-baseline="central">느림 · 끊김 · 패킷 손실</text></g><line class="arr dash" x1="264" y1="286.0" x2="296" y2="286.0" marker-end="url(#ar)"/><line class="arr" x1="145.0" y1="313" x2="145.0" y2="333" marker-end="url(#ar)"/><g class="c-gray"><rect x="30" y="336" width="230" height="48" rx="8" stroke-width="0.5"/><text class="th" x="145.0" y="351.0" text-anchor="middle" dominant-baseline="central">로드밸런서 · 웹서버</text><text class="ts" x="145.0" y="370.0" text-anchor="middle" dominant-baseline="central">Apache · Nginx</text></g><g class="c-coral"><rect x="300" y="342" width="350" height="36" rx="8" stroke-width="0.5"/><text class="th" x="475.0" y="360.0" text-anchor="middle" dominant-baseline="central">Connection refused · 502 · 504</text></g><line class="arr dash" x1="264" y1="360.0" x2="296" y2="360.0" marker-end="url(#ar)"/><line class="arr" x1="145.0" y1="387" x2="145.0" y2="407" marker-end="url(#ar)"/><g class="c-teal"><rect x="30" y="410" width="230" height="48" rx="8" stroke-width="0.5"/><text class="th" x="145.0" y="425.0" text-anchor="middle" dominant-baseline="central">WAS · DB</text><text class="ts" x="145.0" y="444.0" text-anchor="middle" dominant-baseline="central">PHP → MariaDB</text></g><g class="c-coral"><rect x="300" y="416" width="350" height="36" rx="8" stroke-width="0.5"/><text class="th" x="475.0" y="434.0" text-anchor="middle" dominant-baseline="central">DB 연결 타임아웃 · 커넥션 부족</text></g><line class="arr dash" x1="264" y1="434.0" x2="296" y2="434.0" marker-end="url(#ar)"/></svg></div><p class="figcap">웹 페이지 하나를 여는 동안 요청은 최소 여섯 구간을 지난다. 코드(맨 아래 WAS)는 그중 한 구간일 뿐이다. 어느 구간에서 막혔는지에 따라 에러 메시지가 다르게 나온다.</p><table class="tbl"><tr><th>에러 메시지</th><th>무슨 뜻인가</th><th>먼저 볼 곳</th></tr>
+<tr><td><code>Name or service not known</code></td><td>도메인을 IP로 못 바꿈</td><td>DNS 설정 · <code>/etc/hosts</code> · <code>dig</code></td></tr>
+<tr><td><code>Connection timed out</code></td><td>요청이 갔는데 아무 대답이 없음 — 중간에서 조용히 버려짐</td><td>방화벽 · 공유기 포트포워딩 · 라우팅</td></tr>
+<tr><td><code>Connection refused</code></td><td>서버까지는 갔는데 그 포트에서 기다리는 프로그램이 없음</td><td>서비스 기동 여부 · <code>ss -tlnp</code> · 바인드 주소</td></tr>
+<tr><td><code>403 / 502 / 504</code></td><td>연결은 됐고, 웹서버 · WAS 단계에서 문제</td><td>웹서버 로그 · WAS 상태 · 타임아웃 설정</td></tr></table><p class="figcap">에러 메시지만 정확히 읽어도 원인 범위가 절반으로 줄어든다. timed out과 refused는 완전히 다른 곳을 가리킨다.</p></div><h2 id="why">2. 개발자가 네트워크를 알아야 하는 이유 다섯 가지</h2><div class="panel"><p class="qa"><span>1.</span>장애의 절반은 코드 밖에서 난다</p><div class="ans"><p>고객사에서 "STT 웹이 안 열려요"라는 전화가 오면, 원인은 PHP 코드보다 방화벽 · 포트 · DNS · 서비스 미기동인 경우가 훨씬 많다. 위 표처럼 에러를 계층별로 나눠 읽을 수 있어야 엉뚱한 곳을 뒤지지 않는다.</p></div></div><div class="panel"><p class="qa"><span>2.</span>성능은 왕복 횟수가 결정한다</p><div class="ans"><p>네트워크 요청 한 번은 메모리 접근보다 수만~수백만 배 느리다(STAGE 1 메모리 계층의 연장선). 같은 서버실 안에서도 왕복 한 번에 약 0.5ms, 서울–부산은 수 ms가 걸린다.</p><ul><li>DB 쿼리를 루프 안에서 100번 부르면 쿼리 자체보다 <b>왕복 100번</b>이 느리다 → 한 번에 가져오기</li><li>요청마다 TCP 연결을 새로 맺으면 그때마다 왕복이 늘어난다 → 연결 재사용(keep-alive · 커넥션 풀)</li></ul></div></div><div class="panel"><p class="qa"><span>3.</span>보안 사고는 네트워크로 들어온다</p><div class="ans"><p>11/21 홈서버에 SSH 무차별 대입 시도가 7,016건 들어왔다. 포트를 바꿔도 막을 수 없었다. 어떤 포트를 누구에게 열지, DB를 왜 <code>127.0.0.1</code>에만 묶는지는 네트워크를 알아야 판단할 수 있다.</p></div></div><div class="panel"><p class="qa"><span>4.</span>고객사와 일하려면 네트워크 언어를 써야 한다</p><div class="ans"><p>금융권 · 공공기관 고객사에 설치하려면 <b>방화벽 오픈 신청서</b>를 써야 한다: 출발지 IP · 목적지 IP · 포트 · 프로토콜(TCP/UDP) · 방향. 이걸 정확히 못 쓰면 설치 날 아무것도 안 된다. 망분리 환경이면 외부 저장소(dnf · npm)도 못 쓴다.</p></div></div><div class="panel"><p class="qa"><span>5.</span>STT · 녹취 업무 자체가 네트워크다</p><div class="ans"><p>통화 음성은 RTP 패킷으로 흐르고, 녹취는 그 패킷을 복사(미러링)하거나 교환기에서 받아(SIP 연동) 만든다. 채널 수만큼 대역폭도 계산해야 한다 — G.711 통화 1채널은 헤더까지 약 87kbps, 100채널이면 약 8.7Mbps.</p></div></div><h2 id="depth">3. 개발자는 어디까지 알아야 하나</h2><div class="panel"><ul class="sum"><li><b>알아야 할 것</b>: 계층 구조(누가 어떤 정보를 붙이는지), IP · 포트 · DNS · TCP 연결, HTTP, NAT와 방화벽이 패킷을 어떻게 다루는지</li><li><b>도구로 확인할 수 있어야 할 것</b>: <code>ping</code>(닿는가) · <code>traceroute</code>(어디까지 가는가) · <code>ss -tlnp</code>(누가 기다리는가) · <code>curl -v</code>(HTTP가 어떻게 오가는가) · <code>nc -zv 호스트 포트</code>(포트가 열렸나) · <code>tcpdump</code>(실제 패킷)</li><li><b>몰라도 되는 것</b>: 라우터 · 스위치의 장비별 설정 명령어, 케이블 규격의 세부 숫자 — 네트워크 엔지니어의 영역</li></ul></div><div class="panel"><p class="ptitle">핵심 정리</p><ul class="sum"><li>요청은 브라우저 → DNS → 방화벽 → 인터넷 → 웹서버 → WAS · DB를 지나고, 막힌 구간마다 에러가 다르다</li><li>timed out = 중간에서 버려짐, refused = 도착했지만 받는 프로그램이 없음</li><li>성능은 왕복 횟수, 보안은 열린 포트, 고객사 협업은 방화벽 신청서 — 모두 네트워크 언어</li></ul></div>
+<footer><a href="../">← dev-study 목차</a> · <a href="glossary.html">STAGE 2 용어 사전</a> · 참고: 혼자 공부하는 네트워크(인프런) 섹션 1–2 · 각 기술의 역사 자료와 실무 경험을 바탕으로 직접 정리</footer>
+</main>
+</body>
+</html>

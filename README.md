@@ -23,3 +23,11 @@
 - [리눅스 권한 (755) 한 장 그림](https://jungky4132.github.io/dev-study/stage1/linux-permission.html) — ls -l에 보이는 -rwxr-xr-x가 무슨 뜻인지, 755 같은 숫자로 바꾸는 법, 누가 어떤 파일을 읽고 고치고 실행할 수 있는지
 - [systemd와 패키지 관리 한 장 그림](https://jungky4132.github.io/dev-study/stage1/systemd-dnf.html) — 리눅스에서 서비스(sshd 등)를 켜고 끄고 부팅 때 자동으로 띄우는 방법(systemd)과, 프로그램을 설치하는 방법(rpm · dnf)
 - [STAGE 1 관문 정리 · 핵심 6문항과 꼬리 질문](https://jungky4132.github.io/dev-study/stage1/gate-review.html) — 관문 점검에서 나온 6문항의 최종 답과, 답하다 막혔던 꼬리 질문(크롬 탭 · Apache 403 · printf → write · 2차원 배열과 캐시 등) 정리
+
+## STAGE 2 · 네트워크 기초
+- [왜 개발자가 네트워크를 공부해야 하나](https://jungky4132.github.io/dev-study/stage2/why-network.html) — 요청 하나가 브라우저에서 DB까지 지나가는 길과 구간별 장애 증상(timed out vs refused), 성능 · 보안 · 고객사 방화벽 신청 · 녹취 업무와의 연결
+- [네트워크의 구조와 분류](https://jungky4132.github.io/dev-study/stage2/network-basics.html) — 호스트 · 장비 · 매체, 그래프 자료구조(인접 리스트 · 행렬 · 최단 경로)와 토폴로지, LAN · MAN · WAN과 회선 · 메시지 · 패킷 교환으로 나눈 이유와 역사
+- [패킷: 개념 · 구조 · 보는 법 · 음성 패킷](https://jungky4132.github.io/dev-study/stage2/packet.html) — 데이터를 쪼개는 이유, 캡슐화 구조, tcpdump · Wireshark로 보는 법, 전화 음성이 RTP 패킷으로 흐르고 녹취되는 과정
+- [네트워크 장비 종류와 역할](https://jungky4132.github.io/dev-study/stage2/devices.html) — 계층별로 장비가 무엇을 보고 판단하는지, 허브와 스위치의 차이, 집 공유기에 들어 있는 기능들
+- [실무 네트워크 아키텍처와 금융권 구성](https://jungky4132.github.io/dev-study/stage2/architecture.html) — DMZ · 내부망 · 관리망 기본 구성, 은행의 채널계 · 계정계 · 정보계 · 대외계와 망분리(2013~2026), STT · 녹취 서버의 자리
+- [STAGE 2 용어 사전 · 네트워크](https://jungky4132.github.io/dev-study/stage2/glossary.html) — 네트워크 용어 33개를 시대 → 문제(그림) → 개념 · 역할 → 실무 순서로 정리
