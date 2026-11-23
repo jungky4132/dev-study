@@ -55,7 +55,7 @@ footer{font-size:13px;color:var(--muted);margin-top:24px}
 @media (max-width:520px){.row{grid-template-columns:1fr;gap:2px}}
 </style>
 </head>
-<body>
+<body class="gl-page">
 <main>
 <h1>STAGE 2 용어 사전 · 네트워크</h1>
 <p class="sub">STAGE 2 정리에 나오는 네트워크 용어 33개를, 그 개념이 왜 생길 수밖에 없었는지(시대 → 문제 → 개념 → 역할) 순서로 정리 · 2026-11-23</p>
@@ -72,5 +72,6 @@ terms.forEach(t=>{const ok=!v||t.dataset.k.includes(v)||t.textContent.toLowerCas
 grps.forEach(g=>{g.style.display=[...g.querySelectorAll('.term')].some(t=>t.style.display!=='none')?'':'none';});
 empty.style.display=n?'none':'block';});
 </script>
+<script src="glossary-link.js"></script>
 </body>
 </html>
