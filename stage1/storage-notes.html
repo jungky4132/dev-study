@@ -127,7 +127,7 @@ code{font-size:13px;background:var(--bg);padding:1px 5px;border-radius:4px}
 <circle cx="250" cy="600" r="6" fill="#7F77DD"/><text class="ts" x="262" y="600" dominant-baseline="central">헤드 기술</text>
 <circle cx="350" cy="600" r="6" fill="#D85A30"/><text class="ts" x="362" y="600" dominant-baseline="central">기록 밀도 · 대용량</text>
 </svg></div>
-<p>SMR HDD는 덮어쓸 때 겹친 트랙을 다시 써야 해서 SSD의 블록 지우기와 비슷한 약점이 있습니다. NAS · RAID에 SMR 디스크를 섞으면 재구축이 매우 느려질 수 있으니 서버용 디스크는 PMR인지 SMR인지 확인합니다.</p>
+<p>SMR HDD는 덮어쓸 때 겹친 트랙을 다시 써야 해서 SSD의 블록 지우기와 비슷한 약점이 있습니다. NAS · RAID에 SMR 디스크를 섞으면 재구축이 매우 느려질 수 있으니 서버용 디스크는 CMR(트랙을 겹치지 않는 일반 방식)인지 SMR인지 제조사 사양표에서 확인합니다. PMR(수직 기록)은 둘 다 쓰는 기록 방식이라 SMR의 반대말이 아닙니다.</p>
 
 <h2>4. 용어 정리</h2>
 <h3 style="font-size:16px;font-weight:500">셀과 동작</h3>
@@ -171,7 +171,7 @@ code{font-size:13px;background:var(--bg);padding:1px 5px;border-radius:4px}
 <tr><td>플래터 / 헤드</td><td>데이터를 기록하는 자성 원판 / 원판 위에 떠서 읽고 쓰는 장치</td></tr>
 <tr><td>윈체스터 구조</td><td>헤드와 원판을 밀봉한 구조. 지금 HDD의 기본형</td></tr>
 <tr><td>MR / GMR 헤드</td><td>자기저항 효과로 미세한 자기 신호를 읽는 헤드</td></tr>
-<tr><td>PMR / SMR / HAMR</td><td>수직 기록 / 트랙을 기와처럼 겹쳐 쓰기 / 레이저로 가열해 기록</td></tr>
+<tr><td>PMR · CMR / SMR / HAMR</td><td>수직 기록(지금 HDD의 기본 기록 방식) · CMR은 트랙을 겹치지 않는 일반 배치 / SMR은 같은 수직 기록에서 트랙을 기와처럼 겹쳐 쓰는 배치 / 레이저로 가열해 기록</td></tr>
 </table></div>
 <h2>5. 실무 명령어</h2>
 <div class="panel"><pre style="margin:0;font-size:13px;white-space:pre-wrap">systemctl status fstrim.timer    # TRIM 주기 실행 확인
