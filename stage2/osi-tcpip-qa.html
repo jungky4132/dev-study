@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%237A5230'/%3E%3Cpath d='M7 12 L8.5 4.5 L13 9 Z M25 12 L23.5 4.5 L19 9 Z' fill='%23F3E6D3'/%3E%3Cellipse cx='16' cy='19' rx='9.5' ry='10' fill='%23F3E6D3'/%3E%3Cellipse cx='16' cy='25' rx='5' ry='3.6' fill='%23DDBF97'/%3E%3Ccircle cx='11.8' cy='15.5' r='4.2' fill='%23fff' stroke='%234A3220' stroke-width='1.2'/%3E%3Ccircle cx='20.2' cy='15.5' r='4.2' fill='%23fff' stroke='%234A3220' stroke-width='1.2'/%3E%3Ccircle cx='12.4' cy='15.9' r='2' fill='%232B1D12'/%3E%3Ccircle cx='20.8' cy='15.9' r='2' fill='%232B1D12'/%3E%3Cpath d='M14.6 19.2 L17.4 19.2 L16 21.8 Z' fill='%23EF9F27'/%3E%3C/svg%3E">
+<title>OSI · TCP/IP · 세션 질문 정리</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--pk-f:#FBEAF0;--pk-s:#993556;--pk-t:#72243E;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--pk-f:#72243E;--pk-s:#ED93B1;--pk-t:#FBEAF0;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:96px}
+.ptitle{font-size:17px;font-weight:500;margin:0 0 6px}
+.sum{margin:0;padding-left:20px;font-size:15px}.sum li{margin:3px 0}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-pink>rect{fill:var(--pk-f);stroke:var(--pk-s)}.c-pink>.th{fill:var(--pk-t)}.c-pink>.ts{fill:var(--pk-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts{fill:var(--am-s)}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+.qa{margin:0 0 6px;font-size:16px;font-weight:500}
+.qa span{color:var(--pu-s);margin-right:6px}
+.ans{font-size:15px;margin:0}
+.ans p{margin:6px 0}
+.ans ul{margin:6px 0;padding-left:20px}.ans li{margin:3px 0}
+pre{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;overflow-x:auto;margin:8px 0}
+code{font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.figcap{font-size:13px;color:var(--muted);margin:8px 0 0}
+.terms{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0;padding:0;list-style:none}
+.terms a{display:inline-block;font-size:13px;padding:3px 10px;border:1px solid var(--border);border-radius:999px;text-decoration:none;color:var(--fg)}
+.terms a:hover{border-color:var(--pu-s);color:var(--pu-s)}
+
+.c-blue>rect,rect.c-blue{fill:var(--pu-f);stroke:var(--pu-s)}.c-blue>.th{fill:var(--pu-t)}.c-blue>.ts{fill:var(--pu-s)}
+.c-teal>circle{fill:var(--te-f);stroke:var(--te-s)}.c-gray>circle{fill:var(--gr-f);stroke:var(--gr-s)}.c-amber>circle{fill:var(--am-f);stroke:var(--am-s)}.c-coral>circle{fill:var(--co-f);stroke:var(--co-s)}.c-blue>circle,.c-purple>circle{fill:var(--pu-f);stroke:var(--pu-s)}
+.c-teal>.th{fill:var(--te-t)}.c-gray>.th{fill:var(--gr-t)}.c-amber>.th{fill:var(--am-t)}.c-coral>.th{fill:var(--co-t)}
+.fig{margin:6px 0 4px}.fig svg{width:100%;height:auto;display:block}
+.lbl{font-size:12px;fill:var(--muted)}
+.dash{stroke-dasharray:5 4}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px;padding:0;list-style:none}
+.toc a{display:inline-block;font-size:13px;padding:3px 10px;border:1px solid var(--border);border-radius:999px;text-decoration:none;color:var(--fg)}
+.toc a:hover{border-color:var(--pu-s);color:var(--pu-s)}
+h2{font-size:19px;font-weight:500;margin:28px 0 10px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
+.tbl th,.tbl td{border-top:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+.tbl th{font-weight:500;color:var(--muted);font-size:13px}
+.hist{border-left:3px solid var(--am-s);padding:2px 0 2px 12px;margin:10px 0;font-size:15px}
+.hist b{color:var(--am-t)}
+.warn{background:var(--am-f);color:var(--am-t);border-radius:8px;padding:8px 12px;font-size:14px;margin:8px 0}
+.tail{border-left:3px solid var(--pu-s);padding:2px 0 2px 12px;margin:10px 0;font-size:15px}
+.tail b{color:var(--pu-t)}
+
+:root{--zone:#EEF1DF;--zone-s:#8E9A6B;--zone-e:#D9DEC2;--zone-e2:#CDD3B3;--sv-t:#E9EAEC;--sv-l:#C9CCD1;--sv-r:#A9AEB6;--dev-s:#5C6168;
+--sv-tl:#BFE3D6;--sv-tr:#8FC9B5;--sv-al:#F1D9AE;--sv-ar:#DDBB82;--fw-t:#E9A08C;--fw-l:#C9553A;--fw-r:#A9442D;--fw-s:#7C2E1C;--flame:#F2A93B;
+--rt-t:#B7BCC4;--rt-s:#8C939C;--sw-t:#E4E7EA;--sw-l:#C4C9CF;--sw-r:#A5ACB4;--sw-a:#5C6168;--mon:#7DA7D9;--db-t:#C9D9EE;--db-s:#9DB5D6;
+--cloud:#F4F5F6;--person:#6FA8DC;--person-h:#F2C7A5;--bus:#7A7F87;--wan:#FBF4E6;--man:#EFEEFB}
+@media (prefers-color-scheme:dark){:root{--zone:#2B3022;--zone-s:#7E8A5E;--zone-e:#22261B;--zone-e2:#1C2016;--sv-t:#5A5E64;--sv-l:#44484E;--sv-r:#35393E;--dev-s:#9AA0A8;
+--sv-tl:#2E5E50;--sv-tr:#22483D;--sv-al:#6B5326;--sv-ar:#54401C;--fw-t:#A9553F;--fw-l:#8A3A26;--fw-r:#6E2E1E;--fw-s:#E39A86;--rt-t:#6A7078;--rt-s:#50555C;
+--sw-t:#55595F;--sw-l:#45494E;--sw-r:#383B40;--sw-a:#D6D9DD;--mon:#3E6A9E;--db-t:#3C5070;--db-s:#2E3E58;--cloud:#2A2B2D;--person:#3E78AE;--person-h:#C9A07F;--bus:#9AA0A8;--wan:#2E2818;--man:#26253A}}
+.zt{font-size:13px;font-weight:500;fill:var(--zone-s)}
+.dl{font-size:11.5px;fill:var(--fg)}
+.cap2{font-size:12px;fill:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>OSI · TCP/IP · 세션 질문 정리</h1>
+<p class="sub">OSI 모델은 왜 만들었는지, 왜 학교에서는 "왜"를 안 가르쳤는지, 세션의 정확한 뜻, TCP/IP 모델은 왜 따로 있는지를 그림 5장으로 정리 · STAGE 2 네트워크 · 2026-11-26</p>
+<ul class="toc"><li><a href="#q1">OSI를 만든 이유</a></li><li><a href="#q2">계층을 나눈 이유</a></li><li><a href="#q3">학교에서 안 가르친 이유</a></li><li><a href="#q4">세션의 정확한 뜻</a></li><li><a href="#q5">TCP/IP 모델</a></li><li><a href="#q6">지금 남은 것</a></li></ul>
+
+<div class="panel"><p class="ptitle">한 줄 답</p><ul class="sum">
+<li>OSI는 1970년대 <b>회사마다 달라서 서로 못 붙던 네트워크</b>를, 국제 표준 하나로 묶으려고 ISO가 만든 <b>설계도</b>다. 원래는 설계도 위에 실제 표준 프로토콜까지 다 만들 계획이었다</li>
+<li>TCP/IP 모델은 OSI 다음에 "또" 만든 것이 아니다. <b>TCP/IP 프로토콜이 먼저 돌아가고 있었고</b>, 4계층 모델은 이미 돌아가는 것을 나중에 정리한 도면이다. 실제 경쟁에서 이긴 것도 TCP/IP다</li>
+<li>세션은 "<b>시작과 끝이 있는 한 묶음의 대화 동안 유지되는 맥락(상태)</b>"이다. 데이터가 지나가는 통로인 연결(connection)과 다르다. OSI 세션 계층은 그 대화를 관리하는 기능(차례 정하기 · 중간 저장점 · 정상 종료)을 맡으려던 층이다</li>
+</ul></div>
+
+<h2 id="q1">1. OSI 모델은 왜 만들었나 · 역사적 배경</h2>
+<div class="panel"><p class="qa"><span>Q1.</span>OSI는 어떤 문제를 풀려고 나왔나?</p><div class="ans">
+<p><b>문제: 같은 회사 컴퓨터끼리만 통했다.</b> 1970년대 중반 IBM은 SNA(1974), DEC는 DECnet(1975)처럼 회사마다 자기 네트워크 방식을 만들었다. IBM 장비는 IBM 장비끼리, DEC 장비는 DEC 장비끼리만 붙었다. 은행 · 정부가 여러 회사 컴퓨터를 함께 쓰려면 회사마다 따로 연결 장치와 프로그램을 만들어야 했고, 한 회사를 고르면 계속 그 회사 것만 사야 했다(종속).</p>
+<p><b>정치적 배경도 컸다.</b> 그 회사들은 대부분 미국 기업이었다. 유럽 정부와 각국 국영 통신사(PTT)는 미국 기업의 방식이 사실상 표준이 되는 것을 경계했고, 누구 소유도 아닌 "열린(open)" 국제 표준을 원했다. OSI의 O가 Open이다.</p>
+<div class="hist"><b>흐름</b> 1972년 패킷 교환 연구자들이 국제 작업반(INWG)을 만들었다(의장 빈트 서프, 영국 데이비스, 프랑스 푸장 · 짐머만 등). 1977년 ISO가 "개방형 시스템 상호 연결"(OSI) 분과위원회 SC16을 새로 만들었고, 의장은 미국 하니웰의 찰스 바크만, 실무를 이끈 사람은 프랑스의 위베르 짐머만이었다. 바크만은 데이터베이스 표준을 만들던 경험에서 "표준은 부품이 만나는 경계(인터페이스)를 정해야 한다"는 생각을 가져왔다. 1980년 짐머만이 7계층 참조 모델을 논문으로 발표했고, 1983년 국제 표준 ISO 7498로 승인되어 1984년 발행됐다(같은 내용이 통신 쪽 표준 X.200).</div>
+<p><b>설계도만 만든 게 아니다.</b> OSI는 두 부분이었다: ① 7계층 <b>참조 모델</b>(무엇을 어느 층에서 할지 정한 설계도) ② 그 위에서 실제로 동작할 <b>OSI 프로토콜</b>(메일 X.400, 디렉터리 X.500, 파일 전송 FTAM, 세션 프로토콜 X.225, 네트워크 CLNP 등). 계획은 전 세계가 ②를 쓰는 것이었다. 결국 ②는 TCP/IP에 밀려 대부분 사라지고 ①만 "설명용 틀"로 살아남았다. 그래서 지금 OSI가 "실제로는 안 쓰는 이론"처럼 보이는 것이다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 340" role="img" aria-label="1969년부터 1995년까지 TCP/IP와 OSI가 각각 진행된 연표">
+<g class="c-teal"><text class="th" x="50" y="22" dominant-baseline="central">인터넷 · TCP/IP — 먼저 만들어 돌려 보며 정함</text></g>
+<line x1="50" y1="104" x2="644" y2="104" stroke="var(--te-s)" stroke-width="2"/>
+<g class="c-teal"><circle cx="72" cy="104" r="5"/><circle cx="182" cy="104" r="5"/><circle cx="336" cy="104" r="5"/><circle cx="380" cy="104" r="5"/><circle cx="512" cy="104" r="5"/><circle cx="600" cy="104" r="5"/></g>
+<text class="ts" x="72" y="62" text-anchor="middle" dominant-baseline="central">1969</text><text class="t" x="72" y="80" text-anchor="middle" dominant-baseline="central">ARPANET 가동</text>
+<text class="ts" x="182" y="128" text-anchor="middle" dominant-baseline="central">1974</text><text class="t" x="182" y="146" text-anchor="middle" dominant-baseline="central">서프 · 칸 논문</text>
+<text class="ts" x="336" y="62" text-anchor="middle" dominant-baseline="central">1981</text><text class="t" x="336" y="80" text-anchor="middle" dominant-baseline="central">RFC 791 · 793</text>
+<text class="ts" x="380" y="128" text-anchor="middle" dominant-baseline="central">1983</text><text class="t" x="380" y="146" text-anchor="middle" dominant-baseline="central">ARPANET 전환 · 4.2BSD</text>
+<text class="ts" x="512" y="62" text-anchor="middle" dominant-baseline="central">1989</text><text class="t" x="512" y="80" text-anchor="middle" dominant-baseline="central">RFC 1122 4계층 정리</text>
+<text class="ts" x="600" y="128" text-anchor="middle" dominant-baseline="central">1990년대 중반</text><text class="t" x="600" y="146" text-anchor="middle" dominant-baseline="central">사실상 표준</text>
+<g class="c-coral"><text class="th" x="50" y="190" dominant-baseline="central">OSI — 위원회가 설계도부터 정함</text></g>
+<line x1="50" y1="270" x2="644" y2="270" stroke="var(--co-s)" stroke-width="2"/>
+<g class="c-coral"><circle cx="182" cy="270" r="5"/><circle cx="248" cy="270" r="5"/><circle cx="314" cy="270" r="5"/><circle cx="391" cy="270" r="5"/><circle cx="556" cy="270" r="5"/><circle cx="600" cy="270" r="5"/></g>
+<text class="ts" x="182" y="228" text-anchor="middle" dominant-baseline="central">1974–75 · 배경</text><text class="t" x="182" y="246" text-anchor="middle" dominant-baseline="central">회사별 SNA · DECnet</text>
+<text class="ts" x="248" y="294" text-anchor="middle" dominant-baseline="central">1977</text><text class="t" x="248" y="312" text-anchor="middle" dominant-baseline="central">ISO SC16 신설</text>
+<text class="ts" x="314" y="228" text-anchor="middle" dominant-baseline="central">1980</text><text class="t" x="314" y="246" text-anchor="middle" dominant-baseline="central">짐머만 7계층 논문</text>
+<text class="ts" x="391" y="294" text-anchor="middle" dominant-baseline="central">1983 승인 · 1984 발행</text><text class="t" x="391" y="312" text-anchor="middle" dominant-baseline="central">ISO 7498</text>
+<text class="ts" x="556" y="228" text-anchor="middle" dominant-baseline="central">1990</text><text class="t" x="556" y="246" text-anchor="middle" dominant-baseline="central">미국 정부 OSI 의무화</text>
+<text class="ts" x="600" y="294" text-anchor="middle" dominant-baseline="central">1994 전후</text><text class="t" x="600" y="312" text-anchor="middle" dominant-baseline="central">밀려서 사실상 중단</text>
+</svg></div>
+<p class="figcap">그림 1. 두 흐름은 거의 같은 시기에 나란히 진행됐다. TCP/IP는 먼저 만들어 돌리면서 고쳤고, OSI는 설계도를 먼저 합의한 뒤 프로토콜을 만들었다</p>
+</div>
+
+<h2 id="q2">2. 그래서 계층은 왜 나눴나 · "왜 필요한지"의 핵심</h2>
+<div class="panel"><p class="qa"><span>Q2.</span>계층을 나누면 뭐가 좋은가? 왜 하필 7개인가?</p><div class="ans">
+<p><b>핵심은 "한 층을 바꿔도 나머지 층은 손대지 않는다"이다.</b> 층마다 하는 일과, 바로 위아래 층과 주고받는 약속(인터페이스)만 정해 두면, 어느 한 층의 기술이 바뀌어도 다른 층은 그대로 쓸 수 있다. 여러 회사가 각자 다른 층의 제품을 만들어도 서로 맞물린다. 이것이 "회사마다 달라서 안 붙는" 문제에 대한 답이었다.</p>
+<ul><li>랜선을 Wi-Fi로 바꿔도 브라우저 · HTTP · TCP는 하나도 안 바뀐다(링크 층만 교체)</li><li>STT 웹관리자 PHP 코드는 서버가 유선인지, VPN 너머인지 모른 채 똑같이 동작한다</li><li>장애 때 "어느 층 문제인가"로 범위를 나눠 찾을 수 있다(<a href="why-network.html">왜 네트워크를 공부하나</a>의 에러 표)</li></ul>
+<p><b>왜 7개인가.</b> 짐머만 논문은 층을 나누는 원칙을 이렇게 적었다: 하는 일의 성격(추상화 수준)이 다른 곳마다 층을 만들고, 층마다 기능이 뚜렷해야 하며, 층 사이 경계를 지나는 정보는 최소로 하고, 층 수는 너무 많지도 적지도 않게. 그 결과가 7개였다. 다만 7이라는 숫자가 수학적으로 정해진 것은 아니어서, 나중에 "세션 · 표현 층은 할 일이 거의 없고 데이터 링크 · 네트워크 층은 일이 넘친다"는 비판을 받았다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 270" role="img" aria-label="링크 계층만 유선에서 Wi-Fi로 바꿔도 위의 세 계층은 그대로인 그림">
+<defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="th" x="190" y="18" text-anchor="middle" dominant-baseline="central">사무실 PC (유선)</text>
+<text class="th" x="490" y="18" text-anchor="middle" dominant-baseline="central">노트북 (Wi-Fi)</text>
+<g class="c-gray"><rect x="90" y="34" width="200" height="40" rx="8" stroke-width="0.5"/><text class="th" x="190" y="54" text-anchor="middle" dominant-baseline="central">응용 · HTTP</text></g>
+<g class="c-gray"><rect x="90" y="84" width="200" height="40" rx="8" stroke-width="0.5"/><text class="th" x="190" y="104" text-anchor="middle" dominant-baseline="central">전송 · TCP</text></g>
+<g class="c-gray"><rect x="90" y="134" width="200" height="40" rx="8" stroke-width="0.5"/><text class="th" x="190" y="154" text-anchor="middle" dominant-baseline="central">인터넷 · IP</text></g>
+<g class="c-teal"><rect x="90" y="184" width="200" height="40" rx="8" stroke-width="0.5"/><text class="th" x="190" y="204" text-anchor="middle" dominant-baseline="central">링크 · 유선 이더넷</text></g>
+<g class="c-gray"><rect x="390" y="34" width="200" height="40" rx="8" stroke-width="0.5"/><text class="th" x="490" y="48" text-anchor="middle" dominant-baseline="central">응용 · HTTP</text><text class="ts" x="490" y="64" text-anchor="middle" dominant-baseline="central">그대로</text></g>
+<g class="c-gray"><rect x="390" y="84" width="200" height="40" rx="8" stroke-width="0.5"/><text class="th" x="490" y="98" text-anchor="middle" dominant-baseline="central">전송 · TCP</text><text class="ts" x="490" y="114" text-anchor="middle" dominant-baseline="central">그대로</text></g>
+<g class="c-gray"><rect x="390" y="134" width="200" height="40" rx="8" stroke-width="0.5"/><text class="th" x="490" y="148" text-anchor="middle" dominant-baseline="central">인터넷 · IP</text><text class="ts" x="490" y="164" text-anchor="middle" dominant-baseline="central">그대로</text></g>
+<g class="c-coral"><rect x="390" y="184" width="200" height="40" rx="8" stroke-width="0.5"/><text class="th" x="490" y="198" text-anchor="middle" dominant-baseline="central">링크 · Wi-Fi</text><text class="ts" x="490" y="214" text-anchor="middle" dominant-baseline="central">이 층만 교체</text></g>
+<line class="arr" x1="294" y1="204" x2="386" y2="204" marker-end="url(#ar2)"/>
+<text class="ts" x="340" y="250" text-anchor="middle" dominant-baseline="central">층 사이 약속(인터페이스)만 지키면, 아래층을 바꿔도 위층은 손대지 않는다</text>
+</svg></div>
+<p class="figcap">그림 2. 계층을 나누는 진짜 이유. OSI든 TCP/IP든 이 원리는 같다</p>
+</div>
+
+<h2 id="q3">3. 학교에서는 왜 "왜"를 안 가르쳤나</h2>
+<div class="panel"><p class="qa"><span>Q3.</span>교수들은 왜 필요한지 설명하지 않았을까? 본인들도 몰랐던 걸까?</p><div class="ans">
+<p>몰랐다고 단정할 수는 없다. 다만 "왜"가 빠지기 쉬운 구조적인 이유가 몇 가지 있다.</p>
+<ul>
+<li><b>시험이 "무엇"만 묻는다</b>: 정보처리기사 같은 시험은 7개 계층 이름과 계층별 장비 · 프로토콜을 맞히는 문제다. 수업이 시험 범위에 맞춰지면 표를 외우게 하는 것으로 끝난다</li>
+<li><b>"왜"는 기술이 아니라 역사 · 정치 이야기다</b>: OSI가 나온 이유는 회사 간 종속과 국가 간 표준 경쟁이었다. 공학 수업에서 다루기 애매한 내용이라 교재 앞부분 몇 줄로 지나가곤 한다</li>
+<li><b>결말이 어색하다</b>: OSI는 원래 목표(전 세계가 OSI 프로토콜을 쓰는 것)에 실패했다. "실패한 표준의 설계도를 왜 외우나"라는 질문에 답하려면 계층화라는 생각 자체의 가치를 따로 설명해야 하는데, 그 단계까지 가지 않는 경우가 많다</li>
+<li><b>배운 대로 가르친다</b>: 강의하는 사람도 같은 방식(표 외우기)으로 배웠다면 같은 방식으로 전달하기 쉽다</li>
+</ul>
+<p>반대로 제대로 된 교재에는 이 이야기가 들어 있다. 예를 들어 타넨바움의 『Computer Networks』에는 OSI가 왜 실패했는지(나쁜 시기, 나쁜 기술, 나쁜 구현, 나쁜 정치)를 따로 다루는 절이 있다. "왜"를 모르고 외운 7계층은 시험이 끝나면 사라지고, "왜"를 알면 장애를 층별로 나눠 보는 도구가 된다.</p>
+</div></div>
+
+<h2 id="q4">4. 세션의 정확한 뜻</h2>
+<div class="panel"><p class="qa"><span>Q4.</span>세션이란 정확히 무엇인가? 연결(connection)과는 뭐가 다른가?</p><div class="ans">
+<p><b>공통 뜻: 시작과 끝이 있는 한 묶음의 대화, 그리고 그 대화 동안 양쪽이 기억하는 맥락(상태).</b> "누구와 · 무엇을 하던 중인지"를 기억하는 단위다. 어디서 쓰든 이 뜻은 같고, 무엇을 기억하는지와 누가 기억하는지만 다르다.</p>
+<p><b>연결과의 차이.</b> 연결은 데이터가 지나가는 <b>통로</b>(TCP 연결 = IP · 포트 짝)이고, 세션은 그 위에서 이어지는 <b>대화의 맥락</b>이다. 그래서 둘의 수명이 다를 수 있다. 웹에서 로그인한 뒤 30분 동안 페이지를 옮겨 다니면, 그 사이 TCP 연결은 여러 번 끊기고 새로 맺어지지만 로그인 세션은 하나로 이어진다. 브라우저가 매번 쿠키에 세션 ID를 실어 보내서 서버가 "아까 그 사람"임을 알아보기 때문이다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 250" role="img" aria-label="하나의 웹 세션 동안 TCP 연결이 여러 번 맺어지고 끊기는 그림">
+<g class="c-purple"><rect x="60" y="30" width="580" height="44" rx="8" stroke-width="0.5"/><text class="th" x="350" y="45" text-anchor="middle" dominant-baseline="central">웹 세션 하나 (로그인 → 로그아웃 또는 30분 무활동 시 만료)</text><text class="ts" x="350" y="62" text-anchor="middle" dominant-baseline="central">서버가 기억: 누가 로그인했는지 · 하던 작업</text></g>
+<g class="c-teal"><rect x="70" y="104" width="100" height="36" rx="8" stroke-width="0.5"/><text class="th" x="120" y="122" text-anchor="middle" dominant-baseline="central">TCP 연결</text></g>
+<g class="c-teal"><rect x="230" y="104" width="80" height="36" rx="8" stroke-width="0.5"/><text class="th" x="270" y="122" text-anchor="middle" dominant-baseline="central">TCP 연결</text></g>
+<g class="c-teal"><rect x="370" y="104" width="110" height="36" rx="8" stroke-width="0.5"/><text class="th" x="425" y="122" text-anchor="middle" dominant-baseline="central">TCP 연결</text></g>
+<g class="c-teal"><rect x="540" y="104" width="90" height="36" rx="8" stroke-width="0.5"/><text class="th" x="585" y="122" text-anchor="middle" dominant-baseline="central">TCP 연결</text></g>
+<text class="ts" x="200" y="122" text-anchor="middle" dominant-baseline="central">끊김</text><text class="ts" x="340" y="122" text-anchor="middle" dominant-baseline="central">끊김</text><text class="ts" x="510" y="122" text-anchor="middle" dominant-baseline="central">끊김</text>
+<text class="ts" x="350" y="166" text-anchor="middle" dominant-baseline="central">매 요청마다 쿠키의 세션 ID(PHPSESSID)를 보내 같은 세션임을 알린다</text>
+<text class="t" x="350" y="200" text-anchor="middle" dominant-baseline="central">연결 = 데이터가 지나가는 통로 · 세션 = 그 위에서 이어지는 대화의 맥락</text>
+<text class="ts" x="350" y="224" text-anchor="middle" dominant-baseline="central">통로가 여러 번 끊기고 다시 생겨도 맥락은 이어질 수 있다</text>
+</svg></div>
+<p class="figcap">그림 3. 세션과 연결은 수명이 다르다</p>
+</div>
+
+<div class="panel"><p class="qa"><span>Q5.</span>OSI의 세션 계층(L5)은 원래 무슨 일을 하려던 층인가?</p><div class="ans">
+<p>OSI 세션 표준(ISO 8326 · 8327, 통신 쪽 이름 X.215 · X.225)이 정한 일은 주로 셋이다.</p>
+<ul>
+<li><b>대화 제어(토큰)</b>: 양쪽이 동시에 말할지(전이중), 번갈아 말할지(반이중) 정하고, 번갈아 말할 때는 <b>토큰을 가진 쪽만</b> 보내게 한다. 무전기에서 "이상" 하고 넘기는 것과 같다</li>
+<li><b>동기점(체크포인트)과 재동기화</b>: 긴 데이터를 보내는 중간중간 "여기까지 확실히 받았다"는 표시를 남긴다. 연결이 끊기면 처음부터가 아니라 마지막 동기점부터 다시 보낸다</li>
+<li><b>활동(activity) 관리와 정상 종료</b>: 문서 한 건 같은 작업 단위를 시작 · 중단 · 재개하고, 양쪽이 합의해서 대화를 끝낸다(한쪽이 일방적으로 끊어 데이터를 잃지 않게)</li>
+</ul>
+<p><b>왜 이런 층이 필요했나.</b> 1970~80년대 회선은 느리고 자주 끊겼고, 통신사들이 텔렉스 · 텔레텍스처럼 단말이 문서를 주고받는 서비스를 운영했다. 큰 문서를 보내다 90%에서 끊기면 처음부터 다시 보내는 손해가 컸고, 반이중 단말은 누가 말할 차례인지 정해야 했다. 그 공통 기능을 응용마다 따로 만들지 말고 한 층에 모으자는 것이 세션 계층이었다.</p>
+<p><b>TCP/IP에서는 어디로 갔나.</b> 전용 층이 없다. 연결을 맺고 정상 종료하는 일은 TCP(L4)가 하고, 이어받기는 응용이 직접 한다(HTTP의 Range 요청, FTP의 REST 명령). 누가 말할 차례인지도 HTTP의 "요청 → 응답"처럼 응용 프로토콜이 정한다. 필요한 응용만 필요한 만큼 만들어 쓰는 쪽을 택한 것이다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 260" role="img" aria-label="토큰으로 말할 차례를 정하는 대화 제어와, 동기점으로 끊긴 곳부터 다시 보내는 그림">
+<defs><marker id="ar3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="th" x="60" y="16" dominant-baseline="central">① 대화 제어 (토큰)</text>
+<g class="c-gray"><rect x="60" y="32" width="140" height="44" rx="8" stroke-width="0.5"/><text class="th" x="130" y="54" text-anchor="middle" dominant-baseline="central">A · 단말</text></g>
+<g class="c-gray"><rect x="480" y="32" width="140" height="44" rx="8" stroke-width="0.5"/><text class="th" x="550" y="54" text-anchor="middle" dominant-baseline="central">B · 호스트</text></g>
+<g class="c-amber"><circle cx="340" cy="54" r="22" stroke-width="0.5"/><text class="th" x="340" y="54" text-anchor="middle" dominant-baseline="central">토큰</text></g>
+<line class="arr" x1="204" y1="54" x2="314" y2="54" marker-end="url(#ar3)"/>
+<line class="arr" x1="366" y1="54" x2="476" y2="54" marker-end="url(#ar3)"/>
+<text class="ts" x="340" y="98" text-anchor="middle" dominant-baseline="central">토큰을 가진 쪽만 보낸다 · 다 보내면 상대에게 넘긴다 (반이중)</text>
+<text class="th" x="60" y="134" dominant-baseline="central">② 동기점 (체크포인트)</text>
+<g class="c-teal"><rect x="60" y="154" width="500" height="28" rx="6" stroke-width="0.5"/></g>
+<rect x="560" y="154" width="80" height="28" rx="6" style="fill:none;stroke:var(--b);stroke-dasharray:4 3"/>
+<line x1="185" y1="148" x2="185" y2="188" stroke="var(--fg)" stroke-width="1.5"/><line x1="310" y1="148" x2="310" y2="188" stroke="var(--fg)" stroke-width="1.5"/><line x1="435" y1="148" x2="435" y2="188" stroke="var(--fg)" stroke-width="1.5"/>
+<text class="ts" x="185" y="202" text-anchor="middle" dominant-baseline="central">동기점 1</text><text class="ts" x="310" y="202" text-anchor="middle" dominant-baseline="central">동기점 2</text><text class="ts" x="435" y="202" text-anchor="middle" dominant-baseline="central">동기점 3</text>
+<g class="c-coral"><text class="th" x="540" y="202" text-anchor="middle" dominant-baseline="central">✕ 끊김</text></g>
+<text class="ts" x="340" y="234" text-anchor="middle" dominant-baseline="central">다시 연결되면 처음이 아니라 마지막 동기점(3)부터 이어서 보낸다</text>
+</svg></div>
+<p class="figcap">그림 4. OSI 세션 계층이 맡으려던 두 가지 대표 기능</p>
+</div>
+
+<div class="panel"><p class="qa"><span>Q6.</span>실무에서 듣는 "세션"들은 각각 무엇인가?</p><div class="ans">
+<p>이름은 모두 세션이지만 <b>OSI 세션 계층의 프로토콜은 하나도 없다.</b> 공통 뜻(시작~끝 동안 기억하는 맥락)만 같고, 층도 기억하는 주체도 다르다.</p>
+<div style="overflow-x:auto"><table class="tbl">
+<tr><th>부르는 말</th><th>누가 무엇을 기억하나</th><th>끝나는 때</th><th>확인</th></tr>
+<tr><td><b>웹 세션</b> (PHP 세션)</td><td>웹서버가 로그인 사용자 · 작업 상태를 세션 파일에, 브라우저는 세션 ID만 쿠키에</td><td>로그아웃 · 무활동 만료</td><td>개발자 도구의 <code>PHPSESSID</code> 쿠키</td></tr>
+<tr><td><b>방화벽 세션</b> (세션 테이블)</td><td>방화벽 · 리눅스 커널이 연결 하나하나(출발지 · 목적지 IP · 포트, 상태)를 기억 → 응답 패킷을 통과시킴</td><td>연결 종료 또는 유휴 시간 초과</td><td><code>conntrack -L</code></td></tr>
+<tr><td><b>DB 세션</b></td><td>MariaDB가 접속 하나마다 사용자 · 진행 중 트랜잭션 · 세션 변수를 기억</td><td>연결 종료 · <code>wait_timeout</code></td><td><code>SHOW PROCESSLIST</code></td></tr>
+<tr><td><b>SSH · 로그인 세션</b></td><td>sshd · systemd-logind가 로그인한 사용자와 셸을 기억</td><td>로그아웃 · 연결 끊김</td><td><code>loginctl list-sessions</code></td></tr>
+<tr><td><b>TLS 세션</b></td><td>클라이언트 · 서버가 합의한 암호 키를 기억 → 다음 연결 때 협상을 줄임(세션 재개)</td><td>정해진 유효 시간</td><td><code>openssl s_client -reconnect</code></td></tr>
+<tr><td><b>SIP 세션</b> (통화)</td><td>교환기 · 전화기가 통화 상대 · 코덱 · RTP 포트를 기억</td><td>BYE (전화 끊기)</td><td>Wireshark <code>sip</code> 필터</td></tr>
+</table></div>
+<div class="warn">실무 함정: 고객사 방화벽은 세션 테이블의 항목을 일정 시간 아무 패킷이 없으면 지운다. WAS · 연동 모듈이 DB 연결을 맺어 두고(커넥션 풀) 오래 쉬면, 양쪽은 연결이 살아 있다고 믿는데 중간 방화벽은 이미 잊어버린 상태가 된다. 다음 쿼리가 막혀 "MySQL server has gone away"나 타임아웃이 난다. 커넥션 풀의 유휴 검사 주기를 방화벽 유휴 시간보다 짧게 잡거나 TCP keepalive를 쓰고, 고객사에 방화벽 세션 유지 시간을 물어본다.</div>
+</div></div>
+
+<h2 id="q5">5. TCP/IP 모델은 왜 또 만들었나</h2>
+<div class="panel"><p class="qa"><span>Q7.</span>OSI가 있는데 TCP/IP 모델은 왜 따로 있나?</p><div class="ans">
+<p><b>순서가 반대다.</b> TCP/IP 모델은 OSI 다음에 "또" 만든 게 아니다. TCP/IP 프로토콜은 1974년 서프 · 칸 논문에서 시작해 1981년 표준 문서(RFC 791 IP · RFC 793 TCP)가 나오고, 1983년 1월 1일 ARPANET 전체가 TCP/IP로 바뀌었다. 같은 해 유닉스(4.2BSD)에 TCP/IP가 들어가면서 대학 · 연구소 컴퓨터에 공짜로 깔렸다. OSI 표준이 확정된 1983~84년에는 TCP/IP가 이미 실제로 돌아가고 있었다.</p>
+<p><b>모델은 나중에 정리한 도면이다.</b> TCP/IP 쪽 4계층(링크 · 인터넷 · 전송 · 응용)은 1989년 RFC 1122가 이미 돌아가는 인터넷 호스트의 요구 사항을 정리하면서 쓴 구분이다. OSI는 "설계도를 먼저 그리고 건물을 짓자", TCP/IP는 "건물을 먼저 짓고 살면서 고치고, 도면은 나중에"였다.</p>
+<p><b>왜 TCP/IP가 이겼나.</b> 1980년대 중반만 해도 유럽 정부들과 미국 상무부가 OSI를 의무화했고(미국 정부 조달 기준 GOSIP, 1990), 국방부도 OSI로 옮길 계획이었다. 그래도 1990년대 중반 TCP/IP가 사실상 표준이 됐다.</p>
+<ul>
+<li><b>이미 돌아가는 공짜 코드</b>: BSD 유닉스에 들어 있어 누구나 썼다. OSI는 문서가 완성된 뒤에야 제품이 나왔다</li>
+<li><b>공짜 문서와 빠른 결정</b>: RFC는 누구나 무료로 읽었고, 직접 구현해 돌려 본 것을 표준으로 삼았다. ISO 표준 문서는 돈을 주고 사야 했고, 위원회 합의에 몇 년이 걸렸다</li>
+<li><b>단순함</b>: OSI는 여러 나라 · 회사의 요구를 다 넣다 보니 선택 사항이 많고 복잡했다. 같은 OSI라도 고른 옵션이 다르면 서로 안 붙는 일까지 생겼다</li>
+<li><b>인터넷 자체의 성장</b>: 1990년대 웹이 퍼지자, 이미 TCP/IP로 돌아가던 인터넷에 붙는 것이 곧 표준이 됐다</li>
+</ul>
+<p><b>교재마다 4계층 · 5계층이 다른 이유.</b> RFC 1122의 링크 층을 물리 층과 데이터 링크 층으로 나눠서 5계층으로 가르치는 교재가 많다(케이블 · 신호와 MAC · 프레임을 따로 설명하기 좋아서). 둘 다 틀린 게 아니라 같은 구조를 얼마나 잘게 나눠 보느냐의 차이다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 330" role="img" aria-label="OSI 7계층과 TCP/IP 4계층의 대응">
+<g class="c-coral"><text class="th" x="170" y="20" text-anchor="middle" dominant-baseline="central">OSI 7계층</text></g><text class="ts" x="170" y="38" text-anchor="middle" dominant-baseline="central">설계도 먼저 (1977~84)</text>
+<g class="c-teal"><text class="th" x="510" y="20" text-anchor="middle" dominant-baseline="central">TCP/IP 4계층</text></g><text class="ts" x="510" y="38" text-anchor="middle" dominant-baseline="central">동작 먼저 (1974~83) · 모델 정리 1989</text>
+<g class="c-gray"><rect x="60" y="56" width="220" height="30" rx="6" stroke-width="0.5"/><text class="th" x="170" y="71" text-anchor="middle" dominant-baseline="central">7 응용</text></g>
+<g class="c-amber"><rect x="60" y="92" width="220" height="30" rx="6" stroke-width="0.5"/><text class="th" x="170" y="107" text-anchor="middle" dominant-baseline="central">6 표현</text></g>
+<g class="c-amber"><rect x="60" y="128" width="220" height="30" rx="6" stroke-width="0.5"/><text class="th" x="170" y="143" text-anchor="middle" dominant-baseline="central">5 세션</text></g>
+<g class="c-gray"><rect x="60" y="164" width="220" height="30" rx="6" stroke-width="0.5"/><text class="th" x="170" y="179" text-anchor="middle" dominant-baseline="central">4 전송</text></g>
+<g class="c-gray"><rect x="60" y="200" width="220" height="30" rx="6" stroke-width="0.5"/><text class="th" x="170" y="215" text-anchor="middle" dominant-baseline="central">3 네트워크</text></g>
+<g class="c-gray"><rect x="60" y="236" width="220" height="30" rx="6" stroke-width="0.5"/><text class="th" x="170" y="251" text-anchor="middle" dominant-baseline="central">2 데이터 링크</text></g>
+<g class="c-gray"><rect x="60" y="272" width="220" height="30" rx="6" stroke-width="0.5"/><text class="th" x="170" y="287" text-anchor="middle" dominant-baseline="central">1 물리</text></g>
+<g class="c-teal"><rect x="400" y="56" width="220" height="102" rx="6" stroke-width="0.5"/><text class="th" x="510" y="96" text-anchor="middle" dominant-baseline="central">응용</text><text class="ts" x="510" y="116" text-anchor="middle" dominant-baseline="central">5 · 6 · 7을 응용이 직접 처리</text></g>
+<g class="c-teal"><rect x="400" y="164" width="220" height="30" rx="6" stroke-width="0.5"/><text class="th" x="510" y="179" text-anchor="middle" dominant-baseline="central">전송 · TCP · UDP</text></g>
+<g class="c-teal"><rect x="400" y="200" width="220" height="30" rx="6" stroke-width="0.5"/><text class="th" x="510" y="215" text-anchor="middle" dominant-baseline="central">인터넷 · IP</text></g>
+<g class="c-teal"><rect x="400" y="236" width="220" height="66" rx="6" stroke-width="0.5"/><text class="th" x="510" y="262" text-anchor="middle" dominant-baseline="central">링크</text><text class="ts" x="510" y="280" text-anchor="middle" dominant-baseline="central">교재에 따라 물리를 나눠 5계층</text></g>
+<line x1="284" y1="107" x2="396" y2="107" stroke="var(--b)" stroke-dasharray="4 3"/><line x1="284" y1="179" x2="396" y2="179" stroke="var(--b)" stroke-dasharray="4 3"/><line x1="284" y1="215" x2="396" y2="215" stroke="var(--b)" stroke-dasharray="4 3"/><line x1="284" y1="269" x2="396" y2="269" stroke="var(--b)" stroke-dasharray="4 3"/>
+</svg></div>
+<p class="figcap">그림 5. 주황색 두 층(세션 · 표현)은 TCP/IP에 자기 층이 없다. 그래서 L5 · L6 장비도 없다(<a href="devices.html">네트워크 장비</a>)</p>
+</div>
+
+<h2 id="q6">6. 그래도 OSI에서 지금까지 남은 것</h2>
+<div class="panel"><ul class="sum">
+<li><b>계층 번호라는 공용어</b>: L2 스위치 · L4 로드밸런서 · L7 방화벽처럼 장비와 장애를 말할 때 쓰는 번호가 OSI 번호다</li>
+<li><b>X.509 인증서</b>: HTTPS 인증서 형식은 OSI 디렉터리 표준 X.500 계열에서 나왔다</li>
+<li><b>LDAP</b>: 회사 계정 디렉터리(Active Directory 등)에 쓰는 LDAP은 X.500 접근 방식을 가볍게 줄인 것이다</li>
+<li><b>IS-IS</b>: OSI용으로 만든 라우팅 프로토콜인데, 지금도 대형 통신사 망 안에서 쓰인다</li>
+</ul></div>
+
+<div class="panel"><p class="ptitle">핵심 정리</p><ul class="sum">
+<li>OSI는 회사별로 안 붙던 네트워크를 국제 표준으로 묶으려던 설계도 + 프로토콜 계획이었고, 설계도(7계층 모델)만 살아남았다</li>
+<li>계층을 나누는 이유: 층 사이 약속만 지키면 한 층을 바꿔도 나머지는 그대로 → 서로 다른 회사 제품이 맞물리고, 장애를 층별로 좁힐 수 있다</li>
+<li>세션 = 시작~끝이 있는 대화 동안 유지되는 맥락. 연결(통로)과 다르고, 웹 · 방화벽 · DB · TLS · SIP 세션은 이름만 같고 층도 주체도 다르다</li>
+<li>OSI 세션 계층의 일(차례 · 동기점 · 정상 종료)은 TCP/IP에서 TCP와 응용이 나눠 맡는다</li>
+<li>TCP/IP는 먼저 돌아가고 모델은 나중(1989)에 정리됐다. 공짜 코드 · 공짜 문서 · 단순함으로 OSI를 이겼다</li>
+</ul></div>
+<footer><a href="../">← dev-study 목차</a> · <a href="glossary.html">STAGE 2 용어 사전</a> · 참고: Zimmermann, "OSI Reference Model" (IEEE Trans. Communications, 1980) · Day · Zimmermann, "The OSI Reference Model" (Proc. IEEE, 1983) · Russell, "OSI: The Internet That Wasn't" (IEEE Spectrum, 2013) · ITU-T X.215 · X.225 (세션) · RFC 1122 (1989) · Tanenbaum, Computer Networks · 배경지식은 별도 자료로 보충해 직접 정리</footer>
+</main>
+<script src="glossary-link.js"></script>
+</body>
+</html>
