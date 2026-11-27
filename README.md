@@ -32,3 +32,8 @@
 - [실무 네트워크 아키텍처와 금융권 구성](https://jungky4132.github.io/dev-study/stage2/architecture.html) — DMZ · 내부망 · 관리망 기본 구성, 은행의 채널계 · 계정계 · 정보계 · 대외계와 망분리(2013~2026), STT · 녹취 서버의 자리
 - [OSI · TCP/IP · 세션 질문 정리](https://jungky4132.github.io/dev-study/stage2/osi-tcpip-qa.html) — OSI 모델을 만든 역사적 이유, 계층을 나누는 진짜 이유, 학교에서 "왜"를 안 가르친 이유, 세션의 정확한 뜻과 실무의 여러 세션, TCP/IP 모델이 따로 있는 이유
 - [STAGE 2 용어 사전 · 네트워크](https://jungky4132.github.io/dev-study/stage2/glossary.html) — 네트워크 용어 34개를 시대 → 문제(그림) → 개념 · 역할 → 실무 순서로 정리
+
+## 특별 정리 · AI 인프라와 STT 파인튜닝
+- [LLM 인프라 · KV 캐시 · 파인튜닝 · Whisper 정리](https://jungky4132.github.io/dev-study/ai/llm-stt-finetune.html) — 상용 LLM에 데이터센터가 필요한 이유, KV 캐시 메모리 계산, 학습과 파인튜닝의 원리, LoRA · QLoRA와 GPU 메모리, Whisper 파인튜닝 순서, 속기록 100시간으로 학습 데이터 만들기, 개인정보 마스킹(질문 9개 · 그림 9장)
+- [용어 사전 · LLM 인프라 · 파인튜닝 · Whisper](https://jungky4132.github.io/dev-study/ai/glossary.html) — 용어 42개를 시대 → 문제(그림) → 개념 · 역할 → 실무 순서로 정리
+- [Whisper 파인튜닝 스크립트](ai/train_whisper.py) — CSV(path,text) → 학습 → CER 평가

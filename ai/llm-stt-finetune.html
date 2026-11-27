@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%237A5230'/%3E%3Cpath d='M7 12 L8.5 4.5 L13 9 Z M25 12 L23.5 4.5 L19 9 Z' fill='%23F3E6D3'/%3E%3Cellipse cx='16' cy='19' rx='9.5' ry='10' fill='%23F3E6D3'/%3E%3Cellipse cx='16' cy='25' rx='5' ry='3.6' fill='%23DDBF97'/%3E%3Ccircle cx='11.8' cy='15.5' r='4.2' fill='%23fff' stroke='%234A3220' stroke-width='1.2'/%3E%3Ccircle cx='20.2' cy='15.5' r='4.2' fill='%23fff' stroke='%234A3220' stroke-width='1.2'/%3E%3Ccircle cx='12.4' cy='15.9' r='2' fill='%232B1D12'/%3E%3Ccircle cx='20.8' cy='15.9' r='2' fill='%232B1D12'/%3E%3Cpath d='M14.6 19.2 L17.4 19.2 L16 21.8 Z' fill='%23EF9F27'/%3E%3C/svg%3E">
+<title>LLM 인프라 · KV 캐시 · 파인튜닝 · Whisper 정리</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFAF8;--fg:#1F1E1B;--muted:#5F5E5A;--line:#73726c;--b:#B4B2A9;--card:#FFFFFF;--border:#D9D7CF;
+--pu-f:#EEEDFE;--pu-s:#534AB7;--pu-t:#3C3489;--te-f:#E1F5EE;--te-s:#0F6E56;--te-t:#085041;--co-f:#FAECE7;--pk-f:#FBEAF0;--pk-s:#993556;--pk-t:#72243E;--co-s:#993C1D;--co-t:#712B13;--gr-f:#F1EFE8;--gr-s:#5F5E5A;--gr-t:#444441;--am-f:#FAEEDA;--am-s:#854F0B;--am-t:#633806;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1A1A18;--fg:#ECEAE3;--muted:#B4B2A9;--line:#9c9a92;--b:#5F5E5A;--card:#242422;--border:#3A3936;
+--pu-f:#3C3489;--pu-s:#AFA9EC;--pu-t:#EEEDFE;--te-f:#085041;--te-s:#5DCAA5;--te-t:#E1F5EE;--co-f:#712B13;--pk-f:#72243E;--pk-s:#ED93B1;--pk-t:#FBEAF0;--co-s:#F0997B;--co-t:#FAECE7;--gr-f:#444441;--gr-s:#B4B2A9;--gr-t:#F1EFE8;--am-f:#633806;--am-s:#EF9F27;--am-t:#FAEEDA;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1{font-size:24px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--fg);cursor:pointer}
+button:focus-visible{outline:2px solid var(--pu-s);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.dots{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--border);padding:0;border:none}
+.dot.on{background:var(--fg)}
+#stitle{font-size:17px;font-weight:500;margin-top:12px}
+#sdesc{font-size:15px;color:var(--muted);min-height:96px}
+.ptitle{font-size:17px;font-weight:500;margin:0 0 6px}
+.sum{margin:0;padding-left:20px;font-size:15px}.sum li{margin:3px 0}
+svg text{font-family:"Noto Sans KR",system-ui,sans-serif}
+.t{font-size:14px;fill:var(--fg)}.ts{font-size:12px;fill:var(--muted)}.th{font-size:14px;font-weight:500;fill:var(--fg)}
+.arr{stroke:var(--line);stroke-width:1.5;fill:none}
+.c-purple>rect,rect.c-purple{fill:var(--pu-f);stroke:var(--pu-s)}.c-purple>.th{fill:var(--pu-t)}.c-purple>.ts{fill:var(--pu-s)}
+.c-teal>rect,rect.c-teal{fill:var(--te-f);stroke:var(--te-s)}.c-teal>.th{fill:var(--te-t)}.c-teal>.ts{fill:var(--te-s)}
+.c-coral>rect,rect.c-coral{fill:var(--co-f);stroke:var(--co-s)}.c-coral>.th{fill:var(--co-t)}.c-coral>.ts{fill:var(--co-s)}
+.c-pink>rect{fill:var(--pk-f);stroke:var(--pk-s)}.c-pink>.th{fill:var(--pk-t)}.c-pink>.ts{fill:var(--pk-s)}
+.c-gray>rect,rect.c-gray{fill:var(--gr-f);stroke:var(--gr-s)}.c-gray>.th{fill:var(--gr-t)}.c-gray>.ts{fill:var(--gr-s)}
+.c-amber>rect,rect.c-amber{fill:var(--am-f);stroke:var(--am-s)}.c-amber>.th{fill:var(--am-t)}.c-amber>.ts{fill:var(--am-s)}
+.el{transition:opacity .3s}.dim .el{opacity:.13}.dim .el.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.el{transition:none}}
+footer{font-size:13px;color:var(--muted);margin-top:24px} a{color:var(--pu-s)}
+.qa{margin:0 0 6px;font-size:16px;font-weight:500}
+.qa span{color:var(--pu-s);margin-right:6px}
+.ans{font-size:15px;margin:0}
+.ans p{margin:6px 0}
+.ans ul{margin:6px 0;padding-left:20px}.ans li{margin:3px 0}
+pre{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;overflow-x:auto;margin:8px 0}
+code{font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.figcap{font-size:13px;color:var(--muted);margin:8px 0 0}
+.terms{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0;padding:0;list-style:none}
+.terms a{display:inline-block;font-size:13px;padding:3px 10px;border:1px solid var(--border);border-radius:999px;text-decoration:none;color:var(--fg)}
+.terms a:hover{border-color:var(--pu-s);color:var(--pu-s)}
+
+.c-blue>rect,rect.c-blue{fill:var(--pu-f);stroke:var(--pu-s)}.c-blue>.th{fill:var(--pu-t)}.c-blue>.ts{fill:var(--pu-s)}
+.c-teal>circle{fill:var(--te-f);stroke:var(--te-s)}.c-gray>circle{fill:var(--gr-f);stroke:var(--gr-s)}.c-amber>circle{fill:var(--am-f);stroke:var(--am-s)}.c-coral>circle{fill:var(--co-f);stroke:var(--co-s)}.c-blue>circle,.c-purple>circle{fill:var(--pu-f);stroke:var(--pu-s)}
+.c-teal>.th{fill:var(--te-t)}.c-gray>.th{fill:var(--gr-t)}.c-amber>.th{fill:var(--am-t)}.c-coral>.th{fill:var(--co-t)}
+.fig{margin:6px 0 4px}.fig svg{width:100%;height:auto;display:block}
+.lbl{font-size:12px;fill:var(--muted)}
+.dash{stroke-dasharray:5 4}
+.toc{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px;padding:0;list-style:none}
+.toc a{display:inline-block;font-size:13px;padding:3px 10px;border:1px solid var(--border);border-radius:999px;text-decoration:none;color:var(--fg)}
+.toc a:hover{border-color:var(--pu-s);color:var(--pu-s)}
+h2{font-size:19px;font-weight:500;margin:28px 0 10px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
+.tbl th,.tbl td{border-top:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+.tbl th{font-weight:500;color:var(--muted);font-size:13px}
+.hist{border-left:3px solid var(--am-s);padding:2px 0 2px 12px;margin:10px 0;font-size:15px}
+.hist b{color:var(--am-t)}
+.warn{background:var(--am-f);color:var(--am-t);border-radius:8px;padding:8px 12px;font-size:14px;margin:8px 0}
+.tail{border-left:3px solid var(--pu-s);padding:2px 0 2px 12px;margin:10px 0;font-size:15px}
+.tail b{color:var(--pu-t)}
+
+:root{--zone:#EEF1DF;--zone-s:#8E9A6B;--zone-e:#D9DEC2;--zone-e2:#CDD3B3;--sv-t:#E9EAEC;--sv-l:#C9CCD1;--sv-r:#A9AEB6;--dev-s:#5C6168;
+--sv-tl:#BFE3D6;--sv-tr:#8FC9B5;--sv-al:#F1D9AE;--sv-ar:#DDBB82;--fw-t:#E9A08C;--fw-l:#C9553A;--fw-r:#A9442D;--fw-s:#7C2E1C;--flame:#F2A93B;
+--rt-t:#B7BCC4;--rt-s:#8C939C;--sw-t:#E4E7EA;--sw-l:#C4C9CF;--sw-r:#A5ACB4;--sw-a:#5C6168;--mon:#7DA7D9;--db-t:#C9D9EE;--db-s:#9DB5D6;
+--cloud:#F4F5F6;--person:#6FA8DC;--person-h:#F2C7A5;--bus:#7A7F87;--wan:#FBF4E6;--man:#EFEEFB}
+@media (prefers-color-scheme:dark){:root{--zone:#2B3022;--zone-s:#7E8A5E;--zone-e:#22261B;--zone-e2:#1C2016;--sv-t:#5A5E64;--sv-l:#44484E;--sv-r:#35393E;--dev-s:#9AA0A8;
+--sv-tl:#2E5E50;--sv-tr:#22483D;--sv-al:#6B5326;--sv-ar:#54401C;--fw-t:#A9553F;--fw-l:#8A3A26;--fw-r:#6E2E1E;--fw-s:#E39A86;--rt-t:#6A7078;--rt-s:#50555C;
+--sw-t:#55595F;--sw-l:#45494E;--sw-r:#383B40;--sw-a:#D6D9DD;--mon:#3E6A9E;--db-t:#3C5070;--db-s:#2E3E58;--cloud:#2A2B2D;--person:#3E78AE;--person-h:#C9A07F;--bus:#9AA0A8;--wan:#2E2818;--man:#26253A}}
+.zt{font-size:13px;font-weight:500;fill:var(--zone-s)}
+.dl{font-size:11.5px;fill:var(--fg)}
+.cap2{font-size:12px;fill:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>LLM 인프라 · KV 캐시 · 파인튜닝 · Whisper 정리</h1>
+<p class="sub">상용 LLM에 왜 데이터센터가 필요한지부터 KV 캐시, 학습과 파인튜닝의 원리, Whisper 파인튜닝 · 학습 데이터 준비 · 개인정보 마스킹까지 질문 9개를 그림 9장으로 정리 · 특별 정리 · 2026-11-27</p>
+<ul class="toc"><li><a href="#s1">LLM과 데이터센터</a></li><li><a href="#s2">KV 캐시</a></li><li><a href="#s3">학습과 파인튜닝</a></li><li><a href="#s4">파인튜닝 방식과 메모리</a></li><li><a href="#s5">Whisper 파인튜닝</a></li><li><a href="#s6">속기록으로 데이터 만들기</a></li><li><a href="#s7">개인정보 마스킹</a></li><li><a href="#s8">공부 순서</a></li></ul>
+
+<div class="panel"><p class="ptitle">한 줄 답</p><ul class="sum">
+<li>상용 LLM에 데이터센터가 필요한 건 <b>모델 한 벌을 돌려서가 아니라 수백만 명에게 동시에 서비스해서</b>다. 규모는 <b>모델 크기 × 동시 사용자 수 × 컨텍스트 길이</b>로 정해진다</li>
+<li>KV 캐시는 앞 토큰들의 계산 결과(Key · Value)를 GPU 메모리에 저장해 두고 다시 쓰는 것이다. 계산을 줄이는 대신 <b>사용자마다 메모리를 수십 GB씩</b> 쓸 수 있다</li>
+<li>파인튜닝은 <b>이미 학습된 모델을 출발점으로, 내 데이터로 조금 더 학습</b>시키는 것이다. 알고리즘은 사전학습과 같고 출발점과 데이터 규모만 다르다</li>
+<li>Whisper는 가중치가 MIT 라이선스로 공개돼 파인튜닝할 수 있다. 결과는 코드보다 <b>데이터 품질과 평가셋 설계</b>에서 갈린다</li>
+<li>개인정보 마스킹은 <b>인식과 분리</b>해서 후처리로 한다. 파인튜닝을 쓴다면 가린 결과가 아니라 <b>태그를 붙여 출력</b>하게 하고 정규식 안전망을 한 번 더 둔다</li>
+</ul></div>
+
+<h2 id="s1">1. 상용 LLM은 왜 데이터센터가 필요한가</h2>
+<div class="panel"><p class="qa"><span>Q1.</span>Claude · Gemini · GPT 같은 상용 LLM을 운영하려면 데이터센터 단위 인프라가 필요한가?</p><div class="ans">
+<p>맞다. 다만 정확히는 <b>"모델 한 벌을 돌리는 데"가 아니라 "수백만 명에게 동시에 서비스하는 데"</b> 필요하다. 학습과 추론을 나눠 보면 분명해진다.</p>
+<ul>
+<li><b>학습</b>: GPU(나 전용 가속기) 수천~수만 장을 고속 네트워크(InfiniBand 등)로 묶어 몇 주~몇 달 돌린다. 전력이 수십~수백 MW 단위라 처음부터 데이터센터 말고는 방법이 없다.</li>
+<li><b>추론</b>: 프런티어 모델 한 벌은 보통 <b>GPU 서버 1대(8 GPU)나 몇 대</b>에 올라간다. 가중치가 수백 GB~TB 규모라 여러 GPU 메모리(HBM)에 나눠 싣는다(정확한 파라미터 수는 각 회사가 공개하지 않는다).</li>
+<li>병목은 연산보다 <b>메모리</b>다. 사용자마다 대화 맥락을 KV 캐시로 들고 있어야 해서, 컨텍스트가 긴 작업일수록 한 사람이 GPU 메모리를 많이 차지한다. 이런 서버를 동시 접속자 수에 맞춰 수천~수만 대 깔아야 하니 결국 데이터센터 규모가 된다.</li>
+</ul>
+<div class="hist"><b>흐름</b> 2012년 AlexNet이 GPU 2장으로 학습되며 딥러닝이 GPU 위로 올라왔다. 2017년 트랜스포머, 2020년 GPT-3(파라미터 1,750억 개)로 모델이 커졌고, 2022년 ChatGPT 이후 서비스 이용자가 수억 명 단위가 됐다. 학습 클러스터도 커졌지만, 이용자가 폭증하면서 <b>추론 인프라도 데이터센터 단위</b>가 됐다.</div>
+<p><b>작은 모델은 다르다.</b> 7B~70B급 오픈 모델(Llama, Qwen 등)은 양자화하면 GPU 1장이나 서버 1대로 돌아간다. 고객사에 설치하는 온프레미스 STT도 같은 원리다. 모델이 작고 동시 처리 채널 수가 정해져 있으니 서버 몇 대로 충분하다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 232" role="img" aria-label="학습은 GPU 수천 장 클러스터, 추론은 모델 한 벌이 서버 한 대지만 사용자 수만큼 서버가 늘어나는 구조">
+<defs><marker id="m1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-coral"><text class="th" x="24" y="18" dominant-baseline="central">학습 · 모델을 만드는 단계</text></g>
+<rect class="c-coral" x="24" y="34" width="288" height="142" rx="10" stroke-width="0.5"/>
+<g style="fill:var(--co-s);opacity:.55">
+<rect x="40" y="48" width="26" height="16" rx="3"/><rect x="74" y="48" width="26" height="16" rx="3"/><rect x="108" y="48" width="26" height="16" rx="3"/><rect x="142" y="48" width="26" height="16" rx="3"/><rect x="176" y="48" width="26" height="16" rx="3"/><rect x="210" y="48" width="26" height="16" rx="3"/><rect x="244" y="48" width="26" height="16" rx="3"/><rect x="278" y="48" width="26" height="16" rx="3"/>
+<rect x="40" y="72" width="26" height="16" rx="3"/><rect x="74" y="72" width="26" height="16" rx="3"/><rect x="108" y="72" width="26" height="16" rx="3"/><rect x="142" y="72" width="26" height="16" rx="3"/><rect x="176" y="72" width="26" height="16" rx="3"/><rect x="210" y="72" width="26" height="16" rx="3"/><rect x="244" y="72" width="26" height="16" rx="3"/><rect x="278" y="72" width="26" height="16" rx="3"/>
+<rect x="40" y="96" width="26" height="16" rx="3"/><rect x="74" y="96" width="26" height="16" rx="3"/><rect x="108" y="96" width="26" height="16" rx="3"/><rect x="142" y="96" width="26" height="16" rx="3"/><rect x="176" y="96" width="26" height="16" rx="3"/><rect x="210" y="96" width="26" height="16" rx="3"/><rect x="244" y="96" width="26" height="16" rx="3"/><rect x="278" y="96" width="26" height="16" rx="3"/>
+<rect x="40" y="120" width="26" height="16" rx="3"/><rect x="74" y="120" width="26" height="16" rx="3"/><rect x="108" y="120" width="26" height="16" rx="3"/><rect x="142" y="120" width="26" height="16" rx="3"/><rect x="176" y="120" width="26" height="16" rx="3"/><rect x="210" y="120" width="26" height="16" rx="3"/><rect x="244" y="120" width="26" height="16" rx="3"/><rect x="278" y="120" width="26" height="16" rx="3"/>
+<rect x="40" y="144" width="26" height="16" rx="3"/><rect x="74" y="144" width="26" height="16" rx="3"/><rect x="108" y="144" width="26" height="16" rx="3"/><rect x="142" y="144" width="26" height="16" rx="3"/><rect x="176" y="144" width="26" height="16" rx="3"/><rect x="210" y="144" width="26" height="16" rx="3"/><rect x="244" y="144" width="26" height="16" rx="3"/><rect x="278" y="144" width="26" height="16" rx="3"/>
+</g>
+<text class="ts" x="168" y="196" text-anchor="middle" dominant-baseline="central">GPU 수천~수만 장을 고속 네트워크로 한 몸처럼</text>
+<text class="ts" x="168" y="216" text-anchor="middle" dominant-baseline="central">몇 주~몇 달 · 전력 수십~수백 MW</text>
+<line x1="336" y1="10" x2="336" y2="222" stroke="var(--border)" stroke-dasharray="4 4"/>
+<g class="c-teal"><text class="th" x="360" y="18" dominant-baseline="central">추론 · 서비스하는 단계</text></g>
+<g class="c-teal"><rect x="360" y="34" width="140" height="78" rx="10" stroke-width="0.5"/>
+<text class="ts" x="430" y="100" text-anchor="middle" dominant-baseline="central">모델 1벌 = 서버 1대</text></g>
+<g style="fill:var(--te-s);opacity:.55"><rect x="373" y="46" width="24" height="16" rx="3"/><rect x="403" y="46" width="24" height="16" rx="3"/><rect x="433" y="46" width="24" height="16" rx="3"/><rect x="463" y="46" width="24" height="16" rx="3"/><rect x="373" y="68" width="24" height="16" rx="3"/><rect x="403" y="68" width="24" height="16" rx="3"/><rect x="433" y="68" width="24" height="16" rx="3"/><rect x="463" y="68" width="24" height="16" rx="3"/></g>
+<text x="520" y="73" text-anchor="middle" dominant-baseline="central" style="fill:var(--muted);font-size:20px">×</text>
+<g class="c-teal"><rect x="556" y="50" width="104" height="62" rx="10" stroke-width="0.5"/></g>
+<g class="c-teal"><rect x="548" y="42" width="104" height="62" rx="10" stroke-width="0.5"/></g>
+<g class="c-teal"><rect x="540" y="34" width="104" height="62" rx="10" stroke-width="0.5"/><text class="th" x="592" y="56" text-anchor="middle" dominant-baseline="central">수천~수만 대</text><text class="ts" x="592" y="76" text-anchor="middle" dominant-baseline="central">사용자 수만큼</text></g>
+<g class="c-gray"><circle cx="380" cy="168" r="7"/><circle cx="408" cy="168" r="7"/><circle cx="436" cy="168" r="7"/><circle cx="464" cy="168" r="7"/><circle cx="492" cy="168" r="7"/><circle cx="520" cy="168" r="7"/><circle cx="548" cy="168" r="7"/><circle cx="576" cy="168" r="7"/><circle cx="604" cy="168" r="7"/><circle cx="632" cy="168" r="7"/></g>
+<line class="arr" x1="430" y1="156" x2="430" y2="118" marker-end="url(#m1)"/><line class="arr" x1="600" y1="156" x2="600" y2="118" marker-end="url(#m1)"/>
+<text class="ts" x="506" y="196" text-anchor="middle" dominant-baseline="central">동시 사용자 수백만 명 · 사용자마다 KV 캐시</text>
+<text class="ts" x="506" y="216" text-anchor="middle" dominant-baseline="central">→ 서버 수가 사용자 수에 비례해 늘어남</text>
+</svg></div>
+<p class="figcap">그림 1. 학습은 처음부터 데이터센터 규모다. 추론은 "한 벌"은 서버 1대로 되지만, 사용자 수만큼 늘려야 해서 결국 데이터센터 규모가 된다</p>
+</div>
+
+<h2 id="s2">2. KV 캐시</h2>
+<div class="panel"><p class="qa"><span>Q2.</span>KV 캐시는 무엇이고, 왜 메모리 문제가 되나?</p><div class="ans">
+<p><b>LLM이 앞서 처리한 토큰들의 계산 결과(Key, Value)를 GPU 메모리에 저장해 두는 것</b>이다. 다음 토큰을 만들 때 같은 계산을 처음부터 다시 하지 않으려고 쓰는 메모이제이션이다.</p>
+<ul>
+<li>트랜스포머는 토큰을 하나씩 생성하고, 새 토큰을 만들 때마다 어텐션으로 "앞의 모든 토큰"을 참조한다.</li>
+<li>각 토큰은 층마다 Query · Key · Value 벡터를 만든다. 새 토큰의 Query를 앞 토큰들의 Key와 비교해 가중치를 정하고, 그 가중치로 Value를 섞는다.</li>
+<li>앞 토큰의 K · V는 한 번 계산하면 바뀌지 않는다. 저장해 두면 매 단계 새 토큰 하나분만 계산하면 된다. 캐시가 없으면 매번 전체를 다시 계산해야 해서 생성이 극단적으로 느려진다.</li>
+</ul></div>
+<div class="fig"><svg viewBox="0 0 680 268" role="img" aria-label="캐시 없이 매 단계 앞 단어를 다시 계산하는 경우와 KV 캐시로 새 단어만 계산하는 경우 비교">
+<defs><marker id="m2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-coral"><text class="th" x="30" y="16" dominant-baseline="central">캐시 없이 · 단어를 하나 만들 때마다 앞 단어를 전부 다시 계산</text></g>
+<text class="ts" x="58" y="40" text-anchor="middle" dominant-baseline="central">1번째 단어 생성</text><text class="ts" x="311" y="40" text-anchor="middle" dominant-baseline="central">2번째 단어 생성</text><text class="ts" x="564" y="40" text-anchor="middle" dominant-baseline="central">3번째 단어 생성</text>
+<g class="c-coral"><rect x="30" y="54" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="58" y="71" text-anchor="middle" dominant-baseline="central">나는</text></g>
+<g class="c-coral"><rect x="252" y="54" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="280" y="71" text-anchor="middle" dominant-baseline="central">나는</text></g>
+<g class="c-coral"><rect x="314" y="54" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="342" y="71" text-anchor="middle" dominant-baseline="central">학교에</text></g>
+<g class="c-coral"><rect x="474" y="54" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="502" y="71" text-anchor="middle" dominant-baseline="central">나는</text></g>
+<g class="c-coral"><rect x="536" y="54" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="564" y="71" text-anchor="middle" dominant-baseline="central">학교에</text></g>
+<g class="c-coral"><rect x="598" y="54" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="626" y="71" text-anchor="middle" dominant-baseline="central">간다</text></g>
+<text class="ts" x="58" y="104" text-anchor="middle" dominant-baseline="central">계산 1개</text><text class="ts" x="311" y="104" text-anchor="middle" dominant-baseline="central">계산 2개</text><text class="ts" x="564" y="104" text-anchor="middle" dominant-baseline="central">계산 3개</text>
+<line class="arr" x1="96" y1="71" x2="244" y2="71" marker-end="url(#m2)"/><line class="arr" x1="380" y1="71" x2="466" y2="71" marker-end="url(#m2)"/>
+<g class="c-teal"><text class="th" x="30" y="136" dominant-baseline="central">KV 캐시 · 앞 단어의 K · V는 꺼내 쓰고 새 단어만 계산</text></g>
+<text class="ts" x="58" y="160" text-anchor="middle" dominant-baseline="central">1번째 단어 생성</text><text class="ts" x="311" y="160" text-anchor="middle" dominant-baseline="central">2번째 단어 생성</text><text class="ts" x="564" y="160" text-anchor="middle" dominant-baseline="central">3번째 단어 생성</text>
+<g class="c-teal"><rect x="30" y="174" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="58" y="191" text-anchor="middle" dominant-baseline="central">나는</text></g>
+<g class="c-gray"><rect x="252" y="174" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="280" y="191" text-anchor="middle" dominant-baseline="central">나는</text></g>
+<g class="c-teal"><rect x="314" y="174" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="342" y="191" text-anchor="middle" dominant-baseline="central">학교에</text></g>
+<g class="c-gray"><rect x="474" y="174" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="502" y="191" text-anchor="middle" dominant-baseline="central">나는</text></g>
+<g class="c-gray"><rect x="536" y="174" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="564" y="191" text-anchor="middle" dominant-baseline="central">학교에</text></g>
+<g class="c-teal"><rect x="598" y="174" width="56" height="34" rx="6" stroke-width="0.5"/><text class="th" x="626" y="191" text-anchor="middle" dominant-baseline="central">간다</text></g>
+<text class="ts" x="58" y="224" text-anchor="middle" dominant-baseline="central">계산 1 → 저장</text><text class="ts" x="311" y="224" text-anchor="middle" dominant-baseline="central">꺼냄 1 + 계산 1</text><text class="ts" x="564" y="224" text-anchor="middle" dominant-baseline="central">꺼냄 2 + 계산 1</text>
+<line class="arr" x1="96" y1="191" x2="244" y2="191" marker-end="url(#m2)"/><line class="arr" x1="380" y1="191" x2="466" y2="191" marker-end="url(#m2)"/>
+<rect class="c-coral" x="30" y="248" width="12" height="12" rx="2" stroke-width="0.5"/><text class="ts" x="48" y="254" dominant-baseline="central">새로 계산(캐시 없음)</text>
+<rect class="c-teal" x="180" y="248" width="12" height="12" rx="2" stroke-width="0.5"/><text class="ts" x="198" y="254" dominant-baseline="central">새로 계산</text>
+<rect class="c-gray" x="270" y="248" width="12" height="12" rx="2" stroke-width="0.5"/><text class="ts" x="288" y="254" dominant-baseline="central">저장해 둔 K · V를 꺼내 씀</text>
+<text class="ts" x="650" y="254" text-anchor="end" dominant-baseline="central">n개 생성: 1+2+…+n번 → n번</text>
+</svg></div>
+<p class="figcap">그림 2. 캐시가 없으면 계산량이 단어 수의 제곱으로 늘어난다. KV 캐시는 계산을 줄이는 대신 메모리를 쓴다</p>
+<div class="ans">
+<p><b>문제는 크기다.</b> 크기 공식은 <code>2(K, V) × 레이어 수 × KV 헤드 수 × 헤드 차원 × 바이트 수 × 토큰 수</code>다. Llama 3 70B(FP16)로 계산하면 토큰 1개당 약 320KB, 128K 토큰 컨텍스트면 <b>사용자 1명당 약 40GB</b>다. 모델 가중치와 별도로, 사용자 한 명이 긴 대화를 하면 GPU 메모리를 수십 GB씩 차지한다는 뜻이다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 292" role="img" aria-label="KV 캐시 크기 계산과 640GB 서버에 들어가는 사용자 수">
+<defs><marker id="m3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="18" y="24" width="84" height="54" rx="8" stroke-width="0.5"/><text class="th" x="60" y="42" text-anchor="middle" dominant-baseline="central">2</text><text class="ts" x="60" y="62" text-anchor="middle" dominant-baseline="central">K와 V</text></g>
+<g class="c-gray"><rect x="130" y="24" width="84" height="54" rx="8" stroke-width="0.5"/><text class="th" x="172" y="42" text-anchor="middle" dominant-baseline="central">80</text><text class="ts" x="172" y="62" text-anchor="middle" dominant-baseline="central">레이어</text></g>
+<g class="c-gray"><rect x="242" y="24" width="84" height="54" rx="8" stroke-width="0.5"/><text class="th" x="284" y="42" text-anchor="middle" dominant-baseline="central">8</text><text class="ts" x="284" y="62" text-anchor="middle" dominant-baseline="central">KV 헤드(GQA)</text></g>
+<g class="c-gray"><rect x="354" y="24" width="84" height="54" rx="8" stroke-width="0.5"/><text class="th" x="396" y="42" text-anchor="middle" dominant-baseline="central">128</text><text class="ts" x="396" y="62" text-anchor="middle" dominant-baseline="central">헤드 차원</text></g>
+<g class="c-gray"><rect x="466" y="24" width="84" height="54" rx="8" stroke-width="0.5"/><text class="th" x="508" y="42" text-anchor="middle" dominant-baseline="central">2바이트</text><text class="ts" x="508" y="62" text-anchor="middle" dominant-baseline="central">FP16 숫자 1개</text></g>
+<g class="c-coral"><rect x="578" y="24" width="84" height="54" rx="8" stroke-width="0.5"/><text class="th" x="620" y="42" text-anchor="middle" dominant-baseline="central">≈ 320KB</text><text class="ts" x="620" y="62" text-anchor="middle" dominant-baseline="central">토큰 1개당</text></g>
+<text x="116" y="51" text-anchor="middle" dominant-baseline="central" style="fill:var(--muted);font-size:16px">×</text><text x="228" y="51" text-anchor="middle" dominant-baseline="central" style="fill:var(--muted);font-size:16px">×</text><text x="340" y="51" text-anchor="middle" dominant-baseline="central" style="fill:var(--muted);font-size:16px">×</text><text x="452" y="51" text-anchor="middle" dominant-baseline="central" style="fill:var(--muted);font-size:16px">×</text><text x="564" y="51" text-anchor="middle" dominant-baseline="central" style="fill:var(--muted);font-size:16px">=</text>
+<line class="arr" x1="620" y1="82" x2="620" y2="114" marker-end="url(#m3)"/>
+<g class="c-coral"><rect x="360" y="118" width="302" height="54" rx="8" stroke-width="0.5"/><text class="th" x="511" y="136" text-anchor="middle" dominant-baseline="central">× 128K 토큰 = 약 40GB</text><text class="ts" x="511" y="156" text-anchor="middle" dominant-baseline="central">128K 컨텍스트를 채운 사용자 1명</text></g>
+<text class="ts" x="18" y="134" dominant-baseline="central">Llama 3 70B · FP16 기준</text>
+<text class="ts" x="18" y="154" dominant-baseline="central">가중치(140GB)와 별도로 사용자마다 쌓인다</text>
+<text class="th" x="20" y="200" dominant-baseline="central">GPU 서버 1대(80GB × 8 = 640GB)에 넣어 보면</text>
+<g class="c-gray"><rect x="20" y="216" width="140" height="34" rx="4" stroke-width="0.5"/><text class="th" x="90" y="233" text-anchor="middle" dominant-baseline="central">가중치 140GB</text></g>
+<g class="c-coral"><rect x="160" y="216" width="40" height="34" stroke-width="0.5"/><rect x="200" y="216" width="40" height="34" stroke-width="0.5"/><rect x="240" y="216" width="40" height="34" stroke-width="0.5"/><rect x="280" y="216" width="40" height="34" stroke-width="0.5"/><rect x="320" y="216" width="40" height="34" stroke-width="0.5"/><rect x="360" y="216" width="40" height="34" stroke-width="0.5"/><rect x="400" y="216" width="40" height="34" stroke-width="0.5"/><rect x="440" y="216" width="40" height="34" stroke-width="0.5"/><rect x="480" y="216" width="40" height="34" stroke-width="0.5"/><rect x="520" y="216" width="40" height="34" stroke-width="0.5"/><rect x="560" y="216" width="40" height="34" stroke-width="0.5"/><rect x="600" y="216" width="40" height="34" stroke-width="0.5"/>
+<text class="ts" x="180" y="233" text-anchor="middle" dominant-baseline="central">1</text><text class="ts" x="220" y="233" text-anchor="middle" dominant-baseline="central">2</text><text class="ts" x="260" y="233" text-anchor="middle" dominant-baseline="central">3</text><text class="ts" x="300" y="233" text-anchor="middle" dominant-baseline="central">4</text><text class="ts" x="340" y="233" text-anchor="middle" dominant-baseline="central">5</text><text class="ts" x="380" y="233" text-anchor="middle" dominant-baseline="central">6</text><text class="ts" x="420" y="233" text-anchor="middle" dominant-baseline="central">7</text><text class="ts" x="460" y="233" text-anchor="middle" dominant-baseline="central">8</text><text class="ts" x="500" y="233" text-anchor="middle" dominant-baseline="central">9</text><text class="ts" x="540" y="233" text-anchor="middle" dominant-baseline="central">10</text><text class="ts" x="580" y="233" text-anchor="middle" dominant-baseline="central">11</text><text class="ts" x="620" y="233" text-anchor="middle" dominant-baseline="central">12</text></g>
+<rect x="640" y="216" width="20" height="34" fill="none" stroke="var(--b)" stroke-dasharray="3 3"/>
+<text class="ts" x="20" y="272" dominant-baseline="central">128K를 꽉 채운 사용자라면 단순 계산으로 12명 남짓 (실제로는 활성값 · 여유 공간 때문에 더 적다)</text>
+</svg></div>
+<p class="figcap">그림 3. 앞에서 "병목은 메모리"라고 한 이유. 연산 속도와 메모리를 맞바꾸는 구조다</p>
+<div class="ans"><p><b>줄이는 기법</b></p><ul>
+<li><b>GQA · MQA</b>: 여러 Query 헤드가 K · V를 공유해 캐시를 줄인다(위 계산의 "KV 헤드 8개"가 이것).</li>
+<li><b>KV 캐시 양자화</b>: FP16 대신 FP8 · INT4로 저장한다.</li>
+<li><b>PagedAttention(vLLM)</b>: 운영체제의 페이징처럼 캐시를 블록 단위로 관리해 낭비를 줄인다.</li>
+<li><b>프롬프트 캐싱</b>: 같은 시스템 프롬프트의 KV를 여러 요청이 재사용한다. API의 "캐시 히트 할인"이 이것이다.</li>
+</ul></div>
+</div>
+
+<h2 id="s3">3. 학습과 파인튜닝</h2>
+<div class="panel"><p class="qa"><span>Q3.</span>파인튜닝이 뭐지? 먼저 "학습"이 뭔가?</p><div class="ans">
+<p>모델은 결국 거대한 숫자 묶음(가중치)이다. Whisper large는 이런 숫자가 약 15억 개다. <b>학습은 이 숫자들을 조정하는 과정</b>이다. 입력을 넣어 출력을 만들고, 정답과 비교해 얼마나 틀렸는지(loss) 계산하고, 틀린 정도를 줄이는 방향으로 숫자를 조금씩 고친다(역전파 · 경사하강법). 이걸 수십만~수백만 번 반복한다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 232" role="img" aria-label="입력, 순전파, 손실 계산, 가중치 수정을 반복하는 학습 루프">
+<defs><marker id="m4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="30" y="24" width="270" height="58" rx="8" stroke-width="0.5"/><text class="th" x="165" y="44" text-anchor="middle" dominant-baseline="central">① 입력을 넣는다</text><text class="ts" x="165" y="64" text-anchor="middle" dominant-baseline="central">오디오 · 문장</text></g>
+<g class="c-gray"><rect x="380" y="24" width="270" height="58" rx="8" stroke-width="0.5"/><text class="th" x="515" y="44" text-anchor="middle" dominant-baseline="central">② 출력을 만든다 (순전파)</text><text class="ts" x="515" y="64" text-anchor="middle" dominant-baseline="central">지금 가중치로 계산</text></g>
+<g class="c-coral"><rect x="380" y="150" width="270" height="58" rx="8" stroke-width="0.5"/><text class="th" x="515" y="170" text-anchor="middle" dominant-baseline="central">③ 정답과 비교한다 (손실)</text><text class="ts" x="515" y="190" text-anchor="middle" dominant-baseline="central">얼마나 틀렸나 = 숫자 하나</text></g>
+<g class="c-teal"><rect x="30" y="150" width="270" height="58" rx="8" stroke-width="0.5"/><text class="th" x="165" y="170" text-anchor="middle" dominant-baseline="central">④ 가중치를 조금 고친다</text><text class="ts" x="165" y="190" text-anchor="middle" dominant-baseline="central">역전파로 기울기 → 경사하강</text></g>
+<line class="arr" x1="304" y1="53" x2="374" y2="53" marker-end="url(#m4)"/>
+<line class="arr" x1="515" y1="86" x2="515" y2="144" marker-end="url(#m4)"/>
+<line class="arr" x1="376" y1="179" x2="306" y2="179" marker-end="url(#m4)"/>
+<line class="arr" x1="165" y1="146" x2="165" y2="88" marker-end="url(#m4)"/>
+<text class="th" x="340" y="108" text-anchor="middle" dominant-baseline="central">수십만~수백만 번 반복</text>
+<text class="ts" x="340" y="128" text-anchor="middle" dominant-baseline="central">한 번에 고치는 양 = 학습률</text>
+</svg></div>
+<p class="figcap">그림 4. 학습 루프. 사전학습이든 파인튜닝이든 이 루프는 똑같다</p>
+</div>
+
+<div class="panel"><p class="qa"><span>Q4.</span>사전학습과 파인튜닝은 무엇이 다른가?</p><div class="ans">
+<ul>
+<li><b>사전학습</b>: 무작위 숫자에서 시작해 방대한 데이터로 학습한다. OpenAI가 Whisper를 약 68만 시간 분량으로 학습시킨 게 이것이다.</li>
+<li><b>파인튜닝</b>: 그렇게 완성된 숫자에서 시작해 적은 데이터(예: 100시간)로, 작은 학습률로 살짝만 조정한다.</li>
+</ul>
+<p>알고리즘은 똑같다. <b>출발점과 데이터 규모가 다를 뿐</b>이다. 일반 속기를 이미 잘하는 속기사가 특정 회사 콜센터의 용어와 말투에 적응하는 것과 비슷하다. 처음부터 한글을 가르치는 게 아니다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 290" role="img" aria-label="사전학습, 풀 파인튜닝, LoRA의 출발점과 결과 비교">
+<defs><marker id="m5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="ts" x="20" y="12" dominant-baseline="central" style="fill:var(--co-s);font-weight:500">사전학습 · OpenAI · 알리바바가 한 일</text>
+<g class="c-gray"><rect x="20" y="26" width="170" height="56" rx="8" stroke-width="0.5"/><text class="th" x="105" y="45" text-anchor="middle" dominant-baseline="central">무작위 숫자</text><text class="ts" x="105" y="65" text-anchor="middle" dominant-baseline="central">아무것도 모름</text></g>
+<line class="arr" x1="196" y1="54" x2="484" y2="54" marker-end="url(#m5)"/>
+<text class="ts" x="340" y="40" text-anchor="middle" dominant-baseline="central">방대한 데이터 (Whisper 68만 시간)</text><text class="ts" x="340" y="70" text-anchor="middle" dominant-baseline="central">GPU 수천 장 · 몇 주~몇 달</text>
+<g class="c-teal"><rect x="490" y="26" width="170" height="56" rx="8" stroke-width="0.5"/><text class="th" x="575" y="45" text-anchor="middle" dominant-baseline="central">범용 모델</text><text class="ts" x="575" y="65" text-anchor="middle" dominant-baseline="central">Whisper · Qwen</text></g>
+<text class="ts" x="20" y="108" dominant-baseline="central" style="fill:var(--te-s);font-weight:500">풀 파인튜닝 · 내가 할 수 있는 일</text>
+<g class="c-teal"><rect x="20" y="122" width="170" height="56" rx="8" stroke-width="0.5"/><text class="th" x="105" y="141" text-anchor="middle" dominant-baseline="central">범용 모델</text><text class="ts" x="105" y="161" text-anchor="middle" dominant-baseline="central">출발점</text></g>
+<line class="arr" x1="196" y1="150" x2="484" y2="150" marker-end="url(#m5)"/>
+<text class="ts" x="340" y="136" text-anchor="middle" dominant-baseline="central">내 데이터 100시간 · 작은 학습률</text><text class="ts" x="340" y="166" text-anchor="middle" dominant-baseline="central">가중치 전체를 조금씩 수정</text>
+<g class="c-purple"><rect x="490" y="122" width="170" height="56" rx="8" stroke-width="0.5"/><text class="th" x="575" y="141" text-anchor="middle" dominant-baseline="central">우리 도메인 모델</text><text class="ts" x="575" y="161" text-anchor="middle" dominant-baseline="central">GPU 1장 · 수시간~하루</text></g>
+<text class="ts" x="20" y="204" dominant-baseline="central" style="fill:var(--pu-s);font-weight:500">LoRA · 가볍게 하는 파인튜닝</text>
+<g class="c-gray"><rect x="20" y="218" width="126" height="56" rx="8" stroke-width="0.5"/><text class="th" x="83" y="237" text-anchor="middle" dominant-baseline="central">범용 모델</text><text class="ts" x="83" y="257" text-anchor="middle" dominant-baseline="central">얼림(고정)</text></g>
+<g class="c-teal"><rect x="152" y="218" width="76" height="56" rx="8" stroke-width="0.5"/><text class="th" x="190" y="237" text-anchor="middle" dominant-baseline="central">어댑터</text><text class="ts" x="190" y="257" text-anchor="middle" dominant-baseline="central">이것만 학습</text></g>
+<line class="arr" x1="234" y1="246" x2="484" y2="246" marker-end="url(#m5)"/>
+<text class="ts" x="359" y="232" text-anchor="middle" dominant-baseline="central">학습 대상 1% 미만</text><text class="ts" x="359" y="262" text-anchor="middle" dominant-baseline="central">메모리 · 저장 공간 대폭 감소</text>
+<g class="c-purple"><rect x="490" y="218" width="170" height="56" rx="8" stroke-width="0.5"/><text class="th" x="575" y="237" text-anchor="middle" dominant-baseline="central">도메인 모델</text><text class="ts" x="575" y="257" text-anchor="middle" dominant-baseline="central">원본 + 어댑터</text></g>
+</svg></div>
+<p class="figcap">그림 5. 내가 할 수 있는 건 아래 두 줄이다. 프롬프트(<code>initial_prompt</code>)나 RAG는 가중치를 바꾸지 않으므로 파인튜닝이 아니다</p>
+<div class="ans"><p><b>냉정하게</b>: 파인튜닝은 "말투 · 형식 · 특정 작업"을 가르치는 데 효과적이고, "새 지식 주입"에는 효율이 낮다. 사내 문서 기반 Q&amp;A가 목적이라면 RAG가 먼저다.</p></div>
+</div>
+
+<h2 id="s4">4. 파인튜닝 방식과 GPU 메모리</h2>
+<div class="panel"><p class="qa"><span>Q5.</span>Qwen 같은 모델을 학습할 때 필요한 것은?</p><div class="ans">
+<p>"학습"이 무엇을 뜻하느냐에 따라 완전히 다르다.</p>
+<ul>
+<li><b>사전학습(알리바바가 한 것)</b>: Qwen2.5는 사전학습 데이터를 7조 토큰에서 18조 토큰으로 늘렸고, Qwen3는 약 36조 토큰으로 알려져 있다. GPU 수천 장 이상으로 몇 주~몇 달 돌린다(정확한 규모는 공개하지 않음). 사전학습 → 긴 컨텍스트 확장 → 사후학습(SFT, 선호도 학습 · RL) 순서다.</li>
+<li><b>파인튜닝(직접 할 수 있는 것)</b>: 공개된 가중치를 받아 내 데이터로 추가 학습한다. 필요한 GPU 메모리가 방식에 따라 크게 다르다.</li>
+</ul>
+<p><b>풀 파인튜닝은 왜 파라미터당 16바이트인가</b>: 혼합 정밀도 + Adam 기준으로 가중치(FP16) 2 + 기울기(FP16) 2 + 가중치의 FP32 사본 4 + Adam 상태 2개(FP32) 8 = 16바이트다. 여기에 배치 크기에 따라 활성값이 더해진다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 262" role="img" aria-label="7B 모델 풀 파인튜닝, LoRA, QLoRA의 GPU 메모리 비교와 24GB, 48GB GPU 한계선">
+<text class="ts" x="20" y="14" dominant-baseline="central">7B 모델 파인튜닝에 필요한 GPU 메모리 (활성값 제외 · 대략)</text>
+<line x1="266" y1="34" x2="266" y2="234" stroke="var(--line)" stroke-dasharray="5 4"/><line x1="362" y1="34" x2="362" y2="234" stroke="var(--line)" stroke-dasharray="5 4"/>
+<text class="ts" x="266" y="248" text-anchor="middle" dominant-baseline="central">24GB GPU</text><text class="ts" x="362" y="248" text-anchor="middle" dominant-baseline="central">48GB GPU</text>
+<line x1="170" y1="34" x2="170" y2="234" stroke="var(--border)"/>
+<text class="th" x="20" y="56" dominant-baseline="central">풀 파인튜닝</text><text class="ts" x="20" y="74" dominant-baseline="central">파라미터당 16바이트</text><text class="ts" x="20" y="90" dominant-baseline="central">약 112GB 이상</text>
+<g class="c-gray"><rect x="170" y="48" width="56" height="44" stroke-width="0.5"/><text class="ts" x="198" y="62" text-anchor="middle" dominant-baseline="central">가중치</text><text class="ts" x="198" y="80" text-anchor="middle" dominant-baseline="central">14GB</text></g>
+<g class="c-gray"><rect x="226" y="48" width="56" height="44" stroke-width="0.5"/><text class="ts" x="254" y="62" text-anchor="middle" dominant-baseline="central">기울기</text><text class="ts" x="254" y="80" text-anchor="middle" dominant-baseline="central">14GB</text></g>
+<g class="c-amber"><rect x="282" y="48" width="112" height="44" stroke-width="0.5"/><text class="ts" x="338" y="62" text-anchor="middle" dominant-baseline="central">FP32 사본</text><text class="ts" x="338" y="80" text-anchor="middle" dominant-baseline="central">28GB</text></g>
+<g class="c-coral"><rect x="394" y="48" width="224" height="44" stroke-width="0.5"/><text class="ts" x="506" y="62" text-anchor="middle" dominant-baseline="central">Adam 상태 (2개 × 4바이트)</text><text class="ts" x="506" y="80" text-anchor="middle" dominant-baseline="central">56GB</text></g>
+<text class="th" x="20" y="126" dominant-baseline="central">LoRA</text><text class="ts" x="20" y="144" dominant-baseline="central">원본 FP16 + 어댑터</text><text class="ts" x="20" y="160" dominant-baseline="central">약 16~20GB</text>
+<g class="c-teal"><rect x="170" y="118" width="72" height="44" stroke-width="0.5"/></g>
+<text class="th" x="20" y="196" dominant-baseline="central">QLoRA</text><text class="ts" x="20" y="214" dominant-baseline="central">원본 4비트 + 어댑터</text><text class="ts" x="20" y="230" dominant-baseline="central">약 8~10GB</text>
+<g class="c-teal"><rect x="170" y="188" width="36" height="44" stroke-width="0.5"/></g>
+</svg></div>
+<p class="figcap">그림 6. 풀 파인튜닝 메모리의 절반이 옵티마이저(Adam) 상태다. LoRA는 학습하는 가중치가 적어 이 부분이 거의 사라진다</p>
+<div class="ans">
+<p><b>GPU 48GB 한 장(RTX A6000급)으로 되는 것</b></p>
+<ul>
+<li>Whisper: small · medium · large-v3-turbo는 풀 파인튜닝까지 여유 있게 된다. large-v3(1.55B)도 그래디언트 체크포인팅을 켜면 풀 파인튜닝이 된다. Ampere 세대라 BF16을 쓴다.</li>
+<li>LLM: 7B~14B LoRA, 32B QLoRA까지 가능하다. 7B 풀 파인튜닝(112GB 이상)과 70B급은 안 된다.</li>
+<li>24GB 소비자용 GPU(RTX 3090 · 4090)로도 Whisper medium 풀 파인튜닝과 7B QLoRA까지 해 볼 수 있다.</li>
+</ul>
+<p><b>데이터</b>: 질문-답변 형식의 지시 데이터. 양보다 질이 중요해서 잘 만든 수백~수천 건으로도 효과가 난다. <b>도구</b>: Hugging Face Transformers + PEFT + TRL, 또는 Unsloth, LLaMA-Factory.</p>
+</div>
+</div>
+
+<h2 id="s5">5. Whisper 파인튜닝</h2>
+<div class="panel"><p class="qa"><span>Q6.</span>STT 위스퍼는 훈련이 가능한가? 어떻게 하나?</p><div class="ans">
+<p>가능하다. 가중치가 MIT 라이선스로 공개돼 있어 파인튜닝해서 상업적으로 써도 된다. 처음부터 사전학습하는 게 아니라 공개 모델에 내 데이터를 추가로 학습시키는 방식이다.</p>
+<ul>
+<li><b>small(244M)</b>: 16GB GPU 한 장으로 풀 파인튜닝. 첫 실험용</li>
+<li><b>medium(769M)</b>: 24GB면 풀 파인튜닝</li>
+<li><b>large-v3(1.55B)</b>: 풀 파인튜닝은 40GB 이상, LoRA면 24GB</li>
+<li><b>large-v3-turbo(809M)</b>: 디코더를 4층으로 줄인 버전이라 학습과 추론 모두 가볍다</li>
+</ul>
+<p>Whisper는 오디오를 로그 멜 스펙트로그램으로 바꿔 인코더에 넣고, 디코더가 글자 토큰을 하나씩 만든다. 학습할 때는 디코더 출력을 정답 토큰과 비교하는데, 길이를 맞추려 채운 패딩은 라벨 마스킹(-100)으로 채점에서 뺀다.</p></div>
+<div class="fig"><svg viewBox="0 0 680 324" role="img" aria-label="Whisper 처리 흐름과 학습 때 패딩 라벨을 -100으로 빼는 과정">
+<defs><marker id="m7" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="20" y="20" width="196" height="60" rx="8" stroke-width="0.5"/><text class="th" x="118" y="40" text-anchor="middle" dominant-baseline="central">오디오</text><text class="ts" x="118" y="60" text-anchor="middle" dominant-baseline="central">8kHz 전화 · 16kHz</text></g>
+<g class="c-gray"><rect x="242" y="20" width="196" height="60" rx="8" stroke-width="0.5"/><text class="th" x="340" y="40" text-anchor="middle" dominant-baseline="central">16kHz · 30초 이하</text><text class="ts" x="340" y="60" text-anchor="middle" dominant-baseline="central">리샘플링 · 자르기</text></g>
+<g class="c-amber"><rect x="464" y="20" width="196" height="60" rx="8" stroke-width="0.5"/><text class="th" x="562" y="40" text-anchor="middle" dominant-baseline="central">로그 멜 스펙트로그램</text><text class="ts" x="562" y="60" text-anchor="middle" dominant-baseline="central">80(128)칸 × 3000프레임</text></g>
+<g class="c-teal"><rect x="464" y="118" width="196" height="60" rx="8" stroke-width="0.5"/><text class="th" x="562" y="138" text-anchor="middle" dominant-baseline="central">인코더</text><text class="ts" x="562" y="158" text-anchor="middle" dominant-baseline="central">소리 전체를 이해</text></g>
+<g class="c-purple"><rect x="242" y="118" width="196" height="60" rx="8" stroke-width="0.5"/><text class="th" x="340" y="138" text-anchor="middle" dominant-baseline="central">디코더</text><text class="ts" x="340" y="158" text-anchor="middle" dominant-baseline="central">토큰 하나씩 생성 · KV 캐시</text></g>
+<g class="c-gray"><rect x="20" y="118" width="196" height="60" rx="8" stroke-width="0.5"/><text class="th" x="118" y="138" text-anchor="middle" dominant-baseline="central">텍스트</text><text class="ts" x="118" y="158" text-anchor="middle" dominant-baseline="central">"카드 번호는 …"</text></g>
+<line class="arr" x1="220" y1="50" x2="238" y2="50" marker-end="url(#m7)"/><line class="arr" x1="442" y1="50" x2="460" y2="50" marker-end="url(#m7)"/>
+<line class="arr" x1="562" y1="84" x2="562" y2="114" marker-end="url(#m7)"/>
+<line class="arr" x1="460" y1="148" x2="442" y2="148" marker-end="url(#m7)"/><line class="arr" x1="238" y1="148" x2="220" y2="148" marker-end="url(#m7)"/>
+<text class="th" x="20" y="214" dominant-baseline="central">학습할 때: 디코더 출력을 정답 토큰과 비교 (라벨 마스킹)</text>
+<g class="c-teal"><rect x="20" y="230" width="74" height="32" rx="6" stroke-width="0.5"/><text class="th" x="57" y="246" text-anchor="middle" dominant-baseline="central">카드</text></g>
+<g class="c-teal"><rect x="104" y="230" width="74" height="32" rx="6" stroke-width="0.5"/><text class="th" x="141" y="246" text-anchor="middle" dominant-baseline="central">번호</text></g>
+<g class="c-teal"><rect x="188" y="230" width="74" height="32" rx="6" stroke-width="0.5"/><text class="th" x="225" y="246" text-anchor="middle" dominant-baseline="central">는</text></g>
+<g class="c-teal"><rect x="272" y="230" width="74" height="32" rx="6" stroke-width="0.5"/><text class="th" x="309" y="246" text-anchor="middle" dominant-baseline="central">분실</text></g>
+<g class="c-teal"><rect x="356" y="230" width="74" height="32" rx="6" stroke-width="0.5"/><text class="th" x="393" y="246" text-anchor="middle" dominant-baseline="central">&lt;끝&gt;</text></g>
+<g class="c-gray"><rect x="440" y="230" width="74" height="32" rx="6" stroke-width="0.5" stroke-dasharray="4 3"/><text class="th" x="477" y="246" text-anchor="middle" dominant-baseline="central">패딩</text></g>
+<g class="c-gray"><rect x="524" y="230" width="74" height="32" rx="6" stroke-width="0.5" stroke-dasharray="4 3"/><text class="th" x="561" y="246" text-anchor="middle" dominant-baseline="central">패딩</text></g>
+<text class="ts" x="57" y="278" text-anchor="middle" dominant-baseline="central">채점</text><text class="ts" x="141" y="278" text-anchor="middle" dominant-baseline="central">채점</text><text class="ts" x="225" y="278" text-anchor="middle" dominant-baseline="central">채점</text><text class="ts" x="309" y="278" text-anchor="middle" dominant-baseline="central">채점</text><text class="ts" x="393" y="278" text-anchor="middle" dominant-baseline="central">채점</text>
+<text class="ts" x="477" y="278" text-anchor="middle" dominant-baseline="central" style="fill:var(--co-s)">-100 → 무시</text><text class="ts" x="561" y="278" text-anchor="middle" dominant-baseline="central" style="fill:var(--co-s)">-100 → 무시</text>
+<text class="ts" x="20" y="306" dominant-baseline="central">한 배치의 문장 길이를 맞추려 채운 패딩은 -100으로 바꿔 손실 계산에서 뺀다</text>
+</svg></div>
+<p class="figcap">그림 7. Whisper도 디코더가 토큰을 하나씩 만드는 트랜스포머라 KV 캐시를 쓴다. 학습 데이터는 반드시 30초 이하 구간과 그 구간의 전사 쌍이어야 한다</p>
+<div class="ans">
+<p><b>순서</b></p>
+<ul>
+<li><b>데이터 준비</b>(시간이 가장 많이 드는 단계): CSV를 <code>path,text</code> 두 컬럼으로 만들고 학습용 · 평가용을 따로 둔다. 오디오는 30초 이하로 자른다. 전사 규칙(숫자를 "3만원"으로 쓸지 "삼만 원"으로 쓸지, 간투사 포함 여부)을 하나로 통일한다. 규칙이 섞이면 모델도 섞여서 배운다.</li>
+<li><b>환경</b>: <code>pip install torch transformers accelerate evaluate jiwer librosa soundfile pandas datasets</code>. 첫 실험은 whisper-small로, 메모리가 부족하면 배치를 줄이고 누적 횟수(accum)를 늘린다.</li>
+<li><b>실행</b>: <a href="train_whisper.py">train_whisper.py</a>는 학습 전에 베이스라인 CER을 먼저 출력한다. 학습이 끝난 뒤 그 숫자보다 내려가야 의미가 있다.</li>
+<li><b>결과 판단</b>: 평가 CER은 내려가는데 일반 발화가 나빠졌다면 망각이다(일반 데이터를 섞어 재학습). 학습 loss는 내려가는데 평가 CER이 오르면 과적합이다(step 수를 줄임).</li>
+<li><b>배포</b>: faster-whisper(CTranslate2)로 변환해서 쓴다.</li>
+</ul>
+<pre><code>python train_whisper.py --train train.csv --eval eval.csv --model openai/whisper-small --out ./whisper-ko
+
+ct2-transformers-converter --model ./whisper-ko --output_dir whisper-ko-ct2 \
+  --copy_files tokenizer.json preprocessor_config.json --quantization float16</code></pre>
+<p><b>실무에서 주의할 점</b></p>
+<ul>
+<li><b>평가는 CER로</b>: 한국어는 띄어쓰기 때문에 WER이 왜곡된다.</li>
+<li><b>망각</b>: 좁은 도메인 데이터로만 학습하면 일반 발화 인식률이 떨어진다. 일반 데이터를 섞는다.</li>
+<li><b>환각</b>: 무음 · 잡음 구간에서 없는 문장을 지어내는 문제는 파인튜닝만으로 잘 안 고쳐진다. VAD로 앞단에서 거른다.</li>
+<li><b>용어만 문제라면 학습 전에</b> <code>initial_prompt</code>에 전문 용어를 넣어 본다. 비용이 0이다.</li>
+<li><b>8kHz 전화 녹취</b>는 Whisper 학습 데이터와 특성이 달라 성능이 떨어진다. 콜센터용이면 8kHz 데이터로 파인튜닝하는 효과가 가장 크다.</li>
+<li><b>GPU 서버에서 돌릴 때</b>: 운영 · 시연용 서버라면 학습이 GPU를 거의 독점하므로 야간 · 주말에 돌리거나 전용으로 뺀다. <code>nvidia-smi</code>로 메모리 · 드라이버 · CUDA 버전을 확인하고, 처음엔 짧게 돌리며 <code>nvidia-smi -l 5</code>로 온도와 전력을 지켜본다. 기존 서비스와 환경이 섞이지 않게 가상환경이나 컨테이너로 분리한다.</li>
+</ul>
+<p>처음부터 100시간 전체 + large로 돌렸다가 하루 뒤에 설정 실수를 발견하는 게 가장 흔한 시간 낭비다. <b>small + 몇 시간 분량으로 끝까지 도는지 → 베이스라인 대비 CER이 내려가는지 → 전체 데이터와 large</b> 순서로 간다.</p>
+</div>
+</div>
+
+<h2 id="s6">6. 100시간 속기록으로 학습 데이터 만들기</h2>
+<div class="panel"><p class="qa"><span>Q7.</span>실제 녹취 100시간과 속기록을 파인튜닝 데이터로 쓰려면?</p><div class="ans">
+<p>핵심 문제는 <b>녹취는 길고 속기록은 시간 정보 없이 통으로 되어 있다</b>는 점이다. Whisper는 30초 이하 구간과 그 구간의 텍스트 쌍이 필요하니, 일의 대부분은 <b>속기록 문장을 오디오 시간에 맞춰 붙이고(강제 정렬) 자르는 것</b>이다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 246" role="img" aria-label="속기록 정리부터 파일 단위 분할까지 학습 데이터 만드는 6단계">
+<defs><marker id="m8" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-gray"><rect x="20" y="20" width="196" height="64" rx="8" stroke-width="0.5"/><text class="th" x="118" y="42" text-anchor="middle" dominant-baseline="central">① 속기록 정리</text><text class="ts" x="118" y="64" text-anchor="middle" dominant-baseline="central">화자 표시 · 주석 제거</text></g>
+<g class="c-gray"><rect x="242" y="20" width="196" height="64" rx="8" stroke-width="0.5"/><text class="th" x="340" y="42" text-anchor="middle" dominant-baseline="central">② Whisper로 인식</text><text class="ts" x="340" y="64" text-anchor="middle" dominant-baseline="central">타임스탬프 붙은 결과</text></g>
+<g class="c-amber"><rect x="464" y="20" width="196" height="64" rx="8" stroke-width="0.5"/><text class="th" x="562" y="42" text-anchor="middle" dominant-baseline="central">③ 글자 단위 정렬</text><text class="ts" x="562" y="64" text-anchor="middle" dominant-baseline="central">인식 결과 ↔ 속기록</text></g>
+<g class="c-gray"><rect x="20" y="136" width="196" height="64" rx="8" stroke-width="0.5"/><text class="th" x="118" y="158" text-anchor="middle" dominant-baseline="central">④ VAD 쉼에서 자르기</text><text class="ts" x="118" y="180" text-anchor="middle" dominant-baseline="central">30초 이하 구간</text></g>
+<g class="c-coral"><rect x="242" y="136" width="196" height="64" rx="8" stroke-width="0.5"/><text class="th" x="340" y="158" text-anchor="middle" dominant-baseline="central">⑤ CER 필터</text><text class="ts" x="340" y="180" text-anchor="middle" dominant-baseline="central">어긋난 구간 버림</text></g>
+<g class="c-teal"><rect x="464" y="136" width="196" height="64" rx="8" stroke-width="0.5"/><text class="th" x="562" y="158" text-anchor="middle" dominant-baseline="central">⑥ 녹취 파일 단위 분할</text><text class="ts" x="562" y="180" text-anchor="middle" dominant-baseline="central">학습 90h · 평가 5~10h</text></g>
+<line class="arr" x1="220" y1="52" x2="238" y2="52" marker-end="url(#m8)"/><line class="arr" x1="442" y1="52" x2="460" y2="52" marker-end="url(#m8)"/>
+<path class="arr" d="M562 88 V110 H118 V132" marker-end="url(#m8)"/>
+<line class="arr" x1="220" y1="168" x2="238" y2="168" marker-end="url(#m8)"/><line class="arr" x1="442" y1="168" x2="460" y2="168" marker-end="url(#m8)"/>
+<text class="ts" x="20" y="226" dominant-baseline="central">100시간 → 정상이라면 70~85시간이 남는다 · 결과물은 path,text CSV</text>
+</svg></div>
+<p class="figcap">그림 8. 인식이 틀려도 대부분의 글자는 맞기 때문에, Whisper 인식 결과를 정렬의 기준점으로 쓸 수 있다</p>
+<div class="ans">
+<ul>
+<li><b>속기록 상태부터 확인</b>: 문장별 타임스탬프가 있으면 그 시간대로 자르면 되니 ②~③은 건너뛴다. 그리고 <b>속기록은 녹취를 그대로 받아 적은 글이 아니다</b>. 간투사를 빼고, 문법을 다듬고, "(웃음)" 같은 주석을 넣는 경우가 많다. 그대로 학습하면 모델이 "다듬어서 받아쓰기"를 배운다. 원하는 방향인지 먼저 정한다.</li>
+<li><b>텍스트 정리</b>: 화자 표시 · 주석 · 머리말을 지우고 숫자 표기 · 간투사 처리 같은 전사 규칙을 통일한다.</li>
+<li><b>정렬</b>: Whisper 인식 결과와 속기록을 글자 단위로 대조(difflib 같은 편집거리 정렬)해 속기록 글자마다 시간을 매핑하고, VAD로 찾은 쉼에서 자른다. WhisperX(한국어 wav2vec2 정렬 모델 지원)를 쓰는 방법도 있다.</li>
+<li><b>스테레오 녹취</b>(상담원 · 고객 채널 분리)라면 채널부터 나눈다. 겹침 발화가 사라져 정렬이 훨씬 쉬워진다.</li>
+<li><b>품질 필터링</b>: 구간별로 원본 Whisper 결과와 속기록의 CER을 계산해 너무 높은 구간(예: 50% 초과)은 버린다. 대부분 정렬이 틀어진 구간이다. 1초 미만 · 빈 텍스트 구간도 지운다.</li>
+<li><b>분할</b>: 구간이 아니라 <b>녹취 파일(통화) 단위로</b> 나눈다. 같은 통화의 구간이 양쪽에 들어가면 화자와 내용이 겹쳐 평가 점수가 실제보다 좋게 나온다. 흔한 실수다.</li>
+<li><b>학습</b>: 100시간이면 도메인 적응에 충분한 양이다. medium 풀 파인튜닝이나 large-v3-turbo + LoRA가 적당하다.</li>
+</ul>
+<p><b>주의</b>: 실제 고객 녹취는 개인정보 덩어리다. 학습 목적의 이용이 수집 동의 범위에 들어가는지, 비식별화가 필요한지 고객사와 먼저 확인한다. 기술보다 이쪽에서 막히는 경우가 많다.</p>
+</div>
+</div>
+
+<h2 id="s7">7. 개인정보 마스킹</h2>
+<div class="panel"><p class="qa"><span>Q8.</span>Whisper에서 텍스트 마스킹이 가능한가?</p><div class="ans">
+<p>Whisper 자체에는 마스킹 기능이 없다. 카드번호 · 전화번호 · 이름을 가리는 개인정보 마스킹은 <b>STT 결과에 후처리 단계를 붙여서</b> 구현한다.</p>
+<ul>
+<li><b>정규화(ITN)</b>: "공일공 일이삼사"를 "010 1234"로 바꾼다. Whisper는 숫자를 숫자로도 한글로도 쓰기 때문에, 이 단계 없이 정규식을 걸면 놓치는 게 많다. 한국어 마스킹에서 가장 까다로운 부분이다.</li>
+<li><b>패턴 탐지</b>: 카드번호 · 계좌 · 주민번호 · 전화번호처럼 형식이 정해진 건 정규식으로 잡는다.</li>
+<li><b>NER 탐지</b>: 이름 · 주소처럼 형식이 없는 건 한국어 NER 모델(KoELECTRA 계열 등)이나 LLM으로 찾는다.</li>
+<li><b>음성 마스킹</b>: faster-whisper 등에서 <code>word_timestamps=True</code>를 켜면 단어마다 시작 · 끝 시간이 나온다. 그 구간을 묵음이나 삐 소리로 덮는다. 타임스탬프가 수백 ms씩 어긋날 수 있으니 앞뒤로 여유를 둔다.</li>
+</ul>
+</div></div>
+
+<div class="panel"><p class="qa"><span>Q9.</span>파인튜닝에 마스킹 기능을 넣을 수는 없나?</p><div class="ans">
+<p>가능하다. 다만 가린 결과(****)를 바로 출력하게 하는 대신, <b>개인정보 부분을 태그로 감싸서 출력하도록 학습</b>시키는 게 낫다.</p>
+<pre><code>정답 전사(학습 데이터): 카드번호는 [[1234 5678 9012 3456]] 이고요
+모델 출력:             카드번호는 [[1234 5678 9012 3456]] 이고요
+후처리 결과:           카드번호는 **** 이고요</code></pre>
+<p>원문이 남아서 디버깅과 감사가 되고, 마스킹 규칙(전체를 가릴지, 뒤 4자리만 남길지)도 재학습 없이 후처리에서 바꿀 수 있다. 가린 결과를 바로 출력하게 학습시키면, 모델이 놓쳐도 알 방법이 없고 규칙이 바뀔 때마다 재학습해야 한다. 금융 · 공공 고객사라면 "왜 이게 가려졌고 저건 안 가려졌나"를 설명할 수 있어야 한다.</p>
+</div>
+<div class="fig"><svg viewBox="0 0 680 262" role="img" aria-label="인식과 마스킹을 분리한 권장 구조와 태그 출력 파인튜닝에 정규식 안전망을 더한 구조">
+<defs><marker id="m9" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g class="c-teal"><text class="th" x="11" y="14" dominant-baseline="central">기본 구조 · 인식과 마스킹을 분리</text></g>
+<g class="c-gray"><rect x="11" y="30" width="148" height="64" rx="8" stroke-width="0.5"/><text class="th" x="85" y="52" text-anchor="middle" dominant-baseline="central">Whisper 인식</text><text class="ts" x="85" y="74" text-anchor="middle" dominant-baseline="central">원문 + 단어 시간</text></g>
+<g class="c-gray"><rect x="181" y="30" width="148" height="64" rx="8" stroke-width="0.5"/><text class="th" x="255" y="52" text-anchor="middle" dominant-baseline="central">ITN 정규화</text><text class="ts" x="255" y="74" text-anchor="middle" dominant-baseline="central">공일공 → 010</text></g>
+<g class="c-amber"><rect x="351" y="30" width="148" height="64" rx="8" stroke-width="0.5"/><text class="th" x="425" y="52" text-anchor="middle" dominant-baseline="central">탐지</text><text class="ts" x="425" y="74" text-anchor="middle" dominant-baseline="central">정규식 + NER</text></g>
+<g class="c-teal"><rect x="521" y="30" width="148" height="64" rx="8" stroke-width="0.5"/><text class="th" x="595" y="52" text-anchor="middle" dominant-baseline="central">치환</text><text class="ts" x="595" y="74" text-anchor="middle" dominant-baseline="central">카드번호는 ****</text></g>
+<line class="arr" x1="162" y1="62" x2="178" y2="62" marker-end="url(#m9)"/><line class="arr" x1="332" y1="62" x2="348" y2="62" marker-end="url(#m9)"/><line class="arr" x1="502" y1="62" x2="518" y2="62" marker-end="url(#m9)"/>
+<g class="c-purple"><text class="th" x="11" y="134" dominant-baseline="central">파인튜닝을 쓴다면 · 태그 출력 + 안전망</text></g>
+<g class="c-purple"><rect x="11" y="150" width="148" height="64" rx="8" stroke-width="0.5"/><text class="th" x="85" y="172" text-anchor="middle" dominant-baseline="central">파인튜닝 Whisper</text><text class="ts" x="85" y="194" text-anchor="middle" dominant-baseline="central">[[1234 5678 …]]</text></g>
+<g class="c-gray"><rect x="181" y="150" width="148" height="64" rx="8" stroke-width="0.5"/><text class="th" x="255" y="172" text-anchor="middle" dominant-baseline="central">태그 → ****</text><text class="ts" x="255" y="194" text-anchor="middle" dominant-baseline="central">규칙은 후처리에서</text></g>
+<g class="c-amber"><rect x="351" y="150" width="148" height="64" rx="8" stroke-width="0.5"/><text class="th" x="425" y="172" text-anchor="middle" dominant-baseline="central">정규식 한 번 더</text><text class="ts" x="425" y="194" text-anchor="middle" dominant-baseline="central">모델이 놓친 것</text></g>
+<g class="c-teal"><rect x="521" y="150" width="148" height="64" rx="8" stroke-width="0.5"/><text class="th" x="595" y="172" text-anchor="middle" dominant-baseline="central">재현율 측정</text><text class="ts" x="595" y="194" text-anchor="middle" dominant-baseline="central">놓친 비율 따로</text></g>
+<line class="arr" x1="162" y1="182" x2="178" y2="182" marker-end="url(#m9)"/><line class="arr" x1="332" y1="182" x2="348" y2="182" marker-end="url(#m9)"/><line class="arr" x1="502" y1="182" x2="518" y2="182" marker-end="url(#m9)"/>
+<text class="ts" x="11" y="244" dominant-baseline="central">원문이 남아 디버깅 · 감사가 되고, 마스킹 규칙은 재학습 없이 바꿀 수 있다</text>
+</svg></div>
+<p class="figcap">그림 9. 어느 쪽이든 마지막에 정규식 안전망을 둔다. 모델이 놓친 카드번호를 정규식이 잡는다</p>
+<div class="ans">
+<ul>
+<li><b>데이터 라벨링</b>: 기존 전사에 정규식과 NER을 돌려 <code>[[ ]]</code> 태그를 자동으로 붙이고 사람이 검수한다. 태그 누락이 섞이면 모델이 "가끔은 안 감싸도 된다"고 배우니 검수가 핵심이다.</li>
+<li><b>학습</b>: 앞의 스크립트를 그대로 쓴다. CSV의 <code>text</code>에 태그가 들어갈 뿐이다. <code>[[ ]]</code>는 일반 문자라 토크나이저를 고칠 필요가 없다(<code>&lt;pii&gt;</code> 같은 스페셜 토큰을 추가하면 디코딩의 <code>skip_special_tokens=True</code>에 지워져 번거롭다).</li>
+<li><b>후처리</b>: <code>re.sub(r"\[\[.*?\]\]", "****", text)</code></li>
+<li><b>합성 데이터</b>: 개인정보가 들어간 실제 녹취는 학습에 쓰기 어렵다. 가짜 카드번호 · 이름 · 주소로 문장을 만들고 TTS로 음성을 합성해 쓴다. 한국어 TTS를 직접 다루는 입장에서는 유리하다. 단, 합성음만으로 학습하면 실제 통화 음질에서 성능이 떨어지니 실제 녹취와 섞는다.</li>
+<li><b>평가 지표를 따로</b>: CER이 좋아도 개인정보를 놓치면 사고다. "태그해야 할 구간 중 몇 %를 태그했나"(재현율)를 따로 잰다. 마스킹은 정밀도보다 재현율이 중요하다.</li>
+<li><b>부수 효과</b>: 학습 데이터의 숫자를 "1234"처럼 아라비아 숫자로 통일해 두면 모델 출력도 그렇게 바뀌어 ITN 문제가 상당 부분 줄어든다. 파인튜닝의 실질적인 이득은 이쪽이 더 클 수 있다.</li>
+</ul></div>
+</div>
+
+<h2 id="s8">8. 핵심 정리와 공부 순서</h2>
+<div class="panel"><p class="ptitle">핵심 정리</p><ul class="sum">
+<li>LLM 인프라 규모 = 모델 크기 × 동시 사용자 수 × 컨텍스트 길이. 병목은 대개 연산이 아니라 GPU 메모리다</li>
+<li>KV 캐시는 계산을 메모리로 바꾸는 메모이제이션이다. 그래디언트 체크포인팅은 반대로 메모리를 계산으로 바꾼다</li>
+<li>학습 = 순전파 → 손실 → 역전파 → 경사하강의 반복. 사전학습과 파인튜닝은 출발점과 데이터 규모만 다르다</li>
+<li>풀 파인튜닝은 파라미터당 약 16바이트(절반이 Adam 상태). LoRA · QLoRA는 학습 대상을 줄여 GPU 1장으로 가능하게 한다</li>
+<li>Whisper 파인튜닝의 성패는 데이터(30초 이하 정렬 · 전사 규칙 통일 · 파일 단위 분할)와 베이스라인 대비 CER에서 갈린다</li>
+<li>개인정보 마스킹은 인식과 분리하고, 파인튜닝은 태그 출력 + 정규식 안전망 + 재현율 측정으로 쓴다</li>
+</ul></div>
+<div class="panel"><p class="ptitle">냉정한 조언 · 공부 순서</p><div class="ans">
+<p>이 페이지의 개념 없이 스크립트나 데이터 준비만 따라가면 "돌리긴 했는데 왜 안 되는지 모르는" 상태가 된다. 손실 · 경사하강법 · 역전파 · 학습률 · 과적합을 먼저 잡고 → 어텐션(Q · K · V) → KV 캐시 → 학습 시 메모리 구성(기울기 · 옵티마이저 상태) 순서로 가면, 그림 6의 메모리 수치를 직접 계산할 수 있게 된다. 스크립트에서는 코드보다 collator에서 왜 -100으로 바꾸는지, 왜 CER을 쓰는지 같은 "이유" 쪽을 짚어 보는 게 남는다.</p>
+<ul>
+<li>3Blue1Brown 신경망 시리즈(유튜브): 직관을 잡는 데 좋다</li>
+<li>Andrej Karpathy "Neural Networks: Zero to Hero": 역전파를 직접 코드로 짜 본다. 시간이 들지만 이 페이지의 내용이 전부 연결된다</li>
+</ul>
+</div></div>
+<footer><a href="../">← dev-study 목차</a> · <a href="glossary.html">용어 사전</a> · <a href="train_whisper.py">학습 스크립트</a> · 참고: Vaswani et al., "Attention Is All You Need" (2017) · Radford et al., "Robust Speech Recognition via Large-Scale Weak Supervision" (Whisper, 2022) · Hu et al., "LoRA" (2021) · Dettmers et al., "QLoRA" (2023) · Kwon et al., "Efficient Memory Management for LLM Serving with PagedAttention" (2023) · Ainslie et al., "GQA" (2023) · Qwen2.5 Technical Report (2024) · Hugging Face, "Fine-Tune Whisper For Multilingual ASR" · Claude와 나눈 질문 · 답을 바탕으로 정리</footer>
+</main>
+<script src="glossary-link.js"></script>
+</body>
+</html>
